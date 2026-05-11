@@ -481,7 +481,7 @@ function BuilderWizard() {
                 size="sm"
                 className="mt-3 h-8 rounded-lg text-[12px]"
                 onClick={() =>
-                  navigate({ to: "/solutions/$id/contratar", params: { id: solution.id } })
+                  hireImplementador()
                 }
               >
                 Contratar implementador →
