@@ -279,6 +279,26 @@ function BuilderWizard() {
         <p className="mt-1 text-[13px] text-muted-foreground">{solution.title}</p>
       </div>
 
+      {resumeOffer && (
+        <div className="mt-6 rounded-[12px] border border-border bg-muted/40 p-4">
+          <h3 className="text-[14px] font-semibold">Tenés una implementación en curso</h3>
+          <p className="mt-1 text-[12px] text-muted-foreground">
+            Quedaste en el paso {resumeOffer.step} de 5. ¿Querés continuarla?
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              className="h-8 rounded-lg bg-foreground text-background hover:bg-foreground/90 text-[12px]"
+              onClick={resumeSession}
+            >
+              Continuar donde lo dejé
+            </Button>
+            <Button variant="outline" className="h-8 rounded-lg text-[12px]" onClick={startOver}>
+              Empezar de nuevo
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Stepper */}
       <div className="mt-6">
         <div className="flex gap-1.5">
