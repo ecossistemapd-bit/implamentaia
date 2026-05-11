@@ -99,7 +99,7 @@ function BuilderWizard() {
     return true;
   }, [step, builderQuestions, answers, stack, generatedPrompt, generatingPrompt]);
 
-  const persist = async (patch: Record<string, unknown>) => {
+  const persist = async (patch: Parameters<ReturnType<typeof supabase.from<"builder_sessions">>["update"]>[0]) => {
     if (!sessionId) return;
     await supabase.from("builder_sessions").update(patch).eq("id", sessionId);
   };
