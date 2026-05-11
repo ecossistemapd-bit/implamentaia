@@ -123,15 +123,15 @@ function ContratarPage() {
       <main className="mx-auto grid max-w-[1000px] gap-10 px-6 py-10 lg:grid-cols-[55fr_45fr]">
         {/* Left column */}
         <section className="order-2 lg:order-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
             Implementación profesional
           </p>
-          <h1 className="mt-2 text-[2rem] font-bold leading-[1.2] tracking-tight">
+          <h1 className="mt-2 text-[2rem] font-bold leading-[1.2] tracking-tight text-gray-900">
             Conectate con tu
             <br />
             Implementador Verificado
           </h1>
-          <p className="mt-3 max-w-[460px] text-[14px] leading-relaxed text-[#555]">
+          <p className="mt-3 max-w-[460px] text-sm leading-relaxed text-gray-700">
             Asignamos un especialista que configura esta solución en tu empresa
             de principio a fin. Vos solo acompañás el proceso.
           </p>
