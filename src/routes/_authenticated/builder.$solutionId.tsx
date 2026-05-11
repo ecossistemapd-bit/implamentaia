@@ -149,11 +149,59 @@ function BuilderWizard() {
 
   const goNext = async () => {
     const nextStep = Math.min(step + 1, 5);
-    if (step === 1) await persist({ current_step: nextStep, answers: { ...answers, _step1: answers } });
-    if (step === 2) await persist({ current_step: nextStep, answers: { step1: answers, step2: stack } });
-    if (step === 3) await persist({ current_step: nextStep, generated_prompt: generatedPrompt });
-    if (step === 4) await persist({ current_step: nextStep });
+    const baseAnswers = { step1: answers, step2: stack, checklist: checks };
+    if (step === 3) {
+      await persist({ current_step: nextStep, answers: baseAnswers, generated_prompt: generatedPrompt });
+    } else {
+      await persist({ current_step: nextStep, answers: baseAnswers });
+    }
     setStep(nextStep);
+  };
+
+  const hireImplementador = async () => {
+    if (!sessionId || !user || !solution) {
+      navigate({ to: "/solutions/$id/contratar", params: { id: solutionId } });
+      return;
+    }
+    await supabase
+      .from("builder_sessions")
+      .update({ status: "paused", answers: { step1: answers, step2: stack, checklist: checks } })
+      .eq("id", sessionId);
+    await supabase
+      .from("builder_projects")
+      .insert({
+        user_id: user.id,
+        source_solution_id: solution.id,
+        title: solution.title,
+        status: "pending",
+        type: "implementador",
+        builder_session_id: sessionId,
+        inputs: { diagnostico: answers, stack },
+      } as never);
+    try { localStorage.setItem(lsKey, sessionId); } catch {}
+    navigate({ to: "/solutions/$id/contratar", params: { id: solutionId } });
+  };
+
+  const resumeSession = () => {
+    if (!resumeOffer) return;
+    setSessionId(resumeOffer.sessionId);
+    setStep(resumeOffer.step);
+    setAnswers(resumeOffer.answers);
+    setStack(resumeOffer.stack);
+    if (resumeOffer.checklist.length) setChecks(resumeOffer.checklist);
+    if (resumeOffer.generatedPrompt) setGeneratedPrompt(resumeOffer.generatedPrompt);
+    supabase
+      .from("builder_sessions")
+      .update({ status: "in_progress" })
+      .eq("id", resumeOffer.sessionId)
+      .then(() => {});
+    setResumeOffer(null);
+  };
+
+  const startOver = async () => {
+    try { localStorage.removeItem(lsKey); } catch {}
+    setResumeOffer(null);
+    await createNewSession();
   };
 
   // Auto-generate prompt when entering step 3
