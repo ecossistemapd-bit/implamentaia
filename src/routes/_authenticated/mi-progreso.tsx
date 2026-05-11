@@ -1,6 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { TrendingUp, BookOpen, Sparkles, Trophy } from "lucide-react";
+import {
+  TrendingUp, BookOpen, Sparkles, Trophy, ArrowRight, FolderKanban, Rocket,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -8,18 +10,37 @@ export const Route = createFileRoute("/_authenticated/mi-progreso")({
   component: MiProgreso,
 });
 
+const STEP_ORDER = ["herramientas", "archivos", "video", "comentarios", "conclusion"] as const;
+const STEP_LABELS: Record<string, string> = {
+  herramientas: "Herramientas",
+  archivos: "Archivos",
+  video: "Video",
+  comentarios: "Comentarios",
+  conclusion: "Conclusión",
+};
+
+const PROJECT_STATUS: Record<string, { label: string; cls: string }> = {
+  pending: { label: "Pendiente", cls: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
+  assigned: { label: "Asignado", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
+  in_progress: { label: "En curso", cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+  completed: { label: "Completado", cls: "bg-teal-500/20 text-teal-400 border-teal-500/30" },
+  generating: { label: "Generando", cls: "bg-slate-500/20 text-slate-400 border-slate-500/30" },
+  ready: { label: "Listo", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
+  error: { label: "Error", cls: "bg-red-500/20 text-red-400 border-red-500/30" },
+};
+
 function MiProgreso() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const { data, isLoading } = useQuery({
     queryKey: ["mi-progreso", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [stepsRes, modulesProgRes, modulesAllRes, projectsRes] = await Promise.all([
-        (supabase as never as typeof supabase)
+      const [stepsRes, modulesProgRes, modulesAllRes, projectsRes, solutionsRes, coursesRes] = await Promise.all([
+        supabase
           .from("solution_steps_progress" as never)
-          .select("solution_id, completed")
-          .eq("user_id", user!.id),
+          .select("solution_id, step, completed"),
         supabase
           .from("user_progress" as never)
           .select("module_id, completed, modules:module_id(course_id)")
@@ -27,21 +48,42 @@ function MiProgreso() {
         supabase.from("modules" as never).select("id, course_id"),
         supabase
           .from("builder_projects")
-          .select("id, status")
-          .eq("user_id", user!.id),
+          .select("id, title, status, created_at, source_solution_id, solutions:source_solution_id(title)")
+          .eq("user_id", user!.id)
+          .order("created_at", { ascending: false }),
+        supabase.from("solutions").select("id, title, slug, icon_name"),
+        supabase.from("courses" as never).select("id, title, thumbnail_url"),
       ]);
 
-      const steps = ((stepsRes as { data: { solution_id: string; completed: boolean }[] | null }).data) ?? [];
-      const completedBySolution: Record<string, number> = {};
+      type Step = { solution_id: string; step: string; completed: boolean };
+      const steps = ((stepsRes as { data: Step[] | null }).data) ?? [];
+      const stepsBySolution: Record<string, Set<string>> = {};
       steps.forEach((s) => {
-        if (s.completed) completedBySolution[s.solution_id] = (completedBySolution[s.solution_id] ?? 0) + 1;
+        if (!s.completed) return;
+        (stepsBySolution[s.solution_id] ??= new Set()).add(s.step);
       });
-      const solutionsStarted = Object.keys(completedBySolution).length;
-      const solutionsCompleted = Object.values(completedBySolution).filter((n) => n >= 5).length;
+      const solutionsList = ((solutionsRes.data ?? []) as Array<{ id: string; title: string; slug: string }>);
+      const solutionsInProgress = Object.entries(stepsBySolution)
+        .map(([sid, set]) => {
+          const sol = solutionsList.find((x) => x.id === sid);
+          if (!sol) return null;
+          const completed = set.size;
+          const nextIdx = STEP_ORDER.findIndex((k) => !set.has(k));
+          return {
+            id: sid,
+            title: sol.title,
+            completed,
+            currentStep: nextIdx === -1 ? "Completado" : STEP_LABELS[STEP_ORDER[nextIdx]],
+          };
+        })
+        .filter((x): x is NonNullable<typeof x> => !!x)
+        .sort((a, b) => b.completed - a.completed);
+
+      const solutionsStarted = solutionsInProgress.length;
+      const solutionsCompleted = solutionsInProgress.filter((s) => s.completed >= 5).length;
 
       const modProg = ((modulesProgRes.data ?? []) as Array<{ module_id: string; completed: boolean; modules: { course_id: string } | null }>);
       const allMods = ((modulesAllRes.data ?? []) as Array<{ id: string; course_id: string }>);
-      const completedCourseSet = new Set<string>();
       const startedCourseSet = new Set<string>();
       const completedByCourse: Record<string, number> = {};
       modProg.forEach((p) => {
@@ -52,9 +94,21 @@ function MiProgreso() {
       });
       const totalByCourse: Record<string, number> = {};
       allMods.forEach((m) => { totalByCourse[m.course_id] = (totalByCourse[m.course_id] ?? 0) + 1; });
+      const completedCourseSet = new Set<string>();
       Object.keys(totalByCourse).forEach((cid) => {
         if (totalByCourse[cid] > 0 && completedByCourse[cid] === totalByCourse[cid]) completedCourseSet.add(cid);
       });
+
+      const coursesList = ((coursesRes.data ?? []) as Array<{ id: string; title: string }>);
+      const coursesInProgress = Array.from(startedCourseSet).map((cid) => {
+        const c = coursesList.find((x) => x.id === cid);
+        return {
+          id: cid,
+          title: c?.title ?? "Curso",
+          done: completedByCourse[cid] ?? 0,
+          total: totalByCourse[cid] ?? 0,
+        };
+      }).sort((a, b) => b.done - a.done);
 
       const projects = projectsRes.data ?? [];
       return {
@@ -64,6 +118,9 @@ function MiProgreso() {
         coursesCompleted: completedCourseSet.size,
         projectsTotal: projects.length,
         projectsActive: projects.filter((p) => p.status !== "completed").length,
+        solutionsInProgress,
+        coursesInProgress,
+        recentProjects: projects.slice(0, 3),
       };
     },
   });
@@ -78,8 +135,10 @@ function MiProgreso() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <header className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Mi Progreso</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h1 className="text-3xl font-bold tracking-tight text-white">
+          Mi <span className="text-teal-400">Progreso</span>
+        </h1>
+        <p className="mt-1 text-sm text-slate-400">
           Un resumen de todo lo que estás aprendiendo e implementando.
         </p>
       </header>
@@ -88,38 +147,180 @@ function MiProgreso() {
         {cards.map((c) => (
           <div
             key={c.label}
-            className="rounded-xl border border-border bg-card p-5 shadow-lg transition duration-200 hover:scale-[1.01] hover:border-primary/50"
+            className="rounded-xl border border-slate-700 bg-slate-800 p-5 transition duration-200 hover:scale-[1.02] hover:border-teal-500/50"
           >
-            <c.icon className="h-5 w-5 text-primary" strokeWidth={1.75} />
-            <div className="mt-3 text-3xl font-bold tracking-tight text-foreground">
+            <c.icon className="h-5 w-5 text-teal-400" strokeWidth={1.75} />
+            <div className="mt-3 text-3xl font-bold tracking-tight text-teal-400">
               {isLoading ? "—" : c.value}
             </div>
-            <div className="mt-1 text-xs text-muted-foreground">{c.label}</div>
+            <div className="mt-1 text-sm text-slate-400">{c.label}</div>
           </div>
         ))}
       </div>
 
-      {!isLoading && (data?.solutionsStarted ?? 0) === 0 && (data?.coursesStarted ?? 0) === 0 && (
-        <div className="mt-10 rounded-xl border border-dashed border-border bg-card/50 p-10 text-center">
-          <p className="text-sm text-muted-foreground">
-            Todavía no empezaste ninguna solución ni curso.
-          </p>
-          <div className="mt-4 flex justify-center gap-2">
-            <Link
-              to="/solutions"
-              className="rounded-lg bg-gradient-to-r from-sky-500 to-teal-500 px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
-            >
-              Explorar soluciones
-            </Link>
-            <Link
-              to="/cursos"
-              className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground"
-            >
-              Ver cursos
-            </Link>
+      {/* Soluciones en progreso */}
+      <Section title="Soluciones en progreso">
+        {!isLoading && (data?.solutionsInProgress.length ?? 0) === 0 ? (
+          <EmptyState
+            icon={Sparkles}
+            text="Todavía no iniciaste ninguna solución"
+            cta="Ver soluciones"
+            onClick={() => navigate({ to: "/solutions" })}
+          />
+        ) : (
+          <div className="space-y-3">
+            {(data?.solutionsInProgress ?? []).map((s) => {
+              const pct = Math.round((s.completed / 5) * 100);
+              return (
+                <div
+                  key={s.id}
+                  className="rounded-xl border border-slate-700 bg-slate-800 p-5 transition hover:border-teal-500/50"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-slate-100">{s.title}</h3>
+                        <span className="rounded-full border border-teal-500/30 bg-teal-500/10 px-2 py-0.5 text-xs text-teal-400">
+                          En: {s.currentStep}
+                        </span>
+                      </div>
+                      <div className="mt-3 flex items-center gap-3">
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-700">
+                          <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="shrink-0 text-xs text-slate-400">{s.completed} de 5 pasos</span>
+                      </div>
+                    </div>
+                    <Link
+                      to="/solutions/$id"
+                      params={{ id: s.id }}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-600 px-4 py-1.5 text-sm text-slate-300 transition hover:border-teal-500 hover:text-teal-400"
+                    >
+                      Continuar <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
-      )}
+        )}
+      </Section>
+
+      {/* Cursos en progreso */}
+      <Section title="Cursos en progreso">
+        {!isLoading && (data?.coursesInProgress.length ?? 0) === 0 ? (
+          <EmptyState
+            icon={BookOpen}
+            text="Todavía no iniciaste ningún curso"
+            cta="Ver cursos"
+            onClick={() => navigate({ to: "/cursos" })}
+          />
+        ) : (
+          <div className="space-y-3">
+            {(data?.coursesInProgress ?? []).map((c) => {
+              const pct = c.total > 0 ? Math.round((c.done / c.total) * 100) : 0;
+              return (
+                <div
+                  key={c.id}
+                  className="rounded-xl border border-slate-700 bg-slate-800 p-5 transition hover:border-teal-500/50"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4 text-teal-400" />
+                        <h3 className="font-semibold text-slate-100">{c.title}</h3>
+                      </div>
+                      <div className="mt-3 flex items-center gap-3">
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-700">
+                          <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="shrink-0 text-xs text-slate-400">{c.done} de {c.total} módulos</span>
+                      </div>
+                    </div>
+                    <Link
+                      to="/cursos"
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-600 px-4 py-1.5 text-sm text-slate-300 transition hover:border-teal-500 hover:text-teal-400"
+                    >
+                      Continuar <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Section>
+
+      {/* Proyectos recientes */}
+      <Section title="Mis proyectos recientes">
+        {!isLoading && (data?.recentProjects.length ?? 0) === 0 ? (
+          <EmptyState
+            icon={FolderKanban}
+            text="Todavía no creaste ningún proyecto"
+            cta="Ir al Builder"
+            onClick={() => navigate({ to: "/solutions" })}
+          />
+        ) : (
+          <div className="space-y-3">
+            {((data?.recentProjects ?? []) as Array<{
+              id: string; title: string; status: string; created_at: string;
+              solutions: { title: string } | null;
+            }>).map((p) => {
+              const meta = PROJECT_STATUS[p.status] ?? PROJECT_STATUS.pending;
+              return (
+                <div
+                  key={p.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-700 bg-slate-800 p-5 transition hover:border-teal-500/50"
+                >
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-slate-100">{p.title}</h3>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                      <span>{p.solutions?.title ?? "Sin solución"}</span>
+                      <span>·</span>
+                      <span>{new Date(p.created_at).toLocaleDateString("es", { day: "2-digit", month: "2-digit", year: "numeric" })}</span>
+                    </div>
+                  </div>
+                  <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${meta.cls}`}>
+                    {meta.label}
+                  </span>
+                  <Link
+                    to="/projects"
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-600 px-4 py-1.5 text-sm text-slate-300 transition hover:border-teal-500 hover:text-teal-400"
+                  >
+                    Ver proyecto <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Section>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mt-10">
+      <h2 className="mb-4 text-lg font-semibold text-white">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function EmptyState({
+  icon: Icon, text, cta, onClick,
+}: { icon: typeof Rocket; text: string; cta: string; onClick: () => void }) {
+  return (
+    <div className="rounded-xl border border-dashed border-slate-700 bg-slate-800/40 p-10 text-center">
+      <Icon className="mx-auto h-8 w-8 text-slate-500" strokeWidth={1.5} />
+      <p className="mt-3 text-sm text-slate-400">{text}</p>
+      <button
+        onClick={onClick}
+        className="mt-4 inline-flex items-center gap-1 rounded-lg border border-teal-500/40 bg-teal-500/10 px-4 py-2 text-sm font-medium text-teal-400 transition hover:bg-teal-500/20"
+      >
+        {cta} <ArrowRight className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }
