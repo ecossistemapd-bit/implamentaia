@@ -34,6 +34,7 @@ export type Database = {
       }
       builder_projects: {
         Row: {
+          builder_session_id: string | null
           created_at: string
           error_message: string | null
           id: string
@@ -42,10 +43,12 @@ export type Database = {
           source_solution_id: string | null
           status: Database["public"]["Enums"]["builder_status"]
           title: string
+          type: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          builder_session_id?: string | null
           created_at?: string
           error_message?: string | null
           id?: string
@@ -54,10 +57,12 @@ export type Database = {
           source_solution_id?: string | null
           status?: Database["public"]["Enums"]["builder_status"]
           title?: string
+          type?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          builder_session_id?: string | null
           created_at?: string
           error_message?: string | null
           id?: string
@@ -66,10 +71,18 @@ export type Database = {
           source_solution_id?: string | null
           status?: Database["public"]["Enums"]["builder_status"]
           title?: string
+          type?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "builder_projects_builder_session_id_fkey"
+            columns: ["builder_session_id"]
+            isOneToOne: false
+            referencedRelation: "builder_sessions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "builder_projects_source_solution_id_fkey"
             columns: ["source_solution_id"]
@@ -265,7 +278,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      builder_status: "generating" | "ready" | "error"
+      builder_status: "generating" | "ready" | "error" | "pending" | "completed"
       solution_category:
         | "ventas"
         | "marketing"
@@ -401,7 +414,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      builder_status: ["generating", "ready", "error"],
+      builder_status: ["generating", "ready", "error", "pending", "completed"],
       solution_category: [
         "ventas",
         "marketing",

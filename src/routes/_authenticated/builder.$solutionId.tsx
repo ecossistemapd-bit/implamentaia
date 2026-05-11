@@ -50,7 +50,17 @@ function BuilderWizard() {
   const [generatingPrompt, setGeneratingPrompt] = useState(false);
   const [copied, setCopied] = useState(false);
   const [checks, setChecks] = useState<boolean[]>([]);
+  const [resumeOffer, setResumeOffer] = useState<null | {
+    sessionId: string;
+    step: number;
+    answers: Record<string, string>;
+    stack: Record<string, string[]>;
+    checklist: boolean[];
+    generatedPrompt: string | null;
+  }>(null);
   const initRef = useRef(false);
+
+  const lsKey = `builder_session_${solutionId}`;
 
   const { data: solution, isLoading } = useQuery({
     queryKey: ["solution-builder", solutionId],
@@ -65,24 +75,55 @@ function BuilderWizard() {
     },
   });
 
-  // Create session on mount
+  const createNewSession = async () => {
+    if (!user || !solution) return;
+    const { data, error } = await supabase
+      .from("builder_sessions")
+      .insert({
+        user_id: user.id,
+        solution_id: solution.id,
+        current_step: 1,
+        answers: {},
+      })
+      .select("id")
+      .single();
+    if (!error && data) {
+      setSessionId(data.id);
+      try { localStorage.setItem(lsKey, data.id); } catch {}
+    }
+  };
+
+  // On mount: try to resume from localStorage, otherwise create new session
   useEffect(() => {
     if (!user || !solution || initRef.current) return;
     initRef.current = true;
     (async () => {
-      const { data, error } = await supabase
-        .from("builder_sessions")
-        .insert({
-          user_id: user.id,
-          solution_id: solution.id,
-          current_step: 1,
-          answers: {},
-        })
-        .select("id")
-        .single();
-      if (!error && data) setSessionId(data.id);
+      let existingId: string | null = null;
+      try { existingId = localStorage.getItem(lsKey); } catch {}
+      if (existingId) {
+        const { data: s } = await supabase
+          .from("builder_sessions")
+          .select("*")
+          .eq("id", existingId)
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (s && (s.status === "in_progress" || s.status === "paused")) {
+          const ans = (s.answers as Record<string, unknown>) ?? {};
+          setResumeOffer({
+            sessionId: s.id,
+            step: s.current_step ?? 1,
+            answers: (ans.step1 as Record<string, string>) ?? {},
+            stack: (ans.step2 as Record<string, string[]>) ?? {},
+            checklist: (ans.checklist as boolean[]) ?? [],
+            generatedPrompt: s.generated_prompt ?? null,
+          });
+          return;
+        }
+        try { localStorage.removeItem(lsKey); } catch {}
+      }
+      await createNewSession();
     })();
-  }, [user, solution]);
+  }, [user, solution]); // eslint-disable-line
 
   // Init checklist
   useEffect(() => {
@@ -108,11 +149,59 @@ function BuilderWizard() {
 
   const goNext = async () => {
     const nextStep = Math.min(step + 1, 5);
-    if (step === 1) await persist({ current_step: nextStep, answers: { ...answers, _step1: answers } });
-    if (step === 2) await persist({ current_step: nextStep, answers: { step1: answers, step2: stack } });
-    if (step === 3) await persist({ current_step: nextStep, generated_prompt: generatedPrompt });
-    if (step === 4) await persist({ current_step: nextStep });
+    const baseAnswers = { step1: answers, step2: stack, checklist: checks };
+    if (step === 3) {
+      await persist({ current_step: nextStep, answers: baseAnswers, generated_prompt: generatedPrompt });
+    } else {
+      await persist({ current_step: nextStep, answers: baseAnswers });
+    }
     setStep(nextStep);
+  };
+
+  const hireImplementador = async () => {
+    if (!sessionId || !user || !solution) {
+      navigate({ to: "/solutions/$id/contratar", params: { id: solutionId } });
+      return;
+    }
+    await supabase
+      .from("builder_sessions")
+      .update({ status: "paused", answers: { step1: answers, step2: stack, checklist: checks } })
+      .eq("id", sessionId);
+    await supabase
+      .from("builder_projects")
+      .insert({
+        user_id: user.id,
+        source_solution_id: solution.id,
+        title: solution.title,
+        status: "pending",
+        type: "implementador",
+        builder_session_id: sessionId,
+        inputs: { diagnostico: answers, stack },
+      } as never);
+    try { localStorage.setItem(lsKey, sessionId); } catch {}
+    navigate({ to: "/solutions/$id/contratar", params: { id: solutionId } });
+  };
+
+  const resumeSession = () => {
+    if (!resumeOffer) return;
+    setSessionId(resumeOffer.sessionId);
+    setStep(resumeOffer.step);
+    setAnswers(resumeOffer.answers);
+    setStack(resumeOffer.stack);
+    if (resumeOffer.checklist.length) setChecks(resumeOffer.checklist);
+    if (resumeOffer.generatedPrompt) setGeneratedPrompt(resumeOffer.generatedPrompt);
+    supabase
+      .from("builder_sessions")
+      .update({ status: "in_progress" })
+      .eq("id", resumeOffer.sessionId)
+      .then(() => {});
+    setResumeOffer(null);
+  };
+
+  const startOver = async () => {
+    try { localStorage.removeItem(lsKey); } catch {}
+    setResumeOffer(null);
+    await createNewSession();
   };
 
   // Auto-generate prompt when entering step 3
@@ -156,9 +245,12 @@ function BuilderWizard() {
             source_solution_id: solution.id,
             title: solution.title,
             status: "ready",
+            type: "diy",
+            builder_session_id: sessionId,
             inputs: { diagnostico: answers, stack },
             output: { plan_md: generatedPrompt ?? "" },
-          });
+          } as never);
+          try { localStorage.removeItem(lsKey); } catch {}
         }
       })();
     }
@@ -186,6 +278,26 @@ function BuilderWizard() {
         <h1 className="text-[1.5rem] font-bold tracking-tight leading-tight">Implementación guiada</h1>
         <p className="mt-1 text-[13px] text-muted-foreground">{solution.title}</p>
       </div>
+
+      {resumeOffer && (
+        <div className="mt-6 rounded-[12px] border border-border bg-muted/40 p-4">
+          <h3 className="text-[14px] font-semibold">Tenés una implementación en curso</h3>
+          <p className="mt-1 text-[12px] text-muted-foreground">
+            Quedaste en el paso {resumeOffer.step} de 5. ¿Querés continuarla?
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              className="h-8 rounded-lg bg-foreground text-background hover:bg-foreground/90 text-[12px]"
+              onClick={resumeSession}
+            >
+              Continuar donde lo dejé
+            </Button>
+            <Button variant="outline" className="h-8 rounded-lg text-[12px]" onClick={startOver}>
+              Empezar de nuevo
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Stepper */}
       <div className="mt-6">
@@ -369,7 +481,7 @@ function BuilderWizard() {
                 size="sm"
                 className="mt-3 h-8 rounded-lg text-[12px]"
                 onClick={() =>
-                  navigate({ to: "/solutions/$id/contratar", params: { id: solution.id } })
+                  hireImplementador()
                 }
               >
                 Contratar implementador →
