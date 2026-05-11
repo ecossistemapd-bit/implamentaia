@@ -112,11 +112,13 @@ function SolutionsList() {
             ))
           : filtered.map((s) => {
               const Icon = getLucideIcon(s.icon_name);
+              const linkProps = builderMode
+                ? { to: "/builder/$solutionId" as const, params: { solutionId: s.id } }
+                : { to: "/solutions/$id" as const, params: { id: s.id } };
               return (
                 <Link
                   key={s.id}
-                  to="/solutions/$id"
-                  params={{ id: s.id }}
+                  {...linkProps}
                   className="group flex min-h-[130px] flex-col rounded-[10px] border border-border bg-card p-4 transition hover:border-foreground"
                 >
                   <div className="flex items-center gap-2">
