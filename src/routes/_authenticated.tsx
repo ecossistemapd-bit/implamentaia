@@ -14,6 +14,7 @@ import {
   FolderKanban,
   BookOpen,
   Settings as SettingsIcon,
+  Settings2,
   LogOut,
   Menu,
   ChevronRight,
@@ -39,15 +40,26 @@ export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
 });
 
-const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, search: undefined as Record<string, string> | undefined, badge: undefined as string | undefined, implOnly: false },
-  { to: "/solutions", label: "Soluciones", icon: Sparkles, search: undefined, badge: undefined, implOnly: false },
-  { to: "/solutions", label: "Builder", icon: Wrench, search: { mode: "builder" }, badge: undefined, implOnly: false },
-  { to: "/cursos", label: "Cursos", icon: BookOpen, search: undefined, badge: "NUEVO", implOnly: false },
-  { to: "/implementador", label: "Panel Impl.", icon: LayoutDashboard, search: undefined, badge: undefined, implOnly: true },
-  { to: "/projects", label: "Mis Proyectos", icon: FolderKanban, search: undefined, badge: undefined, implOnly: false },
-  { to: "/settings", label: "Configuración", icon: SettingsIcon, search: undefined, badge: undefined, implOnly: false },
-] as const;
+type NavItem = {
+  to: "/dashboard" | "/solutions" | "/cursos" | "/implementador" | "/projects" | "/settings" | "/admin";
+  label: string;
+  icon: typeof LayoutDashboard;
+  search?: Record<string, string>;
+  badge?: string;
+  implOnly?: boolean;
+  adminOnly?: boolean;
+};
+
+const NAV: NavItem[] = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/solutions", label: "Soluciones", icon: Sparkles },
+  { to: "/solutions", label: "Builder", icon: Wrench, search: { mode: "builder" } },
+  { to: "/cursos", label: "Cursos", icon: BookOpen, badge: "NUEVO" },
+  { to: "/implementador", label: "Panel Impl.", icon: LayoutDashboard, implOnly: true },
+  { to: "/projects", label: "Mis Proyectos", icon: FolderKanban },
+  { to: "/admin", label: "Admin", icon: Settings2, adminOnly: true },
+  { to: "/settings", label: "Configuración", icon: SettingsIcon },
+];
 
 function AuthenticatedLayout() {
   const { user, loading } = useAuth();
@@ -117,10 +129,10 @@ function MobileTopBar() {
 function NavList() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const search = useRouterState({ select: (s) => s.location.search as Record<string, string> });
-  const { isImplementer } = useRole();
+  const { isImplementer, isAdmin } = useRole();
   return (
     <nav className="flex-1 space-y-0.5 px-2">
-      {NAV.filter((item) => !item.implOnly || isImplementer).map((item) => {
+      {NAV.filter((item) => (!item.implOnly || isImplementer) && (!item.adminOnly || isAdmin)).map((item) => {
         const isBuilder = item.label === "Builder";
         const isSolutions = item.label === "Soluciones";
         const inBuilderMode = pathname.startsWith("/solutions") && search?.mode === "builder";
