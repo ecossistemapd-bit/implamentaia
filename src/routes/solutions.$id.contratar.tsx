@@ -177,12 +177,12 @@ function ContratarPage() {
 
           {/* Incluido */}
           <div className="mt-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#999]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
               Incluido en el servicio
             </p>
             <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               {INCLUDED.map((it) => (
-                <div key={it} className="flex items-start gap-2 text-[13px]">
+                <div key={it} className="flex items-start gap-2 text-sm text-gray-700">
                   <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
                     <Check className="h-2.5 w-2.5" strokeWidth={3} />
                   </span>
