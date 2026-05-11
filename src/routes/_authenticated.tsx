@@ -138,7 +138,12 @@ function NavList() {
             }`}
           >
             <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
-            {item.label}
+            <span>{item.label}</span>
+            {item.badge && (
+              <span className="ml-auto rounded-full bg-black px-1.5 py-0.5 text-[10px] text-white">
+                {item.badge}
+              </span>
+            )}
           </Link>
         );
       })}
