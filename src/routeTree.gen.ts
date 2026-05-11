@@ -18,6 +18,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSolutionsIndexRouteImport } from './routes/_authenticated/solutions.index'
 import { Route as AuthenticatedBuilderIndexRouteImport } from './routes/_authenticated/builder.index'
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
+import { Route as AuthenticatedSolutionsIdRouteImport } from './routes/_authenticated/solutions.$id'
 import { Route as AuthenticatedBuilderIdRouteImport } from './routes/_authenticated/builder.$id'
 
 const LoginRoute = LoginRouteImport.update({
@@ -67,6 +68,12 @@ const AuthenticatedSolutionsSlugRoute =
     path: '/solutions/$slug',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedSolutionsIdRoute =
+  AuthenticatedSolutionsIdRouteImport.update({
+    id: '/solutions/$id',
+    path: '/solutions/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedBuilderIdRoute = AuthenticatedBuilderIdRouteImport.update({
   id: '/builder/$id',
   path: '/builder/$id',
@@ -80,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/builder/': typeof AuthenticatedBuilderIndexRoute
   '/solutions/': typeof AuthenticatedSolutionsIndexRoute
@@ -91,6 +99,7 @@ export interface FileRoutesByTo {
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/builder': typeof AuthenticatedBuilderIndexRoute
   '/solutions': typeof AuthenticatedSolutionsIndexRoute
@@ -104,6 +113,7 @@ export interface FileRoutesById {
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/_authenticated/builder/': typeof AuthenticatedBuilderIndexRoute
   '/_authenticated/solutions/': typeof AuthenticatedSolutionsIndexRoute
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/settings'
     | '/builder/$id'
+    | '/solutions/$id'
     | '/solutions/$slug'
     | '/builder/'
     | '/solutions/'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/settings'
     | '/builder/$id'
+    | '/solutions/$id'
     | '/solutions/$slug'
     | '/builder'
     | '/solutions'
@@ -140,6 +152,7 @@ export interface FileRouteTypes {
     | '/_authenticated/projects'
     | '/_authenticated/settings'
     | '/_authenticated/builder/$id'
+    | '/_authenticated/solutions/$id'
     | '/_authenticated/solutions/$slug'
     | '/_authenticated/builder/'
     | '/_authenticated/solutions/'
@@ -216,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSolutionsSlugRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/solutions/$id': {
+      id: '/_authenticated/solutions/$id'
+      path: '/solutions/$id'
+      fullPath: '/solutions/$id'
+      preLoaderRoute: typeof AuthenticatedSolutionsIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/builder/$id': {
       id: '/_authenticated/builder/$id'
       path: '/builder/$id'
@@ -231,6 +251,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedBuilderIdRoute: typeof AuthenticatedBuilderIdRoute
+  AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRoute
   AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
   AuthenticatedBuilderIndexRoute: typeof AuthenticatedBuilderIndexRoute
   AuthenticatedSolutionsIndexRoute: typeof AuthenticatedSolutionsIndexRoute
@@ -241,6 +262,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedBuilderIdRoute: AuthenticatedBuilderIdRoute,
+  AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRoute,
   AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
   AuthenticatedBuilderIndexRoute: AuthenticatedBuilderIndexRoute,
   AuthenticatedSolutionsIndexRoute: AuthenticatedSolutionsIndexRoute,
