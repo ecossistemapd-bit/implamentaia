@@ -302,6 +302,76 @@ export type Database = {
           },
         ]
       }
+      solution_comments: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number | null
+          solution_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number | null
+          solution_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number | null
+          solution_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solution_comments_solution_id_fkey"
+            columns: ["solution_id"]
+            isOneToOne: false
+            referencedRelation: "solutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solution_steps_progress: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          id: string
+          solution_id: string
+          step: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          id?: string
+          solution_id: string
+          step: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          id?: string
+          solution_id?: string
+          step?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solution_steps_progress_solution_id_fkey"
+            columns: ["solution_id"]
+            isOneToOne: false
+            referencedRelation: "solutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       solutions: {
         Row: {
           builder_questions: Json | null
@@ -318,11 +388,13 @@ export type Database = {
           long_description: string
           n8n_template: string | null
           prompt_template: string | null
+          resources: Json
           roi_estimate: string
           short_description: string
           slug: string
           title: string
           tools_required: string[]
+          video_url: string | null
         }
         Insert: {
           builder_questions?: Json | null
@@ -339,11 +411,13 @@ export type Database = {
           long_description: string
           n8n_template?: string | null
           prompt_template?: string | null
+          resources?: Json
           roi_estimate: string
           short_description: string
           slug: string
           title: string
           tools_required?: string[]
+          video_url?: string | null
         }
         Update: {
           builder_questions?: Json | null
@@ -360,11 +434,13 @@ export type Database = {
           long_description?: string
           n8n_template?: string | null
           prompt_template?: string | null
+          resources?: Json
           roi_estimate?: string
           short_description?: string
           slug?: string
           title?: string
           tools_required?: string[]
+          video_url?: string | null
         }
         Relationships: []
       }

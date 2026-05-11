@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { CATEGORIES, DIFFICULTY_LABEL, type CategoryKey, type Difficulty } from "@/lib/categories";
 import { getLucideIcon } from "@/lib/icon";
 
@@ -18,8 +18,9 @@ export const Route = createFileRoute("/_authenticated/solutions/")({
 });
 
 function SolutionsList() {
-  const { mode } = Route.useSearch();
-  const builderMode = mode === "builder";
+  Route.useSearch();
+
+  const { user } = useAuth();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<CategoryKey | "all">("all");
   const [diff, setDiff] = useState<Difficulty | "all">("all");
@@ -32,6 +33,27 @@ function SolutionsList() {
       return data;
     },
   });
+
+  const { data: progressRows } = useQuery({
+    queryKey: ["solutions-progress-all", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await (supabase as never as typeof supabase)
+        .from("solution_steps_progress" as never)
+        .select("solution_id, completed")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      return (data ?? []) as { solution_id: string; completed: boolean }[];
+    },
+  });
+
+  const progressBySolution = useMemo(() => {
+    const m: Record<string, number> = {};
+    (progressRows ?? []).forEach((r) => {
+      if (r.completed) m[r.solution_id] = (m[r.solution_id] ?? 0) + 1;
+    });
+    return m;
+  }, [progressRows]);
 
   const counts = useMemo(() => {
     const m: Record<string, number> = {};
@@ -63,11 +85,6 @@ function SolutionsList() {
 
   return (
     <div className="mx-auto max-w-[960px] px-6 py-10">
-      {builderMode && (
-        <div className="mb-4 rounded-lg bg-foreground px-4 py-3 text-[13px] font-medium text-background">
-          Elegí una solución para comenzar la implementación guiada →
-        </div>
-      )}
       <header>
         <h1 className="text-[1.5rem] font-semibold tracking-tight leading-tight">Soluciones</h1>
         <p className="mt-1 text-[13px] text-muted-foreground">
@@ -112,9 +129,9 @@ function SolutionsList() {
             ))
           : filtered.map((s) => {
               const Icon = getLucideIcon(s.icon_name);
-              const linkProps = builderMode
-                ? { to: "/builder/$solutionId" as const, params: { solutionId: s.id } }
-                : { to: "/solutions/$id" as const, params: { id: s.id } };
+              const linkProps = { to: "/solutions/$id" as const, params: { id: s.id } };
+              const completed = progressBySolution[s.id] ?? 0;
+              const pct = Math.min(100, (completed / 5) * 100);
               return (
                 <Link
                   key={s.id}
@@ -134,6 +151,14 @@ function SolutionsList() {
                       {DIFFICULTY_LABEL[s.difficulty as Difficulty]}
                     </span>
                   </div>
+                  {completed > 0 && (
+                    <div className="mt-3">
+                      <div className="h-0.5 w-full overflow-hidden rounded bg-gray-100">
+                        <div className="h-full bg-foreground" style={{ width: `${pct}%` }} />
+                      </div>
+                      <div className="mt-1 text-[11px] text-gray-400">{completed} de 5 pasos</div>
+                    </div>
+                  )}
                 </Link>
               );
             })}

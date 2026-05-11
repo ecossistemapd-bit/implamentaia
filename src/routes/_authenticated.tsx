@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Sparkles,
-  Wrench,
   FolderKanban,
   BookOpen,
   Settings as SettingsIcon,
@@ -53,7 +52,6 @@ type NavItem = {
 const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/solutions", label: "Soluciones", icon: Sparkles },
-  { to: "/solutions", label: "Builder", icon: Wrench, search: { mode: "builder" } },
   { to: "/cursos", label: "Cursos", icon: BookOpen, badge: "NUEVO" },
   { to: "/implementador", label: "Panel Impl.", icon: LayoutDashboard, implOnly: true },
   { to: "/projects", label: "Mis Proyectos", icon: FolderKanban },
