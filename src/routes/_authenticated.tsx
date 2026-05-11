@@ -76,8 +76,8 @@ function AuthenticatedLayout() {
 
 function DesktopSidebar() {
   return (
-    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-border bg-sidebar lg:flex lg:flex-col">
-      <div className="px-6 py-6">
+    <aside className="sticky top-0 hidden h-screen w-[200px] shrink-0 border-r border-border bg-sidebar lg:flex lg:flex-col">
+      <div className="px-4 py-4">
         <Logo />
       </div>
       <NavList />
@@ -113,7 +113,7 @@ function MobileTopBar() {
 function NavList() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <nav className="flex-1 space-y-1 px-3">
+    <nav className="flex-1 space-y-0.5 px-2">
       {NAV.map((item) => {
         const active =
           pathname === item.to ||
@@ -123,13 +123,13 @@ function NavList() {
           <Link
             key={item.to}
             to={item.to}
-            className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition ${
+            className={`flex items-center gap-2.5 rounded-md px-3 py-1.5 text-[13px] transition ${
               active
                 ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                 : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             }`}
           >
-            <Icon className="h-4 w-4" strokeWidth={1.75} />
+            <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
             {item.label}
           </Link>
         );

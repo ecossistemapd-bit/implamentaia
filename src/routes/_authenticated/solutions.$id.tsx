@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Check, Sparkles, Clock, Layers, Tag } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -62,66 +62,52 @@ function SolutionByIdDetail() {
   const catLabel = CATEGORY_LABEL[s.category as CategoryKey];
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10 lg:py-14">
-      <Link to="/solutions" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" /> Soluciones
+    <div className="mx-auto max-w-[960px] px-6 py-8">
+      <Link to="/solutions" className="inline-flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground">
+        <ArrowLeft className="h-3.5 w-3.5" /> Soluciones
       </Link>
 
-      <div className="mt-8 flex flex-wrap gap-2">
-        <Badge variant="secondary">{catLabel}</Badge>
-        <Badge variant="outline" className={DIFFICULTY_BADGE[diff]}>
+      <div className="mt-5 flex flex-wrap items-center gap-1.5">
+        <span className="rounded border border-border px-2 py-[2px] text-[11px] text-muted-foreground">{catLabel}</span>
+        <span className={`rounded border px-2 py-[2px] text-[11px] ${DIFFICULTY_BADGE[diff]}`}>
           {DIFFICULTY_LABEL[diff]}
-        </Badge>
+        </span>
       </div>
 
-      <h1 className="mt-4 text-4xl font-semibold tracking-tight lg:text-5xl">{s.title}</h1>
-      <p className="mt-4 max-w-3xl text-lg text-muted-foreground">{s.short_description}</p>
-
-      {/* Thumbnail */}
-      <div className="mt-8 flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-800 to-black">
-        <Icon className="h-24 w-24 text-white/90" strokeWidth={1.25} />
+      <div className="mt-3 flex items-center gap-3">
+        <Icon className="h-6 w-6 shrink-0" strokeWidth={1.75} />
+        <h1 className="text-[1.75rem] font-bold tracking-tight leading-tight">{s.title}</h1>
       </div>
+      <p className="mt-2 max-w-[600px] text-[14px] leading-relaxed text-foreground/70">{s.short_description}</p>
 
       {/* Metrics */}
-      <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <MetricCard icon={Tag} label="Categoría" value={catLabel} />
-        <MetricCard icon={Layers} label="Nivel" value={DIFFICULTY_LABEL[diff]} />
-        <MetricCard icon={Clock} label="Tiempo estimado" value={s.estimated_time} />
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5" /> Herramientas
-          </div>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {s.tools_required.slice(0, 4).map((t: string) => (
-              <span key={t} className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px]">
-                {t}
-              </span>
-            ))}
-          </div>
-        </div>
+      <div className="mt-6 grid grid-cols-2 gap-2 lg:grid-cols-4">
+        <MetricCard label="Categoría" value={catLabel} />
+        <MetricCard label="Nivel" value={DIFFICULTY_LABEL[diff]} />
+        <MetricCard label="Tiempo" value={s.estimated_time} />
+        <MetricCard label="Herramientas" value={`${s.tools_required.length} apps`} />
       </div>
 
       {/* CTAs */}
-      <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
         {/* Left: Generate prompt */}
-        <div className="rounded-2xl border-2 border-foreground bg-background p-8">
-          <h2 className="text-2xl font-semibold tracking-tight">Generá tu prompt para Lovable</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Personalizá esta solución con tu contexto y obtené un prompt listo para usar.
+        <div className="rounded-[10px] border border-foreground bg-background p-5">
+          <h2 className="text-[16px] font-bold tracking-tight">Generá tu prompt para Lovable</h2>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            Personalizá esta solución con tu contexto.
           </p>
-          <div className="mt-6 space-y-2">
-            <Label htmlFor="context">¿Cuál es tu industria o contexto?</Label>
+          <div className="mt-4 space-y-1.5">
+            <Label htmlFor="context" className="text-[12px]">¿Cuál es tu industria o contexto?</Label>
             <Textarea
               id="context"
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder="Ej: Tienda de e-commerce de indumentaria con 5.000 clientes activos…"
-              rows={4}
+              className="h-[72px] min-h-[72px] text-[13px] rounded-lg"
             />
           </div>
           <Button
-            className="mt-6 w-full rounded-full bg-foreground text-background hover:bg-foreground/90"
-            size="lg"
+            className="mt-4 h-10 w-full rounded-lg bg-foreground text-background hover:bg-foreground/90 text-[14px]"
             disabled={!context.trim() || generating}
             onClick={async () => {
               setGenerating(true);
@@ -143,16 +129,14 @@ function SolutionByIdDetail() {
             {generating ? "Generando…" : "✦ Generar Prompt para Lovable"}
           </Button>
           {generated && (
-            <div className="mt-6 space-y-2">
-              <Label>Prompt generado</Label>
-              <Textarea readOnly value={generated} rows={10} className="font-mono text-xs" />
+            <div className="mt-4 space-y-1.5">
+              <Label className="text-[12px]">Prompt generado</Label>
+              <Textarea readOnly value={generated} rows={10} className="font-mono text-[12px] rounded-lg" />
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full"
-                onClick={() => {
-                  navigator.clipboard.writeText(generated);
-                }}
+                className="rounded-lg text-[12px]"
+                onClick={() => navigator.clipboard.writeText(generated)}
               >
                 Copiar
               </Button>
@@ -161,24 +145,23 @@ function SolutionByIdDetail() {
         </div>
 
         {/* Right: Expert implementation */}
-        <div className="rounded-2xl bg-foreground p-8 text-background">
-          <h2 className="text-2xl font-semibold tracking-tight">Implementación por expertos</h2>
-          <p className="mt-2 text-sm text-background/70">
-            ¿Preferís que un experto lo implemente por vos? Llave en mano.
+        <div className="rounded-[10px] bg-foreground p-5 text-background">
+          <h2 className="text-[16px] font-bold tracking-tight">Implementación por expertos</h2>
+          <p className="mt-1 text-[13px] text-background/70">
+            ¿Preferís que un experto lo implemente por vos?
           </p>
-          <ul className="mt-6 space-y-3">
+          <ul className="mt-4 space-y-2">
             {EXPERT_BENEFITS.map((b) => (
-              <li key={b} className="flex items-start gap-3 text-sm">
-                <Check className="mt-0.5 h-4 w-4 shrink-0" />
+              <li key={b} className="flex items-start gap-2 text-[13px]">
+                <Check className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>{b}</span>
               </li>
             ))}
           </ul>
-          <div className="mt-6 text-3xl font-semibold">Desde $500 USD</div>
+          <div className="mt-4 text-[22px] font-semibold leading-tight">Desde $500 USD</div>
           <Button
             variant="secondary"
-            size="lg"
-            className="mt-6 w-full rounded-full bg-background text-foreground hover:bg-background/90"
+            className="mt-4 h-10 w-full rounded-lg bg-background text-foreground hover:bg-background/90 text-[14px]"
             onClick={() => navigate({ to: "/solutions/$id/contratar", params: { id } })}
           >
             Contratar Implementador →
@@ -187,21 +170,21 @@ function SolutionByIdDetail() {
       </div>
 
       {/* About */}
-      <section className="mt-14">
-        <h3 className="text-2xl font-semibold tracking-tight">Sobre esta solución</h3>
-        <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-muted-foreground">
+      <section className="mt-10">
+        <h3 className="text-[15px] font-semibold tracking-tight">Sobre esta solución</h3>
+        <p className="mt-2 whitespace-pre-line text-[13px] leading-[1.6] text-muted-foreground">
           {s.long_description}
         </p>
       </section>
 
       {/* Tools */}
-      <section className="mt-10">
-        <h4 className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+      <section className="mt-6">
+        <h4 className="text-[11px] font-medium uppercase tracking-[0.05em] text-muted-foreground">
           Herramientas necesarias
         </h4>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {s.tools_required.map((t: string) => (
-            <span key={t} className="rounded-full border border-border bg-card px-3 py-1 text-xs">
+            <span key={t} className="rounded border border-border bg-card px-2.5 py-[3px] text-[12px]">
               {t}
             </span>
           ))}
@@ -211,13 +194,13 @@ function SolutionByIdDetail() {
   );
 }
 
-function MetricCard({ icon: Icon, label, value }: { icon: typeof Sparkles; label: string; value: string }) {
+function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
-        <Icon className="h-3.5 w-3.5" /> {label}
+    <div className="rounded-[10px] border border-border bg-card px-4 py-3">
+      <div className="text-[10px] font-medium uppercase tracking-[0.05em] text-muted-foreground">
+        {label}
       </div>
-      <div className="mt-3 text-base font-medium">{value}</div>
+      <div className="mt-1 text-[14px] font-semibold leading-tight">{value}</div>
     </div>
   );
 }
