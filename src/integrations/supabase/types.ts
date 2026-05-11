@@ -150,10 +150,13 @@ export type Database = {
           created_at: string
           difficulty: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time: string
+          features: string[]
           icon_name: string
           id: string
+          integrations: string[]
           is_featured: boolean
           long_description: string
+          prompt_template: string | null
           roi_estimate: string
           short_description: string
           slug: string
@@ -165,10 +168,13 @@ export type Database = {
           created_at?: string
           difficulty: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time: string
+          features?: string[]
           icon_name?: string
           id?: string
+          integrations?: string[]
           is_featured?: boolean
           long_description: string
+          prompt_template?: string | null
           roi_estimate: string
           short_description: string
           slug: string
@@ -180,10 +186,13 @@ export type Database = {
           created_at?: string
           difficulty?: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time?: string
+          features?: string[]
           icon_name?: string
           id?: string
+          integrations?: string[]
           is_featured?: boolean
           long_description?: string
+          prompt_template?: string | null
           roi_estimate?: string
           short_description?: string
           slug?: string
