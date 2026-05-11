@@ -112,17 +112,23 @@ function MobileTopBar() {
 
 function NavList() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const search = useRouterState({ select: (s) => s.location.search as Record<string, string> });
   return (
     <nav className="flex-1 space-y-0.5 px-2">
       {NAV.map((item) => {
-        const active =
-          pathname === item.to ||
-          (item.to !== "/dashboard" && pathname.startsWith(item.to));
+        const isBuilder = item.label === "Builder";
+        const isSolutions = item.label === "Soluciones";
+        const inBuilderMode = pathname.startsWith("/solutions") && search?.mode === "builder";
+        let active: boolean;
+        if (isBuilder) active = inBuilderMode;
+        else if (isSolutions) active = pathname.startsWith("/solutions") && !inBuilderMode;
+        else active = pathname === item.to || (item.to !== "/dashboard" && pathname.startsWith(item.to));
         const Icon = item.icon;
         return (
           <Link
-            key={item.to}
+            key={item.label}
             to={item.to}
+            search={item.search as never}
             className={`flex items-center gap-2.5 rounded-md px-3 py-1.5 text-[13px] transition ${
               active
                 ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
