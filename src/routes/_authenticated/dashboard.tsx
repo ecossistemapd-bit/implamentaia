@@ -63,26 +63,39 @@ function Dashboard() {
     { label: "Cursos en progreso", value: stats?.courses ?? 0 },
   ];
 
-  const greeting = fullName?.split(" ")[0] || "bienvenido";
+  const hour = new Date().getHours();
+  const tod = hour < 12 ? "Buen día" : hour < 19 ? "Buenas tardes" : "Buenas noches";
+  const greetName = fullName?.split(" ")[0] || "bienvenido";
 
   return (
     <>
       <OnboardingModal />
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-        <h1 className="text-2xl font-bold tracking-tight">Hola, {greeting} 👋</h1>
-        <p className="mt-1 text-sm text-gray-500">Acá está el resumen de tu actividad en Implementa AI.</p>
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            {tod}, {greetName}
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Acá está el resumen de tu actividad en Implementa AI. Seguí construyendo.
+          </p>
+        </header>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {cards.map((c) => (
-            <div key={c.label} className="rounded-xl border border-border bg-card p-4">
-              <div className="text-2xl font-bold tracking-tight">{c.value}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{c.label}</div>
+            <div
+              key={c.label}
+              className="rounded-xl border border-border bg-card p-5 shadow-lg transition duration-200 hover:scale-[1.01] hover:border-primary/50"
+            >
+              <div className="bg-gradient-to-r from-sky-400 to-teal-400 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
+                {c.value}
+              </div>
+              <div className="mt-2 text-xs text-muted-foreground">{c.label}</div>
             </div>
           ))}
         </div>
 
-        <section className="mt-8">
-          <h2 className="text-base font-semibold">Acciones rápidas</h2>
+        <section className="mt-10">
+          <h2 className="text-lg font-semibold text-foreground">Acciones rápidas</h2>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <QuickAction emoji="🔧" label="Nueva solución" to="/solutions" />
             <QuickAction emoji="📚" label="Continuar curso" to="/cursos" />
@@ -100,7 +113,7 @@ function QuickAction({ emoji, label, to }: { emoji: string; label: string; to: "
   return (
     <Link
       to={to}
-      className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-200 p-4 text-center text-sm font-medium transition hover:bg-gray-50"
+      className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center text-sm font-medium text-foreground shadow-lg transition duration-200 hover:scale-[1.01] hover:border-primary/50"
     >
       <span className="text-lg">{emoji}</span>
       <span>{label}</span>

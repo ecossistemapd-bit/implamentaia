@@ -16,7 +16,9 @@ import { Route as CursosCourseIdRouteImport } from './routes/cursos.$courseId'
 import { Route as ContratarConfirmacionRouteImport } from './routes/contratar.confirmacion'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
+import { Route as AuthenticatedMiProgresoRouteImport } from './routes/_authenticated/mi-progreso'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedContratarExpertoRouteImport } from './routes/_authenticated/contratar-experto'
 import { Route as AuthenticatedSolutionsIndexRouteImport } from './routes/_authenticated/solutions.index'
 import { Route as AuthenticatedImplementadorIndexRouteImport } from './routes/_authenticated/implementador.index'
 import { Route as AuthenticatedCursosIndexRouteImport } from './routes/_authenticated/cursos.index'
@@ -61,11 +63,22 @@ const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedMiProgresoRoute = AuthenticatedMiProgresoRouteImport.update({
+  id: '/mi-progreso',
+  path: '/mi-progreso',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedContratarExpertoRoute =
+  AuthenticatedContratarExpertoRouteImport.update({
+    id: '/contratar-experto',
+    path: '/contratar-experto',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSolutionsIndexRoute =
   AuthenticatedSolutionsIndexRouteImport.update({
     id: '/solutions/',
@@ -122,7 +135,9 @@ const AuthenticatedImplementadorProyectoProjectIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/contratar-experto': typeof AuthenticatedContratarExpertoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/mi-progreso': typeof AuthenticatedMiProgresoRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
@@ -140,7 +155,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/contratar-experto': typeof AuthenticatedContratarExpertoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/mi-progreso': typeof AuthenticatedMiProgresoRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
@@ -160,7 +177,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/contratar-experto': typeof AuthenticatedContratarExpertoRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/mi-progreso': typeof AuthenticatedMiProgresoRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
@@ -180,7 +199,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/contratar-experto'
     | '/dashboard'
+    | '/mi-progreso'
     | '/projects'
     | '/settings'
     | '/contratar/confirmacion'
@@ -198,7 +219,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/contratar-experto'
     | '/dashboard'
+    | '/mi-progreso'
     | '/projects'
     | '/settings'
     | '/contratar/confirmacion'
@@ -217,7 +240,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/contratar-experto'
     | '/_authenticated/dashboard'
+    | '/_authenticated/mi-progreso'
     | '/_authenticated/projects'
     | '/_authenticated/settings'
     | '/contratar/confirmacion'
@@ -293,11 +318,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/mi-progreso': {
+      id: '/_authenticated/mi-progreso'
+      path: '/mi-progreso'
+      fullPath: '/mi-progreso'
+      preLoaderRoute: typeof AuthenticatedMiProgresoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/contratar-experto': {
+      id: '/_authenticated/contratar-experto'
+      path: '/contratar-experto'
+      fullPath: '/contratar-experto'
+      preLoaderRoute: typeof AuthenticatedContratarExpertoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/solutions/': {
@@ -367,7 +406,9 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedContratarExpertoRoute: typeof AuthenticatedContratarExpertoRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMiProgresoRoute: typeof AuthenticatedMiProgresoRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedBuilderSolutionIdRoute: typeof AuthenticatedBuilderSolutionIdRoute
@@ -381,7 +422,9 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedContratarExpertoRoute: AuthenticatedContratarExpertoRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMiProgresoRoute: AuthenticatedMiProgresoRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedBuilderSolutionIdRoute: AuthenticatedBuilderSolutionIdRoute,
