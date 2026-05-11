@@ -242,6 +242,7 @@ export type Database = {
           full_name: string | null
           id: string
           industry: string | null
+          onboarding_completed: boolean | null
           role: string | null
           team_size: string | null
           updated_at: string
@@ -253,6 +254,7 @@ export type Database = {
           full_name?: string | null
           id: string
           industry?: string | null
+          onboarding_completed?: boolean | null
           role?: string | null
           team_size?: string | null
           updated_at?: string
@@ -264,6 +266,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           industry?: string | null
+          onboarding_completed?: boolean | null
           role?: string | null
           team_size?: string | null
           updated_at?: string
