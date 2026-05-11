@@ -21,6 +21,7 @@ import {
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRole } from "@/hooks/use-role";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -116,9 +117,10 @@ function MobileTopBar() {
 function NavList() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const search = useRouterState({ select: (s) => s.location.search as Record<string, string> });
+  const { isImplementer } = useRole();
   return (
     <nav className="flex-1 space-y-0.5 px-2">
-      {NAV.map((item) => {
+      {NAV.filter((item) => !item.implOnly || isImplementer).map((item) => {
         const isBuilder = item.label === "Builder";
         const isSolutions = item.label === "Soluciones";
         const inBuilderMode = pathname.startsWith("/solutions") && search?.mode === "builder";
