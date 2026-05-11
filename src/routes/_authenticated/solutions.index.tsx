@@ -134,9 +134,9 @@ function SolutionsList() {
             ))
           : filtered.map((s) => {
               const Icon = getLucideIcon(s.icon_name);
-              const linkProps = builderMode
-                ? { to: "/builder/$solutionId" as const, params: { solutionId: s.id } }
-                : { to: "/solutions/$id" as const, params: { id: s.id } };
+              const linkProps = { to: "/solutions/$id" as const, params: { id: s.id } };
+              const completed = progressBySolution[s.id] ?? 0;
+              const pct = Math.min(100, (completed / 5) * 100);
               return (
                 <Link
                   key={s.id}
@@ -156,6 +156,14 @@ function SolutionsList() {
                       {DIFFICULTY_LABEL[s.difficulty as Difficulty]}
                     </span>
                   </div>
+                  {completed > 0 && (
+                    <div className="mt-3">
+                      <div className="h-0.5 w-full overflow-hidden rounded bg-gray-100">
+                        <div className="h-full bg-foreground" style={{ width: `${pct}%` }} />
+                      </div>
+                      <div className="mt-1 text-[11px] text-gray-400">{completed} de 5 pasos</div>
+                    </div>
+                  )}
                 </Link>
               );
             })}
