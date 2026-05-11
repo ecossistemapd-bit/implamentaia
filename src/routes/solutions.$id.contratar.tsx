@@ -356,14 +356,14 @@ function Step({
         {num}
       </span>
       <div className="flex items-center gap-2">
-        <h3 className="text-[14px] font-semibold">{title}</h3>
+        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
         {badge && (
           <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
             {badge}
           </span>
         )}
       </div>
-      <p className="mt-1 text-[13px] leading-relaxed text-[#666]">{desc}</p>
+      <p className="mt-1 text-sm leading-relaxed text-gray-700">{desc}</p>
     </li>
   );
 }
