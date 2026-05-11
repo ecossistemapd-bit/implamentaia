@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Check, Copy, ExternalLink } from "lucide-react";
+import { ArrowLeft, Check, Copy, ExternalLink, LifeBuoy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { useAuth } from "@/hooks/use-auth";
@@ -513,6 +513,29 @@ function BuilderWizard() {
                 </Button>
               </div>
             )}
+
+            <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <div className="flex items-start gap-3">
+                <LifeBuoy className="mt-0.5 h-5 w-5 shrink-0 text-gray-400" strokeWidth={1.75} />
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-gray-700">
+                    ¿Necesitás ayuda para terminar?
+                  </h4>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Si llegaste hasta acá y preferís que un experto complete la configuración,
+                    podemos asignarte uno.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 h-8 rounded-lg text-[12px]"
+                    onClick={() => hireImplementador()}
+                  >
+                    Solicitar ayuda →
+                  </Button>
+                </div>
+              </div>
+            </div>
           </Step>
         )}
       </div>

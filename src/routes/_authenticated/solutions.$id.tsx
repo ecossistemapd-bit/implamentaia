@@ -1,13 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { useEffect } from "react";
+import { ArrowLeft } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, type Difficulty, type CategoryKey } from "@/lib/categories";
 import { getLucideIcon } from "@/lib/icon";
 
@@ -21,21 +18,9 @@ const DIFFICULTY_BADGE: Record<Difficulty, string> = {
   avanzado: "bg-red-100 text-red-800 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-900",
 };
 
-const EXPERT_BENEFITS = [
-  "Análisis personalizado de tu negocio",
-  "Implementación end-to-end por expertos",
-  "Integraciones con tus herramientas actuales",
-  "Capacitación a tu equipo",
-  "Soporte post-implementación 30 días",
-];
-
 function SolutionByIdDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const [context, setContext] = useState("");
-  const [generating, setGenerating] = useState(false);
-  const [generated, setGenerated] = useState<string | null>(null);
-  const [showPromptModal, setShowPromptModal] = useState(false);
 
   const { data: s, isLoading, isError } = useQuery({
     queryKey: ["solution-by-id", id],
@@ -90,103 +75,42 @@ function SolutionByIdDetail() {
       </div>
 
       {/* CTAs */}
-      <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
-        {/* Left: Generate prompt */}
+      <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-[1.6fr_1fr]">
+        {/* Left: DIY (PRIMARY) */}
         <div className="rounded-[10px] border border-foreground bg-background p-5">
-          <h2 className="text-[16px] font-bold tracking-tight">Implementá esta solución</h2>
-          <p className="mt-1 text-[13px] text-muted-foreground">
-            Un wizard te guía paso a paso con tu contexto y stack.
+          <h2 className="text-[1rem] font-bold tracking-tight">Implementá vos mismo</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Guía paso a paso con prompt personalizado para tu empresa.
           </p>
           <Button
-            className="mt-4 h-10 w-full rounded-lg bg-foreground text-background hover:bg-foreground/90 text-[14px]"
+            className="mt-4 h-11 w-full rounded-lg bg-foreground text-background hover:bg-foreground/90 text-[14px] font-semibold"
             onClick={() => navigate({ to: "/builder/$solutionId", params: { solutionId: id } })}
           >
-            → Comenzar implementación guiada
-          </Button>
-          <Button
-            variant="outline"
-            className="mt-2 h-10 w-full rounded-lg text-[14px]"
-            onClick={() => setShowPromptModal(true)}
-          >
-            Generar solo el prompt
+            Comenzar implementación guiada →
           </Button>
           <p className="mt-2 text-[12px] text-muted-foreground">
             El Builder te guía paso a paso en 15 minutos.
           </p>
-
-          {showPromptModal && (
-            <div className="mt-4 space-y-3 border-t border-border pt-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="context" className="text-[12px]">¿Cuál es tu industria o contexto?</Label>
-                <Textarea
-                  id="context"
-                  value={context}
-                  onChange={(e) => setContext(e.target.value)}
-                  placeholder="Ej: Tienda de e-commerce de indumentaria con 5.000 clientes activos…"
-                  className="h-[72px] min-h-[72px] text-[13px] rounded-lg"
-                />
-              </div>
-              <Button
-                size="sm"
-                className="h-9 w-full rounded-lg bg-foreground text-background hover:bg-foreground/90 text-[13px]"
-                disabled={!context.trim() || generating}
-                onClick={async () => {
-                  setGenerating(true);
-                  setGenerated(null);
-                  try {
-                    const { data, error } = await supabase.functions.invoke("generate-solution-prompt", {
-                      body: { solution_id: id, user_context: context },
-                    });
-                    if (error) throw error;
-                    setGenerated((data as { prompt?: string })?.prompt ?? null);
-                  } catch (e: unknown) {
-                    const msg = e instanceof Error ? e.message : "Error generando prompt";
-                    alert(msg);
-                  } finally {
-                    setGenerating(false);
-                  }
-                }}
-              >
-                {generating ? "Generando…" : "✦ Generar Prompt"}
-              </Button>
-              {generated && (
-                <div className="space-y-1.5">
-                  <Textarea readOnly value={generated} rows={8} className="font-mono text-[12px] rounded-lg" />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-lg text-[12px]"
-                    onClick={() => navigator.clipboard.writeText(generated)}
-                  >
-                    Copiar
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
-        {/* Right: Expert implementation */}
-        <div className="rounded-[10px] bg-foreground p-5 text-background">
-          <h2 className="text-[16px] font-bold tracking-tight">Implementación por expertos</h2>
-          <p className="mt-1 text-[13px] text-background/70">
-            ¿Preferís que un experto lo implemente por vos?
+        {/* Right: Contratar (SECONDARY) */}
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <p className="text-xs uppercase tracking-widest text-gray-400">
+            ¿Preferís delegar?
           </p>
-          <ul className="mt-4 space-y-2">
-            {EXPERT_BENEFITS.map((b) => (
-              <li key={b} className="flex items-start gap-2 text-[13px]">
-                <Check className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 text-[22px] font-semibold leading-tight">Desde $500 USD</div>
+          <h3 className="mt-2 text-sm font-semibold text-gray-700">
+            Contratar implementador
+          </h3>
+          <p className="mt-1 text-xs text-gray-500">
+            Un experto configura todo por vos.
+          </p>
           <Button
-            variant="secondary"
-            className="mt-4 h-10 w-full rounded-lg bg-background text-foreground hover:bg-background/90 text-[14px]"
+            variant="outline"
+            size="sm"
+            className="mt-3 h-8 rounded-lg text-[12px]"
             onClick={() => navigate({ to: "/solutions/$id/contratar", params: { id } })}
           >
-            Contratar Implementador →
+            Ver opciones →
           </Button>
         </div>
       </div>

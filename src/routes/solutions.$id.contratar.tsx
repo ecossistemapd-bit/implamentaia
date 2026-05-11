@@ -124,16 +124,14 @@ function ContratarPage() {
         {/* Left column */}
         <section className="order-2 lg:order-1">
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
-            Implementación profesional
+            Alternativa con experto
           </p>
           <h1 className="mt-2 text-[2rem] font-bold leading-[1.2] tracking-tight text-gray-900">
-            Conectate con tu
-            <br />
-            Implementador Verificado
+            Implementación con experto
           </h1>
           <p className="mt-3 max-w-[460px] text-sm leading-relaxed text-gray-700">
-            Asignamos un especialista que configura esta solución en tu empresa
-            de principio a fin. Vos solo acompañás el proceso.
+            Para equipos que prefieren delegar la configuración técnica a un
+            especialista verificado.
           </p>
 
           {/* Resumen del pedido */}
