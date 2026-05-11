@@ -88,7 +88,9 @@ function CourseDetailPage() {
   const toggleComplete = async () => {
     if (!selected || !user) return;
     const isDone = !!progress?.[selected.id];
-    await supabase.from("user_progress" as never).upsert(
+    await (supabase.from("user_progress" as never) as unknown as {
+      upsert: (v: unknown, o: unknown) => Promise<unknown>;
+    }).upsert(
       {
         user_id: user.id,
         module_id: selected.id,
