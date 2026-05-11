@@ -112,11 +112,6 @@ const AuthenticatedBuilderSolutionIdRoute =
     path: '/builder/$solutionId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedImplementadorProyectoProjectIdRoute =
   AuthenticatedImplementadorProyectoProjectIdRouteImport.update({
     id: '/implementador/proyecto/$projectId',
