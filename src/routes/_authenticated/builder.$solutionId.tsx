@@ -245,9 +245,12 @@ function BuilderWizard() {
             source_solution_id: solution.id,
             title: solution.title,
             status: "ready",
+            type: "diy",
+            builder_session_id: sessionId,
             inputs: { diagnostico: answers, stack },
             output: { plan_md: generatedPrompt ?? "" },
-          });
+          } as never);
+          try { localStorage.removeItem(lsKey); } catch {}
         }
       })();
     }
