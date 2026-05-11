@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CursosCourseIdRouteImport } from './routes/cursos.$courseId'
 import { Route as ContratarConfirmacionRouteImport } from './routes/contratar.confirmacion'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
@@ -35,6 +36,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CursosCourseIdRoute = CursosCourseIdRouteImport.update({
+  id: '/cursos/$courseId',
+  path: '/cursos/$courseId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContratarConfirmacionRoute = ContratarConfirmacionRouteImport.update({
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
+  '/cursos/$courseId': typeof CursosCourseIdRoute
   '/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
+  '/cursos/$courseId': typeof CursosCourseIdRoute
   '/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
+  '/cursos/$courseId': typeof CursosCourseIdRoute
   '/_authenticated/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/settings'
     | '/contratar/confirmacion'
+    | '/cursos/$courseId'
     | '/builder/$solutionId'
     | '/solutions/$id'
     | '/solutions/$slug'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/settings'
     | '/contratar/confirmacion'
+    | '/cursos/$courseId'
     | '/builder/$solutionId'
     | '/solutions/$id'
     | '/solutions/$slug'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/_authenticated/projects'
     | '/_authenticated/settings'
     | '/contratar/confirmacion'
+    | '/cursos/$courseId'
     | '/_authenticated/builder/$solutionId'
     | '/_authenticated/solutions/$id'
     | '/_authenticated/solutions/$slug'
@@ -188,6 +200,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   ContratarConfirmacionRoute: typeof ContratarConfirmacionRoute
+  CursosCourseIdRoute: typeof CursosCourseIdRoute
   SolutionsIdContratarRoute: typeof SolutionsIdContratarRoute
 }
 
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cursos/$courseId': {
+      id: '/cursos/$courseId'
+      path: '/cursos/$courseId'
+      fullPath: '/cursos/$courseId'
+      preLoaderRoute: typeof CursosCourseIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contratar/confirmacion': {
@@ -318,8 +338,19 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   ContratarConfirmacionRoute: ContratarConfirmacionRoute,
+  CursosCourseIdRoute: CursosCourseIdRoute,
   SolutionsIdContratarRoute: SolutionsIdContratarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
