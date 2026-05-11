@@ -1,13 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { useEffect } from "react";
+import { ArrowLeft } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, type Difficulty, type CategoryKey } from "@/lib/categories";
 import { getLucideIcon } from "@/lib/icon";
 
@@ -21,21 +18,9 @@ const DIFFICULTY_BADGE: Record<Difficulty, string> = {
   avanzado: "bg-red-100 text-red-800 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-900",
 };
 
-const EXPERT_BENEFITS = [
-  "Análisis personalizado de tu negocio",
-  "Implementación end-to-end por expertos",
-  "Integraciones con tus herramientas actuales",
-  "Capacitación a tu equipo",
-  "Soporte post-implementación 30 días",
-];
-
 function SolutionByIdDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const [context, setContext] = useState("");
-  const [generating, setGenerating] = useState(false);
-  const [generated, setGenerated] = useState<string | null>(null);
-  const [showPromptModal, setShowPromptModal] = useState(false);
 
   const { data: s, isLoading, isError } = useQuery({
     queryKey: ["solution-by-id", id],
