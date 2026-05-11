@@ -39,12 +39,13 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, search: undefined as Record<string, string> | undefined, badge: undefined as string | undefined },
-  { to: "/solutions", label: "Soluciones", icon: Sparkles, search: undefined, badge: undefined },
-  { to: "/solutions", label: "Builder", icon: Wrench, search: { mode: "builder" }, badge: undefined },
-  { to: "/cursos", label: "Cursos", icon: BookOpen, search: undefined, badge: "NUEVO" },
-  { to: "/projects", label: "Mis Proyectos", icon: FolderKanban, search: undefined, badge: undefined },
-  { to: "/settings", label: "Configuración", icon: SettingsIcon, search: undefined, badge: undefined },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, search: undefined as Record<string, string> | undefined, badge: undefined as string | undefined, implOnly: false },
+  { to: "/solutions", label: "Soluciones", icon: Sparkles, search: undefined, badge: undefined, implOnly: false },
+  { to: "/solutions", label: "Builder", icon: Wrench, search: { mode: "builder" }, badge: undefined, implOnly: false },
+  { to: "/cursos", label: "Cursos", icon: BookOpen, search: undefined, badge: "NUEVO", implOnly: false },
+  { to: "/implementador", label: "Panel Impl.", icon: LayoutDashboard, search: undefined, badge: undefined, implOnly: true },
+  { to: "/projects", label: "Mis Proyectos", icon: FolderKanban, search: undefined, badge: undefined, implOnly: false },
+  { to: "/settings", label: "Configuración", icon: SettingsIcon, search: undefined, badge: undefined, implOnly: false },
 ] as const;
 
 function AuthenticatedLayout() {
