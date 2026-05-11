@@ -99,7 +99,8 @@ function BuilderWizard() {
     return true;
   }, [step, builderQuestions, answers, stack, generatedPrompt, generatingPrompt]);
 
-  const persist = async (patch: Parameters<ReturnType<typeof supabase.from<"builder_sessions">>["update"]>[0]) => {
+  type SessionUpdate = Database["public"]["Tables"]["builder_sessions"]["Update"];
+  const persist = async (patch: SessionUpdate) => {
     if (!sessionId) return;
     await supabase.from("builder_sessions").update(patch).eq("id", sessionId);
   };
