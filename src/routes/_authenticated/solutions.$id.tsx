@@ -21,7 +21,7 @@ const DIFFICULTY_BADGE: Record<Difficulty, string> = {
   avanzado: "bg-red-100 text-red-800 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-900",
 };
 
-const BENEFITS = [
+const EXPERT_BENEFITS = [
   "Análisis personalizado de tu negocio",
   "Implementación end-to-end por expertos",
   "Integraciones con tus herramientas actuales",
@@ -33,6 +33,8 @@ function SolutionByIdDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [context, setContext] = useState("");
+  const [generating, setGenerating] = useState(false);
+  const [generated, setGenerated] = useState<string | null>(null);
 
   const { data: s, isLoading, isError } = useQuery({
     queryKey: ["solution-by-id", id],
@@ -120,10 +122,42 @@ function SolutionByIdDetail() {
           <Button
             className="mt-6 w-full rounded-full bg-foreground text-background hover:bg-foreground/90"
             size="lg"
-            onClick={() => alert("Próximamente")}
+            disabled={!context.trim() || generating}
+            onClick={async () => {
+              setGenerating(true);
+              setGenerated(null);
+              try {
+                const { data, error } = await supabase.functions.invoke("generate-solution-prompt", {
+                  body: { solution_id: id, user_context: context },
+                });
+                if (error) throw error;
+                setGenerated((data as { prompt?: string })?.prompt ?? null);
+              } catch (e: unknown) {
+                const msg = e instanceof Error ? e.message : "Error generando prompt";
+                alert(msg);
+              } finally {
+                setGenerating(false);
+              }
+            }}
           >
-            ✦ Generar Prompt para Lovable
+            {generating ? "Generando…" : "✦ Generar Prompt para Lovable"}
           </Button>
+          {generated && (
+            <div className="mt-6 space-y-2">
+              <Label>Prompt generado</Label>
+              <Textarea readOnly value={generated} rows={10} className="font-mono text-xs" />
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                onClick={() => {
+                  navigator.clipboard.writeText(generated);
+                }}
+              >
+                Copiar
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Right: Expert implementation */}
@@ -133,7 +167,7 @@ function SolutionByIdDetail() {
             ¿Preferís que un experto lo implemente por vos? Llave en mano.
           </p>
           <ul className="mt-6 space-y-3">
-            {BENEFITS.map((b) => (
+            {EXPERT_BENEFITS.map((b) => (
               <li key={b} className="flex items-start gap-3 text-sm">
                 <Check className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>{b}</span>

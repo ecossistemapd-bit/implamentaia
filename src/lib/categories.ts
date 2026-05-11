@@ -18,7 +18,7 @@ export type CategoryKey =
 export const CATEGORIES: { key: CategoryKey; label: string; icon: typeof Briefcase; description: string }[] = [
   { key: "ventas", label: "Ventas", icon: Briefcase, description: "Califica leads, agenda y cierra más rápido." },
   { key: "marketing", label: "Marketing", icon: Megaphone, description: "Contenido, anuncios y SEO con IA." },
-  { key: "atencion", label: "Atención al cliente", icon: Headphones, description: "Soporte 24/7 que retiene clientes." },
+  { key: "atencion", label: "Servicio al Cliente", icon: Headphones, description: "Soporte 24/7 que retiene clientes." },
   { key: "finanzas", label: "Finanzas", icon: Wallet, description: "Conciliación, reportes y cash flow." },
   { key: "operaciones", label: "Operaciones", icon: SettingsIcon, description: "Procesos, onboarding y logística." },
   { key: "rrhh", label: "Recursos Humanos", icon: Users, description: "Screening, onboarding y clima." },
