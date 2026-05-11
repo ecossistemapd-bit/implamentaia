@@ -416,6 +416,7 @@ export type Database = {
           role: string
         }[]
       }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_implementer_or_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
