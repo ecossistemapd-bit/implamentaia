@@ -86,7 +86,7 @@ function SolutionsList() {
   return (
     <div className="mx-auto max-w-[1100px] px-6 py-10">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Soluciones</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Soluciones de <span className="text-teal-400">IA</span></h1>
         <p className="mt-1 text-sm text-slate-400">
           Implementaciones reales y listas para tu empresa.
         </p>
