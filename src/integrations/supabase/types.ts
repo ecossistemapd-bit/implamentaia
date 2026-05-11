@@ -242,6 +242,7 @@ export type Database = {
           full_name: string | null
           id: string
           industry: string | null
+          onboarding_completed: boolean | null
           role: string | null
           team_size: string | null
           updated_at: string
@@ -253,6 +254,7 @@ export type Database = {
           full_name?: string | null
           id: string
           industry?: string | null
+          onboarding_completed?: boolean | null
           role?: string | null
           team_size?: string | null
           updated_at?: string
@@ -264,6 +266,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           industry?: string | null
+          onboarding_completed?: boolean | null
           role?: string | null
           team_size?: string | null
           updated_at?: string
@@ -402,6 +405,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_users: {
+        Args: never
+        Returns: {
+          company_name: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          role: string
+        }[]
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_implementer_or_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {

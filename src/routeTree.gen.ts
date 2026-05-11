@@ -20,6 +20,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSolutionsIndexRouteImport } from './routes/_authenticated/solutions.index'
 import { Route as AuthenticatedImplementadorIndexRouteImport } from './routes/_authenticated/implementador.index'
 import { Route as AuthenticatedCursosIndexRouteImport } from './routes/_authenticated/cursos.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as SolutionsIdContratarRouteImport } from './routes/solutions.$id.contratar'
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
 import { Route as AuthenticatedSolutionsIdRouteImport } from './routes/_authenticated/solutions.$id'
@@ -83,6 +84,11 @@ const AuthenticatedCursosIndexRoute =
     path: '/cursos/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const SolutionsIdContratarRoute = SolutionsIdContratarRouteImport.update({
   id: '/solutions/$id/contratar',
   path: '/solutions/$id/contratar',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/cursos/': typeof AuthenticatedCursosIndexRoute
   '/implementador/': typeof AuthenticatedImplementadorIndexRoute
   '/solutions/': typeof AuthenticatedSolutionsIndexRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/cursos': typeof AuthenticatedCursosIndexRoute
   '/implementador': typeof AuthenticatedImplementadorIndexRoute
   '/solutions': typeof AuthenticatedSolutionsIndexRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/cursos/': typeof AuthenticatedCursosIndexRoute
   '/_authenticated/implementador/': typeof AuthenticatedImplementadorIndexRoute
   '/_authenticated/solutions/': typeof AuthenticatedSolutionsIndexRoute
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/solutions/$id'
     | '/solutions/$slug'
     | '/solutions/$id/contratar'
+    | '/admin/'
     | '/cursos/'
     | '/implementador/'
     | '/solutions/'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/solutions/$id'
     | '/solutions/$slug'
     | '/solutions/$id/contratar'
+    | '/admin'
     | '/cursos'
     | '/implementador'
     | '/solutions'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/_authenticated/solutions/$id'
     | '/_authenticated/solutions/$slug'
     | '/solutions/$id/contratar'
+    | '/_authenticated/admin/'
     | '/_authenticated/cursos/'
     | '/_authenticated/implementador/'
     | '/_authenticated/solutions/'
@@ -309,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCursosIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/solutions/$id/contratar': {
       id: '/solutions/$id/contratar'
       path: '/solutions/$id/contratar'
@@ -354,6 +373,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedBuilderSolutionIdRoute: typeof AuthenticatedBuilderSolutionIdRoute
   AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRoute
   AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedCursosIndexRoute: typeof AuthenticatedCursosIndexRoute
   AuthenticatedImplementadorIndexRoute: typeof AuthenticatedImplementadorIndexRoute
   AuthenticatedSolutionsIndexRoute: typeof AuthenticatedSolutionsIndexRoute
@@ -367,6 +387,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBuilderSolutionIdRoute: AuthenticatedBuilderSolutionIdRoute,
   AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRoute,
   AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedCursosIndexRoute: AuthenticatedCursosIndexRoute,
   AuthenticatedImplementadorIndexRoute: AuthenticatedImplementadorIndexRoute,
   AuthenticatedSolutionsIndexRoute: AuthenticatedSolutionsIndexRoute,
