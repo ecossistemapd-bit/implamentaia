@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContratarConfirmacionRouteImport } from './routes/contratar.confirmacion'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -33,6 +34,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContratarConfirmacionRoute = ContratarConfirmacionRouteImport.update({
+  id: '/contratar/confirmacion',
+  path: '/contratar/confirmacion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/contratar/confirmacion': typeof ContratarConfirmacionRoute
   '/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/contratar/confirmacion': typeof ContratarConfirmacionRoute
   '/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/contratar/confirmacion': typeof ContratarConfirmacionRoute
   '/_authenticated/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/projects'
     | '/settings'
+    | '/contratar/confirmacion'
     | '/builder/$solutionId'
     | '/solutions/$id'
     | '/solutions/$slug'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/projects'
     | '/settings'
+    | '/contratar/confirmacion'
     | '/builder/$solutionId'
     | '/solutions/$id'
     | '/solutions/$slug'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/projects'
     | '/_authenticated/settings'
+    | '/contratar/confirmacion'
     | '/_authenticated/builder/$solutionId'
     | '/_authenticated/solutions/$id'
     | '/_authenticated/solutions/$slug'
@@ -162,6 +174,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ContratarConfirmacionRoute: typeof ContratarConfirmacionRoute
   SolutionsIdContratarRoute: typeof SolutionsIdContratarRoute
 }
 
@@ -186,6 +199,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contratar/confirmacion': {
+      id: '/contratar/confirmacion'
+      path: '/contratar/confirmacion'
+      fullPath: '/contratar/confirmacion'
+      preLoaderRoute: typeof ContratarConfirmacionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings': {
@@ -275,6 +295,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  ContratarConfirmacionRoute: ContratarConfirmacionRoute,
   SolutionsIdContratarRoute: SolutionsIdContratarRoute,
 }
 export const routeTree = rootRouteImport
