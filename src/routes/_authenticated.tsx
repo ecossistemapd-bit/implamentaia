@@ -38,11 +38,11 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/solutions", label: "Soluciones", icon: Sparkles },
-  { to: "/builder", label: "Builder", icon: Wrench },
-  { to: "/projects", label: "Mis Proyectos", icon: FolderKanban },
-  { to: "/settings", label: "Configuración", icon: SettingsIcon },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, search: undefined as Record<string, string> | undefined },
+  { to: "/solutions", label: "Soluciones", icon: Sparkles, search: undefined },
+  { to: "/solutions", label: "Builder", icon: Wrench, search: { mode: "builder" } },
+  { to: "/projects", label: "Mis Proyectos", icon: FolderKanban, search: undefined },
+  { to: "/settings", label: "Configuración", icon: SettingsIcon, search: undefined },
 ] as const;
 
 function AuthenticatedLayout() {
