@@ -1,11 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { ClipboardList, Clock, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useRole } from "@/hooks/use-role";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/implementador/")({
   component: ImplementerPanel,
@@ -24,14 +23,14 @@ type Row = {
 };
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  pending: { label: "Pendiente", cls: "bg-yellow-50 text-yellow-700 border-yellow-200" },
-  assigned: { label: "Asignado", cls: "bg-blue-50 text-blue-700 border-blue-200" },
-  in_progress: { label: "En curso", cls: "bg-purple-50 text-purple-700 border-purple-200" },
-  completed: { label: "Completado", cls: "bg-green-50 text-green-700 border-green-200" },
-  cancelled: { label: "Cancelado", cls: "bg-gray-50 text-gray-500 border-gray-200" },
-  generating: { label: "Generando", cls: "bg-gray-50 text-gray-500 border-gray-200" },
-  ready: { label: "Listo", cls: "bg-green-50 text-green-700 border-green-200" },
-  error: { label: "Error", cls: "bg-red-50 text-red-700 border-red-200" },
+  pending: { label: "Pendiente", cls: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
+  assigned: { label: "Asignado", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
+  in_progress: { label: "En curso", cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+  completed: { label: "Completado", cls: "bg-teal-500/20 text-teal-400 border-teal-500/30" },
+  cancelled: { label: "Cancelado", cls: "bg-slate-500/20 text-slate-400 border-slate-500/30" },
+  generating: { label: "Generando", cls: "bg-slate-500/20 text-slate-400 border-slate-500/30" },
+  ready: { label: "Listo", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
+  error: { label: "Error", cls: "bg-red-500/20 text-red-400 border-red-500/30" },
 };
 
 function ImplementerPanel() {
@@ -91,30 +90,38 @@ function ImplementerPanel() {
   }, [data, tab, search]);
 
   if (roleLoading || !isImplementer) {
-    return <div className="p-10 text-sm text-gray-400">Cargando…</div>;
+    return <div className="p-10 text-sm text-slate-400">Cargando…</div>;
   }
+
+  const stats = [
+    { n: counts.total, l: "Total", icon: ClipboardList },
+    { n: counts.pending, l: "Pendientes", icon: Clock },
+    { n: counts.in_progress, l: "En curso", icon: Loader2 },
+    { n: counts.completed, l: "Completados", icon: CheckCircle2 },
+  ];
 
   return (
     <div className="mx-auto max-w-[1100px] px-6 py-10">
-      <h1 className="text-2xl font-bold tracking-tight">Panel del Implementador</h1>
-      <p className="mt-1 text-sm text-gray-500">Proyectos asignados a tu cuenta.</p>
+      <h1 className="text-3xl font-bold tracking-tight text-white">
+        Panel del <span className="text-teal-400">Implementador</span>
+      </h1>
+      <p className="mt-1 text-sm text-slate-400">Proyectos asignados a tu cuenta.</p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          { n: counts.total, l: "Total" },
-          { n: counts.pending, l: "Pendientes" },
-          { n: counts.in_progress, l: "En curso" },
-          { n: counts.completed, l: "Completados" },
-        ].map((s) => (
-          <div key={s.l} className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-2xl font-bold">{s.n}</div>
-            <div className="text-xs text-gray-500">{s.l}</div>
+        {stats.map((s) => (
+          <div
+            key={s.l}
+            className="rounded-xl border border-slate-700 bg-slate-800 p-5 transition hover:scale-[1.02] hover:border-teal-500/50"
+          >
+            <s.icon className="h-4 w-4 text-teal-400" strokeWidth={1.75} />
+            <div className="mt-3 text-3xl font-bold text-teal-400">{s.n}</div>
+            <div className="mt-1 text-sm text-slate-400">{s.l}</div>
           </div>
         ))}
       </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-1 rounded-lg border border-gray-200 bg-white p-1 text-xs">
+        <div className="flex gap-1 rounded-xl bg-slate-800/50 p-1 text-xs">
           {([
             ["all", "Todos"],
             ["pending", "Pendientes"],
@@ -124,65 +131,72 @@ function ImplementerPanel() {
             <button
               key={k}
               onClick={() => setTab(k)}
-              className={`rounded-md px-3 py-1.5 transition ${
-                tab === k ? "bg-foreground text-background" : "text-gray-600 hover:bg-gray-50"
+              className={`rounded-lg border px-3 py-1.5 transition ${
+                tab === k
+                  ? "border-teal-500/50 bg-teal-500/20 text-teal-400"
+                  : "border-slate-700 bg-slate-800 text-slate-400 hover:text-slate-200"
               }`}
             >
               {label}
             </button>
           ))}
         </div>
-        <Input
+        <input
           placeholder="Buscar por cliente o empresa…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="h-9 w-full sm:max-w-xs text-sm"
+          className="h-9 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 text-sm text-slate-200 placeholder:text-slate-500 focus:border-teal-500/50 focus:outline-none sm:max-w-xs"
         />
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="mt-4 overflow-hidden rounded-xl border border-slate-700 bg-slate-800/50">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs uppercase tracking-wider text-gray-500">
+          <thead className="bg-slate-900 text-left text-xs uppercase tracking-wide text-slate-400">
             <tr>
-              <th className="px-4 py-3">Cliente</th>
-              <th className="px-4 py-3">Solución</th>
-              <th className="px-4 py-3">Estado</th>
-              <th className="px-4 py-3">Fecha</th>
-              <th className="px-4 py-3 text-right">Acciones</th>
+              <th className="px-4 py-3 font-medium">Cliente</th>
+              <th className="px-4 py-3 font-medium">Solución</th>
+              <th className="px-4 py-3 font-medium">Estado</th>
+              <th className="px-4 py-3 font-medium">Fecha</th>
+              <th className="px-4 py-3 text-right font-medium">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody>
             {isLoading ? (
-              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-gray-400">Cargando…</td></tr>
+              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-slate-500">Cargando…</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-gray-400">Sin proyectos.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-slate-500">Sin proyectos.</td></tr>
             ) : (
               filtered.map((r) => {
                 const meta = STATUS_META[r.status] ?? STATUS_META.pending;
+                const hasName = !!r.contact_name;
                 return (
-                  <tr key={r.id} className="hover:bg-gray-50">
+                  <tr key={r.id} className="border-b border-slate-700/50 bg-slate-800 transition hover:bg-slate-700/50">
                     <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900">{r.contact_name ?? "—"}</div>
-                      <div className="text-xs text-gray-500">{r.company_name ?? ""}</div>
+                      {hasName ? (
+                        <>
+                          <div className="font-medium text-slate-200">{r.contact_name}</div>
+                          <div className="text-xs text-slate-500">{r.company_name ?? ""}</div>
+                        </>
+                      ) : (
+                        <span className="italic text-slate-500">Sin asignar</span>
+                      )}
                     </td>
-                    <td className="px-4 py-3 text-gray-700">{r.solutions?.title ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-300">{r.solutions?.title ?? "—"}</td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex rounded-md border px-2 py-0.5 text-[11px] font-medium ${meta.cls}`}>
+                      <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${meta.cls}`}>
                         {meta.label}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-600">
+                    <td className="px-4 py-3 text-xs text-slate-400">
                       {new Date(r.created_at).toLocaleDateString("es", { day: "2-digit", month: "2-digit", year: "numeric" })}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 text-xs"
+                      <button
                         onClick={() => navigate({ to: "/implementador/proyecto/$projectId", params: { projectId: r.id } })}
+                        className="rounded-lg border border-slate-600 px-4 py-1.5 text-sm text-slate-300 transition hover:border-teal-500 hover:text-teal-400"
                       >
                         Ver detalle →
-                      </Button>
+                      </button>
                     </td>
                   </tr>
                 );
