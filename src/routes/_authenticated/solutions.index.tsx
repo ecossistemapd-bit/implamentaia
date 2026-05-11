@@ -18,8 +18,8 @@ export const Route = createFileRoute("/_authenticated/solutions/")({
 });
 
 function SolutionsList() {
-  const { mode } = Route.useSearch();
-  const builderMode = mode === "builder";
+  Route.useSearch();
+
   const { user } = useAuth();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<CategoryKey | "all">("all");
