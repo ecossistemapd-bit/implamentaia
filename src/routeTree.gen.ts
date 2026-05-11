@@ -12,14 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContratarConfirmacionRouteImport } from './routes/contratar.confirmacion'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedSolutionsIndexRouteImport } from './routes/_authenticated/solutions.index'
+import { Route as SolutionsIdContratarRouteImport } from './routes/solutions.$id.contratar'
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
 import { Route as AuthenticatedSolutionsIdRouteImport } from './routes/_authenticated/solutions.$id'
 import { Route as AuthenticatedBuilderSolutionIdRouteImport } from './routes/_authenticated/builder.$solutionId'
-import { Route as AuthenticatedSolutionsIdContratarRouteImport } from './routes/_authenticated/solutions.$id.contratar'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -33,6 +34,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContratarConfirmacionRoute = ContratarConfirmacionRouteImport.update({
+  id: '/contratar/confirmacion',
+  path: '/contratar/confirmacion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -56,6 +62,11 @@ const AuthenticatedSolutionsIndexRoute =
     path: '/solutions/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const SolutionsIdContratarRoute = SolutionsIdContratarRouteImport.update({
+  id: '/solutions/$id/contratar',
+  path: '/solutions/$id/contratar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSolutionsSlugRoute =
   AuthenticatedSolutionsSlugRouteImport.update({
     id: '/solutions/$slug',
@@ -74,12 +85,6 @@ const AuthenticatedBuilderSolutionIdRoute =
     path: '/builder/$solutionId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedSolutionsIdContratarRoute =
-  AuthenticatedSolutionsIdContratarRouteImport.update({
-    id: '/contratar',
-    path: '/contratar',
-    getParentRoute: () => AuthenticatedSolutionsIdRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,11 +92,12 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/contratar/confirmacion': typeof ContratarConfirmacionRoute
   '/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
-  '/solutions/$id': typeof AuthenticatedSolutionsIdRouteWithChildren
+  '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
+  '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/solutions/': typeof AuthenticatedSolutionsIndexRoute
-  '/solutions/$id/contratar': typeof AuthenticatedSolutionsIdContratarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -99,11 +105,12 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/contratar/confirmacion': typeof ContratarConfirmacionRoute
   '/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
-  '/solutions/$id': typeof AuthenticatedSolutionsIdRouteWithChildren
+  '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
+  '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/solutions': typeof AuthenticatedSolutionsIndexRoute
-  '/solutions/$id/contratar': typeof AuthenticatedSolutionsIdContratarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -113,11 +120,12 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/contratar/confirmacion': typeof ContratarConfirmacionRoute
   '/_authenticated/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
-  '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRouteWithChildren
+  '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
+  '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/_authenticated/solutions/': typeof AuthenticatedSolutionsIndexRoute
-  '/_authenticated/solutions/$id/contratar': typeof AuthenticatedSolutionsIdContratarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -127,11 +135,12 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/projects'
     | '/settings'
+    | '/contratar/confirmacion'
     | '/builder/$solutionId'
     | '/solutions/$id'
     | '/solutions/$slug'
-    | '/solutions/'
     | '/solutions/$id/contratar'
+    | '/solutions/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,11 +148,12 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/projects'
     | '/settings'
+    | '/contratar/confirmacion'
     | '/builder/$solutionId'
     | '/solutions/$id'
     | '/solutions/$slug'
-    | '/solutions'
     | '/solutions/$id/contratar'
+    | '/solutions'
   id:
     | '__root__'
     | '/'
@@ -152,17 +162,20 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/projects'
     | '/_authenticated/settings'
+    | '/contratar/confirmacion'
     | '/_authenticated/builder/$solutionId'
     | '/_authenticated/solutions/$id'
     | '/_authenticated/solutions/$slug'
+    | '/solutions/$id/contratar'
     | '/_authenticated/solutions/'
-    | '/_authenticated/solutions/$id/contratar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ContratarConfirmacionRoute: typeof ContratarConfirmacionRoute
+  SolutionsIdContratarRoute: typeof SolutionsIdContratarRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -186,6 +199,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contratar/confirmacion': {
+      id: '/contratar/confirmacion'
+      path: '/contratar/confirmacion'
+      fullPath: '/contratar/confirmacion'
+      preLoaderRoute: typeof ContratarConfirmacionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings': {
@@ -216,6 +236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSolutionsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/solutions/$id/contratar': {
+      id: '/solutions/$id/contratar'
+      path: '/solutions/$id/contratar'
+      fullPath: '/solutions/$id/contratar'
+      preLoaderRoute: typeof SolutionsIdContratarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/solutions/$slug': {
       id: '/_authenticated/solutions/$slug'
       path: '/solutions/$slug'
@@ -237,37 +264,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBuilderSolutionIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/solutions/$id/contratar': {
-      id: '/_authenticated/solutions/$id/contratar'
-      path: '/contratar'
-      fullPath: '/solutions/$id/contratar'
-      preLoaderRoute: typeof AuthenticatedSolutionsIdContratarRouteImport
-      parentRoute: typeof AuthenticatedSolutionsIdRoute
-    }
   }
 }
-
-interface AuthenticatedSolutionsIdRouteChildren {
-  AuthenticatedSolutionsIdContratarRoute: typeof AuthenticatedSolutionsIdContratarRoute
-}
-
-const AuthenticatedSolutionsIdRouteChildren: AuthenticatedSolutionsIdRouteChildren =
-  {
-    AuthenticatedSolutionsIdContratarRoute:
-      AuthenticatedSolutionsIdContratarRoute,
-  }
-
-const AuthenticatedSolutionsIdRouteWithChildren =
-  AuthenticatedSolutionsIdRoute._addFileChildren(
-    AuthenticatedSolutionsIdRouteChildren,
-  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedBuilderSolutionIdRoute: typeof AuthenticatedBuilderSolutionIdRoute
-  AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRouteWithChildren
+  AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRoute
   AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
   AuthenticatedSolutionsIndexRoute: typeof AuthenticatedSolutionsIndexRoute
 }
@@ -277,7 +282,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedBuilderSolutionIdRoute: AuthenticatedBuilderSolutionIdRoute,
-  AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRouteWithChildren,
+  AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRoute,
   AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
   AuthenticatedSolutionsIndexRoute: AuthenticatedSolutionsIndexRoute,
 }
@@ -290,6 +295,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  ContratarConfirmacionRoute: ContratarConfirmacionRoute,
+  SolutionsIdContratarRoute: SolutionsIdContratarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
