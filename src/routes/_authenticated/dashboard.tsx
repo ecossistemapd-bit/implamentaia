@@ -80,6 +80,94 @@ function Dashboard() {
           36 soluciones listas con guía paso a paso, prompts e integraciones.
         </p>
       </section>
+
+      <ContinuarAprendiendo />
     </div>
+  );
+}
+
+const COURSE_EMOJI: Record<string, string> = {
+  "No-Code": "🛠️",
+  "Inteligencia Artificial": "🤖",
+  "Automatización": "⚡",
+};
+
+function ContinuarAprendiendo() {
+  const { user } = useAuth();
+  const { data } = useQuery({
+    queryKey: ["dashboard-courses", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data: courses } = await supabase
+        .from("courses" as never)
+        .select("id, title, category")
+        .eq("is_published", true)
+        .order("order_index")
+        .limit(2);
+      const list = (courses ?? []) as Array<{ id: string; title: string; category: string | null }>;
+      const ids = list.map((c) => c.id);
+      if (ids.length === 0) return [];
+      const { data: mods } = await supabase
+        .from("modules" as never)
+        .select("id, course_id")
+        .in("course_id", ids);
+      const modList = (mods ?? []) as Array<{ id: string; course_id: string }>;
+      const modIds = modList.map((m) => m.id);
+      const { data: prog } = modIds.length
+        ? await supabase
+            .from("user_progress" as never)
+            .select("module_id, completed")
+            .eq("user_id", user!.id)
+            .in("module_id", modIds)
+        : { data: [] as Array<{ module_id: string; completed: boolean }> };
+      const completedSet = new Set(
+        ((prog ?? []) as Array<{ module_id: string; completed: boolean }>)
+          .filter((p) => p.completed)
+          .map((p) => p.module_id),
+      );
+      return list.map((c) => {
+        const courseMods = modList.filter((m) => m.course_id === c.id);
+        const total = courseMods.length;
+        const done = courseMods.filter((m) => completedSet.has(m.id)).length;
+        return { ...c, total, done };
+      });
+    },
+  });
+
+  const items = data ?? [];
+
+  return (
+    <section className="mt-14">
+      <div className="flex items-center justify-between">
+        <h2 className="text-base font-semibold">Continuar aprendiendo</h2>
+        <Link to="/cursos" className="text-sm text-muted-foreground hover:text-foreground">
+          Ver todos los cursos →
+        </Link>
+      </div>
+      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+        {items.map((c) => {
+          const pct = c.total > 0 ? Math.round((c.done / c.total) * 100) : 0;
+          return (
+            <Link
+              key={c.id}
+              to="/cursos/$courseId"
+              params={{ courseId: c.id }}
+              className="flex h-20 items-center gap-4 rounded-xl border border-border bg-card px-4 transition hover:bg-accent"
+            >
+              <div className="text-2xl">{COURSE_EMOJI[c.category ?? ""] ?? "📘"}</div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium">{c.title}</div>
+                <div className="mt-1.5 h-1 w-full overflow-hidden rounded bg-muted">
+                  <div className="h-full bg-foreground" style={{ width: `${pct}%` }} />
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {c.done} de {c.total} módulos
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
   );
 }
