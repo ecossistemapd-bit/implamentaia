@@ -50,7 +50,17 @@ function BuilderWizard() {
   const [generatingPrompt, setGeneratingPrompt] = useState(false);
   const [copied, setCopied] = useState(false);
   const [checks, setChecks] = useState<boolean[]>([]);
+  const [resumeOffer, setResumeOffer] = useState<null | {
+    sessionId: string;
+    step: number;
+    answers: Record<string, string>;
+    stack: Record<string, string[]>;
+    checklist: boolean[];
+    generatedPrompt: string | null;
+  }>(null);
   const initRef = useRef(false);
+
+  const lsKey = `builder_session_${solutionId}`;
 
   const { data: solution, isLoading } = useQuery({
     queryKey: ["solution-builder", solutionId],
@@ -65,24 +75,55 @@ function BuilderWizard() {
     },
   });
 
-  // Create session on mount
+  const createNewSession = async () => {
+    if (!user || !solution) return;
+    const { data, error } = await supabase
+      .from("builder_sessions")
+      .insert({
+        user_id: user.id,
+        solution_id: solution.id,
+        current_step: 1,
+        answers: {},
+      })
+      .select("id")
+      .single();
+    if (!error && data) {
+      setSessionId(data.id);
+      try { localStorage.setItem(lsKey, data.id); } catch {}
+    }
+  };
+
+  // On mount: try to resume from localStorage, otherwise create new session
   useEffect(() => {
     if (!user || !solution || initRef.current) return;
     initRef.current = true;
     (async () => {
-      const { data, error } = await supabase
-        .from("builder_sessions")
-        .insert({
-          user_id: user.id,
-          solution_id: solution.id,
-          current_step: 1,
-          answers: {},
-        })
-        .select("id")
-        .single();
-      if (!error && data) setSessionId(data.id);
+      let existingId: string | null = null;
+      try { existingId = localStorage.getItem(lsKey); } catch {}
+      if (existingId) {
+        const { data: s } = await supabase
+          .from("builder_sessions")
+          .select("*")
+          .eq("id", existingId)
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (s && (s.status === "in_progress" || s.status === "paused")) {
+          const ans = (s.answers as Record<string, unknown>) ?? {};
+          setResumeOffer({
+            sessionId: s.id,
+            step: s.current_step ?? 1,
+            answers: (ans.step1 as Record<string, string>) ?? {},
+            stack: (ans.step2 as Record<string, string[]>) ?? {},
+            checklist: (ans.checklist as boolean[]) ?? [],
+            generatedPrompt: s.generated_prompt ?? null,
+          });
+          return;
+        }
+        try { localStorage.removeItem(lsKey); } catch {}
+      }
+      await createNewSession();
     })();
-  }, [user, solution]);
+  }, [user, solution]); // eslint-disable-line
 
   // Init checklist
   useEffect(() => {
