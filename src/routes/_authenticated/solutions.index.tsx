@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/solutions/")({
 });
 
 function SolutionsList() {
+  const { mode } = Route.useSearch();
+  const builderMode = mode === "builder";
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<CategoryKey | "all">("all");
   const [diff, setDiff] = useState<Difficulty | "all">("all");
