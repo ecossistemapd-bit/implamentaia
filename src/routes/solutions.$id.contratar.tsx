@@ -151,7 +151,7 @@ function ContratarPage() {
 
           {/* Próximos pasos */}
           <div className="mt-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#999]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
               Próximos pasos
             </p>
             <ol className="relative mt-4 space-y-5 border-l border-border pl-6">
