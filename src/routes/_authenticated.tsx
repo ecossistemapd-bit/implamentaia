@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Sparkles,
-  Wrench,
   FolderKanban,
   BookOpen,
   Settings as SettingsIcon,
