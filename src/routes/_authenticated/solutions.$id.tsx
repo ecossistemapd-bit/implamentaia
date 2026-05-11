@@ -35,6 +35,7 @@ function SolutionByIdDetail() {
   const [context, setContext] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState<string | null>(null);
+  const [showPromptModal, setShowPromptModal] = useState(false);
 
   const { data: s, isLoading, isError } = useQuery({
     queryKey: ["solution-by-id", id],
@@ -92,54 +93,75 @@ function SolutionByIdDetail() {
       <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
         {/* Left: Generate prompt */}
         <div className="rounded-[10px] border border-foreground bg-background p-5">
-          <h2 className="text-[16px] font-bold tracking-tight">Generá tu prompt para Lovable</h2>
+          <h2 className="text-[16px] font-bold tracking-tight">Implementá esta solución</h2>
           <p className="mt-1 text-[13px] text-muted-foreground">
-            Personalizá esta solución con tu contexto.
+            Un wizard te guía paso a paso con tu contexto y stack.
           </p>
-          <div className="mt-4 space-y-1.5">
-            <Label htmlFor="context" className="text-[12px]">¿Cuál es tu industria o contexto?</Label>
-            <Textarea
-              id="context"
-              value={context}
-              onChange={(e) => setContext(e.target.value)}
-              placeholder="Ej: Tienda de e-commerce de indumentaria con 5.000 clientes activos…"
-              className="h-[72px] min-h-[72px] text-[13px] rounded-lg"
-            />
-          </div>
           <Button
             className="mt-4 h-10 w-full rounded-lg bg-foreground text-background hover:bg-foreground/90 text-[14px]"
-            disabled={!context.trim() || generating}
-            onClick={async () => {
-              setGenerating(true);
-              setGenerated(null);
-              try {
-                const { data, error } = await supabase.functions.invoke("generate-solution-prompt", {
-                  body: { solution_id: id, user_context: context },
-                });
-                if (error) throw error;
-                setGenerated((data as { prompt?: string })?.prompt ?? null);
-              } catch (e: unknown) {
-                const msg = e instanceof Error ? e.message : "Error generando prompt";
-                alert(msg);
-              } finally {
-                setGenerating(false);
-              }
-            }}
+            onClick={() => navigate({ to: "/builder/$solutionId", params: { solutionId: id } })}
           >
-            {generating ? "Generando…" : "✦ Generar Prompt para Lovable"}
+            → Comenzar implementación guiada
           </Button>
-          {generated && (
-            <div className="mt-4 space-y-1.5">
-              <Label className="text-[12px]">Prompt generado</Label>
-              <Textarea readOnly value={generated} rows={10} className="font-mono text-[12px] rounded-lg" />
+          <Button
+            variant="outline"
+            className="mt-2 h-10 w-full rounded-lg text-[14px]"
+            onClick={() => setShowPromptModal(true)}
+          >
+            Generar solo el prompt
+          </Button>
+          <p className="mt-2 text-[12px] text-muted-foreground">
+            El Builder te guía paso a paso en 15 minutos.
+          </p>
+
+          {showPromptModal && (
+            <div className="mt-4 space-y-3 border-t border-border pt-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="context" className="text-[12px]">¿Cuál es tu industria o contexto?</Label>
+                <Textarea
+                  id="context"
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  placeholder="Ej: Tienda de e-commerce de indumentaria con 5.000 clientes activos…"
+                  className="h-[72px] min-h-[72px] text-[13px] rounded-lg"
+                />
+              </div>
               <Button
-                variant="outline"
                 size="sm"
-                className="rounded-lg text-[12px]"
-                onClick={() => navigator.clipboard.writeText(generated)}
+                className="h-9 w-full rounded-lg bg-foreground text-background hover:bg-foreground/90 text-[13px]"
+                disabled={!context.trim() || generating}
+                onClick={async () => {
+                  setGenerating(true);
+                  setGenerated(null);
+                  try {
+                    const { data, error } = await supabase.functions.invoke("generate-solution-prompt", {
+                      body: { solution_id: id, user_context: context },
+                    });
+                    if (error) throw error;
+                    setGenerated((data as { prompt?: string })?.prompt ?? null);
+                  } catch (e: unknown) {
+                    const msg = e instanceof Error ? e.message : "Error generando prompt";
+                    alert(msg);
+                  } finally {
+                    setGenerating(false);
+                  }
+                }}
               >
-                Copiar
+                {generating ? "Generando…" : "✦ Generar Prompt"}
               </Button>
+              {generated && (
+                <div className="space-y-1.5">
+                  <Textarea readOnly value={generated} rows={8} className="font-mono text-[12px] rounded-lg" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-lg text-[12px]"
+                    onClick={() => navigator.clipboard.writeText(generated)}
+                  >
+                    Copiar
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>

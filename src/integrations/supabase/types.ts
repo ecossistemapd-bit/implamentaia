@@ -79,6 +79,53 @@ export type Database = {
           },
         ]
       }
+      builder_sessions: {
+        Row: {
+          answers: Json
+          created_at: string
+          current_step: number
+          generated_n8n: string | null
+          generated_prompt: string | null
+          id: string
+          solution_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          current_step?: number
+          generated_n8n?: string | null
+          generated_prompt?: string | null
+          id?: string
+          solution_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          current_step?: number
+          generated_n8n?: string | null
+          generated_prompt?: string | null
+          id?: string
+          solution_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "builder_sessions_solution_id_fkey"
+            columns: ["solution_id"]
+            isOneToOne: false
+            referencedRelation: "solutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -146,7 +193,9 @@ export type Database = {
       }
       solutions: {
         Row: {
+          builder_questions: Json | null
           category: Database["public"]["Enums"]["solution_category"]
+          checklist_items: string[] | null
           created_at: string
           difficulty: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time: string
@@ -156,6 +205,7 @@ export type Database = {
           integrations: string[]
           is_featured: boolean
           long_description: string
+          n8n_template: string | null
           prompt_template: string | null
           roi_estimate: string
           short_description: string
@@ -164,7 +214,9 @@ export type Database = {
           tools_required: string[]
         }
         Insert: {
+          builder_questions?: Json | null
           category: Database["public"]["Enums"]["solution_category"]
+          checklist_items?: string[] | null
           created_at?: string
           difficulty: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time: string
@@ -174,6 +226,7 @@ export type Database = {
           integrations?: string[]
           is_featured?: boolean
           long_description: string
+          n8n_template?: string | null
           prompt_template?: string | null
           roi_estimate: string
           short_description: string
@@ -182,7 +235,9 @@ export type Database = {
           tools_required?: string[]
         }
         Update: {
+          builder_questions?: Json | null
           category?: Database["public"]["Enums"]["solution_category"]
+          checklist_items?: string[] | null
           created_at?: string
           difficulty?: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time?: string
@@ -192,6 +247,7 @@ export type Database = {
           integrations?: string[]
           is_featured?: boolean
           long_description?: string
+          n8n_template?: string | null
           prompt_template?: string | null
           roi_estimate?: string
           short_description?: string

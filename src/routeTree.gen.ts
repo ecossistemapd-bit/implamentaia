@@ -16,10 +16,9 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedSolutionsIndexRouteImport } from './routes/_authenticated/solutions.index'
-import { Route as AuthenticatedBuilderIndexRouteImport } from './routes/_authenticated/builder.index'
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
 import { Route as AuthenticatedSolutionsIdRouteImport } from './routes/_authenticated/solutions.$id'
-import { Route as AuthenticatedBuilderIdRouteImport } from './routes/_authenticated/builder.$id'
+import { Route as AuthenticatedBuilderSolutionIdRouteImport } from './routes/_authenticated/builder.$solutionId'
 import { Route as AuthenticatedSolutionsIdContratarRouteImport } from './routes/_authenticated/solutions.$id.contratar'
 
 const LoginRoute = LoginRouteImport.update({
@@ -57,12 +56,6 @@ const AuthenticatedSolutionsIndexRoute =
     path: '/solutions/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedBuilderIndexRoute =
-  AuthenticatedBuilderIndexRouteImport.update({
-    id: '/builder/',
-    path: '/builder/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedSolutionsSlugRoute =
   AuthenticatedSolutionsSlugRouteImport.update({
     id: '/solutions/$slug',
@@ -75,11 +68,12 @@ const AuthenticatedSolutionsIdRoute =
     path: '/solutions/$id',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedBuilderIdRoute = AuthenticatedBuilderIdRouteImport.update({
-  id: '/builder/$id',
-  path: '/builder/$id',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
+const AuthenticatedBuilderSolutionIdRoute =
+  AuthenticatedBuilderSolutionIdRouteImport.update({
+    id: '/builder/$solutionId',
+    path: '/builder/$solutionId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSolutionsIdContratarRoute =
   AuthenticatedSolutionsIdContratarRouteImport.update({
     id: '/contratar',
@@ -93,10 +87,9 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/solutions/$id': typeof AuthenticatedSolutionsIdRouteWithChildren
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
-  '/builder/': typeof AuthenticatedBuilderIndexRoute
   '/solutions/': typeof AuthenticatedSolutionsIndexRoute
   '/solutions/$id/contratar': typeof AuthenticatedSolutionsIdContratarRoute
 }
@@ -106,10 +99,9 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/solutions/$id': typeof AuthenticatedSolutionsIdRouteWithChildren
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
-  '/builder': typeof AuthenticatedBuilderIndexRoute
   '/solutions': typeof AuthenticatedSolutionsIndexRoute
   '/solutions/$id/contratar': typeof AuthenticatedSolutionsIdContratarRoute
 }
@@ -121,10 +113,9 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
-  '/_authenticated/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/_authenticated/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRouteWithChildren
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
-  '/_authenticated/builder/': typeof AuthenticatedBuilderIndexRoute
   '/_authenticated/solutions/': typeof AuthenticatedSolutionsIndexRoute
   '/_authenticated/solutions/$id/contratar': typeof AuthenticatedSolutionsIdContratarRoute
 }
@@ -136,10 +127,9 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/projects'
     | '/settings'
-    | '/builder/$id'
+    | '/builder/$solutionId'
     | '/solutions/$id'
     | '/solutions/$slug'
-    | '/builder/'
     | '/solutions/'
     | '/solutions/$id/contratar'
   fileRoutesByTo: FileRoutesByTo
@@ -149,10 +139,9 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/projects'
     | '/settings'
-    | '/builder/$id'
+    | '/builder/$solutionId'
     | '/solutions/$id'
     | '/solutions/$slug'
-    | '/builder'
     | '/solutions'
     | '/solutions/$id/contratar'
   id:
@@ -163,10 +152,9 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/projects'
     | '/_authenticated/settings'
-    | '/_authenticated/builder/$id'
+    | '/_authenticated/builder/$solutionId'
     | '/_authenticated/solutions/$id'
     | '/_authenticated/solutions/$slug'
-    | '/_authenticated/builder/'
     | '/_authenticated/solutions/'
     | '/_authenticated/solutions/$id/contratar'
   fileRoutesById: FileRoutesById
@@ -228,13 +216,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSolutionsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/builder/': {
-      id: '/_authenticated/builder/'
-      path: '/builder'
-      fullPath: '/builder/'
-      preLoaderRoute: typeof AuthenticatedBuilderIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/solutions/$slug': {
       id: '/_authenticated/solutions/$slug'
       path: '/solutions/$slug'
@@ -249,11 +230,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSolutionsIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/builder/$id': {
-      id: '/_authenticated/builder/$id'
-      path: '/builder/$id'
-      fullPath: '/builder/$id'
-      preLoaderRoute: typeof AuthenticatedBuilderIdRouteImport
+    '/_authenticated/builder/$solutionId': {
+      id: '/_authenticated/builder/$solutionId'
+      path: '/builder/$solutionId'
+      fullPath: '/builder/$solutionId'
+      preLoaderRoute: typeof AuthenticatedBuilderSolutionIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/solutions/$id/contratar': {
@@ -285,10 +266,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
-  AuthenticatedBuilderIdRoute: typeof AuthenticatedBuilderIdRoute
+  AuthenticatedBuilderSolutionIdRoute: typeof AuthenticatedBuilderSolutionIdRoute
   AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRouteWithChildren
   AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
-  AuthenticatedBuilderIndexRoute: typeof AuthenticatedBuilderIndexRoute
   AuthenticatedSolutionsIndexRoute: typeof AuthenticatedSolutionsIndexRoute
 }
 
@@ -296,10 +276,9 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
-  AuthenticatedBuilderIdRoute: AuthenticatedBuilderIdRoute,
+  AuthenticatedBuilderSolutionIdRoute: AuthenticatedBuilderSolutionIdRoute,
   AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRouteWithChildren,
   AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
-  AuthenticatedBuilderIndexRoute: AuthenticatedBuilderIndexRoute,
   AuthenticatedSolutionsIndexRoute: AuthenticatedSolutionsIndexRoute,
 }
 
