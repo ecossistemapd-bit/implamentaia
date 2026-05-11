@@ -53,7 +53,8 @@ function ProjectDetail() {
       if (error) throw error;
       if (!project) return null;
 
-      let session: { generated_prompt: string | null; answers: Record<string, unknown> } | null = null;
+      type Sess = { generated_prompt: string | null; answers: Record<string, unknown> };
+      let session: Sess | null = null;
       if (project.source_solution_id && project.user_id) {
         const { data: s } = await supabase
           .from("builder_sessions")
@@ -63,7 +64,7 @@ function ProjectDetail() {
           .order("updated_at", { ascending: false })
           .limit(1)
           .maybeSingle();
-        session = (s as typeof session) ?? null;
+        session = s ? ({ generated_prompt: s.generated_prompt, answers: (s.answers ?? {}) as Record<string, unknown> }) : null;
       }
       return { project, session };
     },
