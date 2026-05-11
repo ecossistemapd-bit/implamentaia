@@ -123,15 +123,15 @@ function ContratarPage() {
       <main className="mx-auto grid max-w-[1000px] gap-10 px-6 py-10 lg:grid-cols-[55fr_45fr]">
         {/* Left column */}
         <section className="order-2 lg:order-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
             Implementación profesional
           </p>
-          <h1 className="mt-2 text-[2rem] font-bold leading-[1.2] tracking-tight">
+          <h1 className="mt-2 text-[2rem] font-bold leading-[1.2] tracking-tight text-gray-900">
             Conectate con tu
             <br />
             Implementador Verificado
           </h1>
-          <p className="mt-3 max-w-[460px] text-[14px] leading-relaxed text-[#555]">
+          <p className="mt-3 max-w-[460px] text-sm leading-relaxed text-gray-700">
             Asignamos un especialista que configura esta solución en tu empresa
             de principio a fin. Vos solo acompañás el proceso.
           </p>
@@ -140,18 +140,18 @@ function ContratarPage() {
           <div className="mt-8 rounded-[10px] border border-[#e5e5e5] bg-white p-5">
             <Badge
               variant="outline"
-              className="rounded-full border-foreground/20 px-2.5 py-0.5 text-[10px] uppercase tracking-wider"
+              className="rounded-full border-foreground/20 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-gray-700"
             >
               {solution?.category ?? "—"}
             </Badge>
-            <div className="mt-1.5 text-[15px] font-semibold">
+            <div className="mt-1.5 text-[15px] font-semibold text-gray-900">
               {solution?.title ?? "Cargando…"}
             </div>
           </div>
 
           {/* Próximos pasos */}
           <div className="mt-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#999]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
               Próximos pasos
             </p>
             <ol className="relative mt-4 space-y-5 border-l border-border pl-6">
@@ -177,12 +177,12 @@ function ContratarPage() {
 
           {/* Incluido */}
           <div className="mt-8">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#999]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
               Incluido en el servicio
             </p>
             <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               {INCLUDED.map((it) => (
-                <div key={it} className="flex items-start gap-2 text-[13px]">
+                <div key={it} className="flex items-start gap-2 text-sm text-gray-700">
                   <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
                     <Check className="h-2.5 w-2.5" strokeWidth={3} />
                   </span>
@@ -356,14 +356,14 @@ function Step({
         {num}
       </span>
       <div className="flex items-center gap-2">
-        <h3 className="text-[14px] font-semibold">{title}</h3>
+        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
         {badge && (
           <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
             {badge}
           </span>
         )}
       </div>
-      <p className="mt-1 text-[13px] leading-relaxed text-[#666]">{desc}</p>
+      <p className="mt-1 text-sm leading-relaxed text-gray-700">{desc}</p>
     </li>
   );
 }
