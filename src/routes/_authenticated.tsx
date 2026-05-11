@@ -12,6 +12,7 @@ import {
   Sparkles,
   Wrench,
   FolderKanban,
+  BookOpen,
   Settings as SettingsIcon,
   LogOut,
   Menu,
@@ -38,11 +39,12 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, search: undefined as Record<string, string> | undefined },
-  { to: "/solutions", label: "Soluciones", icon: Sparkles, search: undefined },
-  { to: "/solutions", label: "Builder", icon: Wrench, search: { mode: "builder" } },
-  { to: "/projects", label: "Mis Proyectos", icon: FolderKanban, search: undefined },
-  { to: "/settings", label: "Configuración", icon: SettingsIcon, search: undefined },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, search: undefined as Record<string, string> | undefined, badge: undefined as string | undefined },
+  { to: "/solutions", label: "Soluciones", icon: Sparkles, search: undefined, badge: undefined },
+  { to: "/solutions", label: "Builder", icon: Wrench, search: { mode: "builder" }, badge: undefined },
+  { to: "/cursos", label: "Cursos", icon: BookOpen, search: undefined, badge: "NUEVO" },
+  { to: "/projects", label: "Mis Proyectos", icon: FolderKanban, search: undefined, badge: undefined },
+  { to: "/settings", label: "Configuración", icon: SettingsIcon, search: undefined, badge: undefined },
 ] as const;
 
 function AuthenticatedLayout() {
