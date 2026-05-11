@@ -21,15 +21,13 @@ export function OnboardingModal() {
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("onboarding_completed, full_name, company_name")
+        .select("onboarding_completed")
         .eq("id", user.id)
         .maybeSingle();
       if (cancelled) return;
       if (!data || data.onboarding_completed) {
         setStatus("done");
       } else {
-        setFullName(data.full_name ?? "");
-        setCompanyName(data.company_name ?? "");
         setStatus("step1");
       }
     })();
