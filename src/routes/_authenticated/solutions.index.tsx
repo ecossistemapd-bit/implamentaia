@@ -141,8 +141,13 @@ function SolutionsList() {
                   className="group flex flex-col overflow-hidden rounded-xl border border-slate-700 bg-slate-800 transition duration-200 hover:scale-[1.01] hover:border-teal-500"
                 >
                   {/* Card header with icon */}
-                  <div className="flex h-24 items-center justify-center bg-slate-700/50">
-                    <Icon className="h-10 w-10 text-teal-400" strokeWidth={1.5} />
+                  <div className="flex h-28 items-center justify-center bg-slate-700/30">
+                    <div
+                      className="flex h-20 w-20 items-center justify-center rounded-2xl border border-slate-600/50 bg-slate-700/50"
+                      style={{ boxShadow: "0 0 24px rgba(20, 184, 166, 0.10)" }}
+                    >
+                      <Icon className="h-9 w-9 text-teal-400" strokeWidth={1.5} />
+                    </div>
                   </div>
                   <div className="flex flex-1 flex-col p-5">
                     <h3 className="line-clamp-1 text-base font-semibold leading-tight text-white">
