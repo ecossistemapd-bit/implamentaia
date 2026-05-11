@@ -21,7 +21,7 @@ const DIFFICULTY_BADGE: Record<Difficulty, string> = {
   avanzado: "bg-red-100 text-red-800 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-900",
 };
 
-const BENEFITS = [
+const EXPERT_BENEFITS = [
   "Análisis personalizado de tu negocio",
   "Implementación end-to-end por expertos",
   "Integraciones con tus herramientas actuales",
