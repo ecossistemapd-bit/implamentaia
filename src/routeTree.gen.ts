@@ -18,11 +18,13 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedSolutionsIndexRouteImport } from './routes/_authenticated/solutions.index'
+import { Route as AuthenticatedImplementadorIndexRouteImport } from './routes/_authenticated/implementador.index'
 import { Route as AuthenticatedCursosIndexRouteImport } from './routes/_authenticated/cursos.index'
 import { Route as SolutionsIdContratarRouteImport } from './routes/solutions.$id.contratar'
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
 import { Route as AuthenticatedSolutionsIdRouteImport } from './routes/_authenticated/solutions.$id'
 import { Route as AuthenticatedBuilderSolutionIdRouteImport } from './routes/_authenticated/builder.$solutionId'
+import { Route as AuthenticatedImplementadorProyectoProjectIdRouteImport } from './routes/_authenticated/implementador.proyecto.$projectId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -69,6 +71,12 @@ const AuthenticatedSolutionsIndexRoute =
     path: '/solutions/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedImplementadorIndexRoute =
+  AuthenticatedImplementadorIndexRouteImport.update({
+    id: '/implementador/',
+    path: '/implementador/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedCursosIndexRoute =
   AuthenticatedCursosIndexRouteImport.update({
     id: '/cursos/',
@@ -98,6 +106,12 @@ const AuthenticatedBuilderSolutionIdRoute =
     path: '/builder/$solutionId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedImplementadorProyectoProjectIdRoute =
+  AuthenticatedImplementadorProyectoProjectIdRouteImport.update({
+    id: '/implementador/proyecto/$projectId',
+    path: '/implementador/proyecto/$projectId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -112,7 +126,9 @@ export interface FileRoutesByFullPath {
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/cursos/': typeof AuthenticatedCursosIndexRoute
+  '/implementador/': typeof AuthenticatedImplementadorIndexRoute
   '/solutions/': typeof AuthenticatedSolutionsIndexRoute
+  '/implementador/proyecto/$projectId': typeof AuthenticatedImplementadorProyectoProjectIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -127,7 +143,9 @@ export interface FileRoutesByTo {
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/cursos': typeof AuthenticatedCursosIndexRoute
+  '/implementador': typeof AuthenticatedImplementadorIndexRoute
   '/solutions': typeof AuthenticatedSolutionsIndexRoute
+  '/implementador/proyecto/$projectId': typeof AuthenticatedImplementadorProyectoProjectIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -144,7 +162,9 @@ export interface FileRoutesById {
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/_authenticated/cursos/': typeof AuthenticatedCursosIndexRoute
+  '/_authenticated/implementador/': typeof AuthenticatedImplementadorIndexRoute
   '/_authenticated/solutions/': typeof AuthenticatedSolutionsIndexRoute
+  '/_authenticated/implementador/proyecto/$projectId': typeof AuthenticatedImplementadorProyectoProjectIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,7 +181,9 @@ export interface FileRouteTypes {
     | '/solutions/$slug'
     | '/solutions/$id/contratar'
     | '/cursos/'
+    | '/implementador/'
     | '/solutions/'
+    | '/implementador/proyecto/$projectId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -176,7 +198,9 @@ export interface FileRouteTypes {
     | '/solutions/$slug'
     | '/solutions/$id/contratar'
     | '/cursos'
+    | '/implementador'
     | '/solutions'
+    | '/implementador/proyecto/$projectId'
   id:
     | '__root__'
     | '/'
@@ -192,7 +216,9 @@ export interface FileRouteTypes {
     | '/_authenticated/solutions/$slug'
     | '/solutions/$id/contratar'
     | '/_authenticated/cursos/'
+    | '/_authenticated/implementador/'
     | '/_authenticated/solutions/'
+    | '/_authenticated/implementador/proyecto/$projectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -269,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSolutionsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/implementador/': {
+      id: '/_authenticated/implementador/'
+      path: '/implementador'
+      fullPath: '/implementador/'
+      preLoaderRoute: typeof AuthenticatedImplementadorIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/cursos/': {
       id: '/_authenticated/cursos/'
       path: '/cursos'
@@ -304,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBuilderSolutionIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/implementador/proyecto/$projectId': {
+      id: '/_authenticated/implementador/proyecto/$projectId'
+      path: '/implementador/proyecto/$projectId'
+      fullPath: '/implementador/proyecto/$projectId'
+      preLoaderRoute: typeof AuthenticatedImplementadorProyectoProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -315,7 +355,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRoute
   AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
   AuthenticatedCursosIndexRoute: typeof AuthenticatedCursosIndexRoute
+  AuthenticatedImplementadorIndexRoute: typeof AuthenticatedImplementadorIndexRoute
   AuthenticatedSolutionsIndexRoute: typeof AuthenticatedSolutionsIndexRoute
+  AuthenticatedImplementadorProyectoProjectIdRoute: typeof AuthenticatedImplementadorProyectoProjectIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -326,7 +368,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRoute,
   AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
   AuthenticatedCursosIndexRoute: AuthenticatedCursosIndexRoute,
+  AuthenticatedImplementadorIndexRoute: AuthenticatedImplementadorIndexRoute,
   AuthenticatedSolutionsIndexRoute: AuthenticatedSolutionsIndexRoute,
+  AuthenticatedImplementadorProyectoProjectIdRoute:
+    AuthenticatedImplementadorProyectoProjectIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

@@ -21,6 +21,7 @@ import {
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRole } from "@/hooks/use-role";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -39,12 +40,13 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, search: undefined as Record<string, string> | undefined, badge: undefined as string | undefined },
-  { to: "/solutions", label: "Soluciones", icon: Sparkles, search: undefined, badge: undefined },
-  { to: "/solutions", label: "Builder", icon: Wrench, search: { mode: "builder" }, badge: undefined },
-  { to: "/cursos", label: "Cursos", icon: BookOpen, search: undefined, badge: "NUEVO" },
-  { to: "/projects", label: "Mis Proyectos", icon: FolderKanban, search: undefined, badge: undefined },
-  { to: "/settings", label: "Configuración", icon: SettingsIcon, search: undefined, badge: undefined },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, search: undefined as Record<string, string> | undefined, badge: undefined as string | undefined, implOnly: false },
+  { to: "/solutions", label: "Soluciones", icon: Sparkles, search: undefined, badge: undefined, implOnly: false },
+  { to: "/solutions", label: "Builder", icon: Wrench, search: { mode: "builder" }, badge: undefined, implOnly: false },
+  { to: "/cursos", label: "Cursos", icon: BookOpen, search: undefined, badge: "NUEVO", implOnly: false },
+  { to: "/implementador", label: "Panel Impl.", icon: LayoutDashboard, search: undefined, badge: undefined, implOnly: true },
+  { to: "/projects", label: "Mis Proyectos", icon: FolderKanban, search: undefined, badge: undefined, implOnly: false },
+  { to: "/settings", label: "Configuración", icon: SettingsIcon, search: undefined, badge: undefined, implOnly: false },
 ] as const;
 
 function AuthenticatedLayout() {
@@ -115,9 +117,10 @@ function MobileTopBar() {
 function NavList() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const search = useRouterState({ select: (s) => s.location.search as Record<string, string> });
+  const { isImplementer } = useRole();
   return (
     <nav className="flex-1 space-y-0.5 px-2">
-      {NAV.map((item) => {
+      {NAV.filter((item) => !item.implOnly || isImplementer).map((item) => {
         const isBuilder = item.label === "Builder";
         const isSolutions = item.label === "Soluciones";
         const inBuilderMode = pathname.startsWith("/solutions") && search?.mode === "builder";

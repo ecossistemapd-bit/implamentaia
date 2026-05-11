@@ -42,10 +42,12 @@ export type Database = {
           created_at: string
           error_message: string | null
           id: string
+          implementador_id: string | null
           inputs: Json
           output: Json | null
           source_solution_id: string | null
           status: Database["public"]["Enums"]["builder_status"]
+          status_note: string | null
           title: string
           type: string
           updated_at: string
@@ -60,10 +62,12 @@ export type Database = {
           created_at?: string
           error_message?: string | null
           id?: string
+          implementador_id?: string | null
           inputs?: Json
           output?: Json | null
           source_solution_id?: string | null
           status?: Database["public"]["Enums"]["builder_status"]
+          status_note?: string | null
           title?: string
           type?: string
           updated_at?: string
@@ -78,10 +82,12 @@ export type Database = {
           created_at?: string
           error_message?: string | null
           id?: string
+          implementador_id?: string | null
           inputs?: Json
           output?: Json | null
           source_solution_id?: string | null
           status?: Database["public"]["Enums"]["builder_status"]
+          status_note?: string | null
           title?: string
           type?: string
           updated_at?: string
@@ -396,10 +402,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_implementer_or_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      builder_status: "generating" | "ready" | "error" | "pending" | "completed"
+      builder_status:
+        | "generating"
+        | "ready"
+        | "error"
+        | "pending"
+        | "completed"
+        | "assigned"
+        | "in_progress"
+        | "cancelled"
       solution_category:
         | "ventas"
         | "marketing"
@@ -535,7 +549,16 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      builder_status: ["generating", "ready", "error", "pending", "completed"],
+      builder_status: [
+        "generating",
+        "ready",
+        "error",
+        "pending",
+        "completed",
+        "assigned",
+        "in_progress",
+        "cancelled",
+      ],
       solution_category: [
         "ventas",
         "marketing",
