@@ -55,25 +55,25 @@ function SolutionsList() {
   ];
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12 lg:py-16">
+    <div className="mx-auto max-w-[960px] px-6 py-10">
       <header>
-        <h1 className="text-4xl font-semibold tracking-tight">Soluciones</h1>
-        <p className="mt-2 text-muted-foreground">
+        <h1 className="text-[1.5rem] font-semibold tracking-tight leading-tight">Soluciones</h1>
+        <p className="mt-1 text-[13px] text-muted-foreground">
           Implementaciones reales y listas para tu empresa.
         </p>
       </header>
 
-      <div className="sticky top-0 z-10 mt-8 space-y-4 bg-background/80 py-4 backdrop-blur">
+      <div className="sticky top-0 z-10 mt-4 space-y-3 bg-background/85 py-3 backdrop-blur">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Buscar soluciones..."
-            className="pl-9"
+            className="h-9 pl-9 text-[13px] rounded-lg"
           />
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           <FilterChip active={cat === "all"} onClick={() => setCat("all")}>
             Todas <span className="ml-1 opacity-60">({data?.length ?? 0})</span>
           </FilterChip>
@@ -83,20 +83,20 @@ function SolutionsList() {
             </FilterChip>
           ))}
         </div>
-        <div className="flex flex-wrap gap-2">
-          <FilterChip active={diff === "all"} onClick={() => setDiff("all")} small>Toda dificultad</FilterChip>
+        <div className="flex flex-wrap gap-1.5">
+          <FilterChip active={diff === "all"} onClick={() => setDiff("all")}>Toda dificultad</FilterChip>
           {(["principiante","intermedio","avanzado"] as Difficulty[]).map((d) => (
-            <FilterChip key={d} active={diff === d} onClick={() => setDiff(d)} small>
+            <FilterChip key={d} active={diff === d} onClick={() => setDiff(d)}>
               {DIFFICULTY_LABEL[d]}
             </FilterChip>
           ))}
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading
           ? Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-48 animate-pulse rounded-2xl bg-muted" />
+              <div key={i} className="h-[130px] animate-pulse rounded-[10px] bg-muted" />
             ))
           : filtered.map((s) => {
               const Icon = getLucideIcon(s.icon_name);
@@ -105,42 +105,47 @@ function SolutionsList() {
                   key={s.id}
                   to="/solutions/$id"
                   params={{ id: s.id }}
-                  className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition hover:shadow-sm"
+                  className="group flex min-h-[130px] flex-col rounded-[10px] border border-border bg-card p-4 transition hover:border-foreground"
                 >
-                  <Icon className="h-6 w-6" strokeWidth={1.5} />
-                  <h3 className="mt-5 line-clamp-2 text-lg font-medium leading-snug">{s.title}</h3>
-                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{s.short_description}</p>
-                  <div className="mt-auto flex flex-wrap gap-1.5 pt-5">
-                    <Badge variant="secondary">{CATEGORIES.find((c) => c.key === s.category)?.label}</Badge>
-                    <Badge variant="outline">{DIFFICULTY_LABEL[s.difficulty as Difficulty]}</Badge>
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-5 w-5 shrink-0" strokeWidth={1.75} />
+                    <h3 className="line-clamp-1 text-[14px] font-semibold leading-tight">{s.title}</h3>
+                  </div>
+                  <p className="mt-2 line-clamp-2 text-[12px] leading-snug text-muted-foreground">{s.short_description}</p>
+                  <div className="mt-auto flex flex-wrap gap-1 pt-3">
+                    <span className="rounded border border-border px-2 py-[2px] text-[11px] text-muted-foreground">
+                      {CATEGORIES.find((c) => c.key === s.category)?.label}
+                    </span>
+                    <span className="rounded border border-border px-2 py-[2px] text-[11px] text-muted-foreground">
+                      {DIFFICULTY_LABEL[s.difficulty as Difficulty]}
+                    </span>
                   </div>
                 </Link>
               );
             })}
       </div>
       {!isLoading && filtered.length === 0 && (
-        <div className="mt-12 rounded-2xl border border-dashed border-border p-12 text-center">
-          <p className="text-muted-foreground">No encontramos soluciones con esos filtros.</p>
+        <div className="mt-8 rounded-[10px] border border-dashed border-border p-10 text-center">
+          <p className="text-[13px] text-muted-foreground">No encontramos soluciones con esos filtros.</p>
         </div>
       )}
 
       {/* Coming soon */}
-      <section className="mt-20">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold tracking-tight">Próximamente</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Más soluciones en camino.</p>
+      <section className="mt-12">
+        <div className="mb-3">
+          <h2 className="text-[14px] font-semibold tracking-tight text-muted-foreground">Próximamente</h2>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {comingSoon.map((c) => (
             <div
               key={c.label}
-              className="flex flex-col items-start gap-3 rounded-2xl border border-border bg-neutral-950 p-6 text-neutral-100 dark:bg-neutral-900"
+              className="flex min-h-[130px] flex-col rounded-[10px] border border-border bg-muted/40 p-4"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg">
-                🔒
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <span className="text-[16px]">🔒</span>
+                <h3 className="text-[14px] font-medium text-foreground/80">{c.label}</h3>
               </div>
-              <h3 className="text-base font-medium">{c.label}</h3>
-              <span className="mt-auto rounded-full border border-white/20 px-2 py-0.5 text-[11px] text-white/70">
+              <span className="mt-auto text-[11px] uppercase tracking-wider text-muted-foreground">
                 En desarrollo
               </span>
             </div>
@@ -155,7 +160,6 @@ function FilterChip({
   children,
   active,
   onClick,
-  small,
 }: {
   children: React.ReactNode;
   active: boolean;
@@ -165,7 +169,7 @@ function FilterChip({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border px-3 ${small ? "py-1 text-xs" : "py-1.5 text-sm"} transition ${
+      className={`h-7 rounded-full border px-3 text-[12px] transition ${
         active
           ? "border-foreground bg-foreground text-background"
           : "border-border bg-card text-muted-foreground hover:text-foreground"
