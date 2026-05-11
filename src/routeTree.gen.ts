@@ -10,11 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedSolutionsIndexRouteImport } from './routes/_authenticated/solutions.index'
+import { Route as AuthenticatedBuilderIndexRouteImport } from './routes/_authenticated/builder.index'
+import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
+import { Route as AuthenticatedBuilderIdRouteImport } from './routes/_authenticated/builder.$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,30 +34,120 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSolutionsIndexRoute =
+  AuthenticatedSolutionsIndexRouteImport.update({
+    id: '/solutions/',
+    path: '/solutions/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBuilderIndexRoute =
+  AuthenticatedBuilderIndexRouteImport.update({
+    id: '/builder/',
+    path: '/builder/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSolutionsSlugRoute =
+  AuthenticatedSolutionsSlugRouteImport.update({
+    id: '/solutions/$slug',
+    path: '/solutions/$slug',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBuilderIdRoute = AuthenticatedBuilderIdRouteImport.update({
+  id: '/builder/$id',
+  path: '/builder/$id',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/projects': typeof AuthenticatedProjectsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
+  '/builder/': typeof AuthenticatedBuilderIndexRoute
+  '/solutions/': typeof AuthenticatedSolutionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/projects': typeof AuthenticatedProjectsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
+  '/builder': typeof AuthenticatedBuilderIndexRoute
+  '/solutions': typeof AuthenticatedSolutionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/projects': typeof AuthenticatedProjectsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/builder/$id': typeof AuthenticatedBuilderIdRoute
+  '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
+  '/_authenticated/builder/': typeof AuthenticatedBuilderIndexRoute
+  '/_authenticated/solutions/': typeof AuthenticatedSolutionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/projects'
+    | '/settings'
+    | '/builder/$id'
+    | '/solutions/$slug'
+    | '/builder/'
+    | '/solutions/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/' | '/login'
+  to:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/projects'
+    | '/settings'
+    | '/builder/$id'
+    | '/solutions/$slug'
+    | '/builder'
+    | '/solutions'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/projects'
+    | '/_authenticated/settings'
+    | '/_authenticated/builder/$id'
+    | '/_authenticated/solutions/$slug'
+    | '/_authenticated/builder/'
+    | '/_authenticated/solutions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
@@ -58,6 +160,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +174,85 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/projects': {
+      id: '/_authenticated/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AuthenticatedProjectsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/solutions/': {
+      id: '/_authenticated/solutions/'
+      path: '/solutions'
+      fullPath: '/solutions/'
+      preLoaderRoute: typeof AuthenticatedSolutionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/builder/': {
+      id: '/_authenticated/builder/'
+      path: '/builder'
+      fullPath: '/builder/'
+      preLoaderRoute: typeof AuthenticatedBuilderIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/solutions/$slug': {
+      id: '/_authenticated/solutions/$slug'
+      path: '/solutions/$slug'
+      fullPath: '/solutions/$slug'
+      preLoaderRoute: typeof AuthenticatedSolutionsSlugRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/builder/$id': {
+      id: '/_authenticated/builder/$id'
+      path: '/builder/$id'
+      fullPath: '/builder/$id'
+      preLoaderRoute: typeof AuthenticatedBuilderIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedBuilderIdRoute: typeof AuthenticatedBuilderIdRoute
+  AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
+  AuthenticatedBuilderIndexRoute: typeof AuthenticatedBuilderIndexRoute
+  AuthenticatedSolutionsIndexRoute: typeof AuthenticatedSolutionsIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedBuilderIdRoute: AuthenticatedBuilderIdRoute,
+  AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
+  AuthenticatedBuilderIndexRoute: AuthenticatedBuilderIndexRoute,
+  AuthenticatedSolutionsIndexRoute: AuthenticatedSolutionsIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
