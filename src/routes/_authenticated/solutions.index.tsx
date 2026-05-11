@@ -63,6 +63,11 @@ function SolutionsList() {
 
   return (
     <div className="mx-auto max-w-[960px] px-6 py-10">
+      {builderMode && (
+        <div className="mb-4 rounded-lg bg-foreground px-4 py-3 text-[13px] font-medium text-background">
+          Elegí una solución para comenzar la implementación guiada →
+        </div>
+      )}
       <header>
         <h1 className="text-[1.5rem] font-semibold tracking-tight leading-tight">Soluciones</h1>
         <p className="mt-1 text-[13px] text-muted-foreground">
