@@ -20,6 +20,7 @@ export const Route = createFileRoute("/_authenticated/solutions/")({
 function SolutionsList() {
   const { mode } = Route.useSearch();
   const builderMode = mode === "builder";
+  const { user } = useAuth();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<CategoryKey | "all">("all");
   const [diff, setDiff] = useState<Difficulty | "all">("all");
@@ -32,6 +33,27 @@ function SolutionsList() {
       return data;
     },
   });
+
+  const { data: progressRows } = useQuery({
+    queryKey: ["solutions-progress-all", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await (supabase as never as typeof supabase)
+        .from("solution_steps_progress" as never)
+        .select("solution_id, completed")
+        .eq("user_id", user!.id);
+      if (error) throw error;
+      return (data ?? []) as { solution_id: string; completed: boolean }[];
+    },
+  });
+
+  const progressBySolution = useMemo(() => {
+    const m: Record<string, number> = {};
+    (progressRows ?? []).forEach((r) => {
+      if (r.completed) m[r.solution_id] = (m[r.solution_id] ?? 0) + 1;
+    });
+    return m;
+  }, [progressRows]);
 
   const counts = useMemo(() => {
     const m: Record<string, number> = {};
