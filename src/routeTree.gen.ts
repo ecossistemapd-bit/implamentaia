@@ -24,6 +24,8 @@ import { Route as SolutionsIdContratarRouteImport } from './routes/solutions.$id
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
 import { Route as AuthenticatedSolutionsIdRouteImport } from './routes/_authenticated/solutions.$id'
 import { Route as AuthenticatedBuilderSolutionIdRouteImport } from './routes/_authenticated/builder.$solutionId'
+import { Route as AuthenticatedImplementadorIndexRouteImport } from './routes/_authenticated/implementador.index'
+import { Route as AuthenticatedImplementadorProyectoProjectIdRouteImport } from './routes/_authenticated/implementador.proyecto.$projectId'
 import { Route as AuthenticatedImplementadorProyectoProjectIdRouteImport } from './routes/_authenticated/implementador.proyecto.$projectId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -104,6 +106,18 @@ const AuthenticatedBuilderSolutionIdRoute =
   AuthenticatedBuilderSolutionIdRouteImport.update({
     id: '/builder/$solutionId',
     path: '/builder/$solutionId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedImplementadorIndexRoute =
+  AuthenticatedImplementadorIndexRouteImport.update({
+    id: '/implementador/',
+    path: '/implementador/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedImplementadorProyectoProjectIdRoute =
+  AuthenticatedImplementadorProyectoProjectIdRouteImport.update({
+    id: '/implementador/proyecto/$projectId',
+    path: '/implementador/proyecto/$projectId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedImplementadorProyectoProjectIdRoute =
