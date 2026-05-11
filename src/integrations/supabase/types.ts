@@ -405,6 +405,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_users: {
+        Args: never
+        Returns: {
+          company_name: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          role: string
+        }[]
+      }
       is_implementer_or_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
