@@ -33,6 +33,8 @@ function SolutionByIdDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [context, setContext] = useState("");
+  const [generating, setGenerating] = useState(false);
+  const [generated, setGenerated] = useState<string | null>(null);
 
   const { data: s, isLoading, isError } = useQuery({
     queryKey: ["solution-by-id", id],
