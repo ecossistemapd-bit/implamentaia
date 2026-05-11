@@ -35,6 +35,10 @@ export type Database = {
       builder_projects: {
         Row: {
           builder_session_id: string | null
+          company_name: string | null
+          contact_email: string | null
+          contact_name: string | null
+          context_message: string | null
           created_at: string
           error_message: string | null
           id: string
@@ -49,6 +53,10 @@ export type Database = {
         }
         Insert: {
           builder_session_id?: string | null
+          company_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          context_message?: string | null
           created_at?: string
           error_message?: string | null
           id?: string
@@ -63,6 +71,10 @@ export type Database = {
         }
         Update: {
           builder_session_id?: string | null
+          company_name?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          context_message?: string | null
           created_at?: string
           error_message?: string | null
           id?: string
