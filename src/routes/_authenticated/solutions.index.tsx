@@ -8,7 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { CATEGORIES, DIFFICULTY_LABEL, type CategoryKey, type Difficulty } from "@/lib/categories";
 import { getLucideIcon } from "@/lib/icon";
 
+type SolutionsSearch = { mode?: "builder" };
+
 export const Route = createFileRoute("/_authenticated/solutions/")({
+  validateSearch: (s: Record<string, unknown>): SolutionsSearch => ({
+    mode: s.mode === "builder" ? "builder" : undefined,
+  }),
   component: SolutionsList,
 });
 
