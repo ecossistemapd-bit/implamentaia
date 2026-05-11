@@ -26,6 +26,17 @@ function SolutionsList() {
     },
   });
 
+  const counts = useMemo(() => {
+    const m: Record<string, number> = {};
+    (data ?? []).forEach((s) => { m[s.category] = (m[s.category] ?? 0) + 1; });
+    return m;
+  }, [data]);
+
+  const visibleCategories = useMemo(
+    () => CATEGORIES.filter((c) => (counts[c.key] ?? 0) > 0),
+    [counts],
+  );
+
   const filtered = useMemo(() => {
     if (!data) return [];
     return data.filter((s) => {
@@ -36,12 +47,19 @@ function SolutionsList() {
     });
   }, [data, q, cat, diff]);
 
+  const comingSoon = [
+    { label: "Operaciones y Logística", icon: "📦" },
+    { label: "Legal y Contratos", icon: "⚖️" },
+    { label: "E-commerce", icon: "🛒" },
+    { label: "Educación", icon: "🎓" },
+  ];
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-12 lg:py-16">
       <header>
         <h1 className="text-4xl font-semibold tracking-tight">Soluciones</h1>
         <p className="mt-2 text-muted-foreground">
-          36 implementaciones listas para tu empresa.
+          Implementaciones reales y listas para tu empresa.
         </p>
       </header>
 
@@ -56,9 +74,13 @@ function SolutionsList() {
           />
         </div>
         <div className="flex flex-wrap gap-2">
-          <FilterChip active={cat === "all"} onClick={() => setCat("all")}>Todas</FilterChip>
-          {CATEGORIES.map((c) => (
-            <FilterChip key={c.key} active={cat === c.key} onClick={() => setCat(c.key)}>{c.label}</FilterChip>
+          <FilterChip active={cat === "all"} onClick={() => setCat("all")}>
+            Todas <span className="ml-1 opacity-60">({data?.length ?? 0})</span>
+          </FilterChip>
+          {visibleCategories.map((c) => (
+            <FilterChip key={c.key} active={cat === c.key} onClick={() => setCat(c.key)}>
+              {c.label} <span className="ml-1 opacity-60">({counts[c.key]})</span>
+            </FilterChip>
           ))}
         </div>
         <div className="flex flex-wrap gap-2">
@@ -81,8 +103,8 @@ function SolutionsList() {
               return (
                 <Link
                   key={s.id}
-                  to="/solutions/$slug"
-                  params={{ slug: s.slug }}
+                  to="/solutions/$id"
+                  params={{ id: s.id }}
                   className="group flex flex-col rounded-2xl border border-border bg-card p-6 transition hover:shadow-sm"
                 >
                   <Icon className="h-6 w-6" strokeWidth={1.5} />
@@ -101,6 +123,30 @@ function SolutionsList() {
           <p className="text-muted-foreground">No encontramos soluciones con esos filtros.</p>
         </div>
       )}
+
+      {/* Coming soon */}
+      <section className="mt-20">
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold tracking-tight">Próximamente</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Más soluciones en camino.</p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {comingSoon.map((c) => (
+            <div
+              key={c.label}
+              className="flex flex-col items-start gap-3 rounded-2xl border border-border bg-neutral-950 p-6 text-neutral-100 dark:bg-neutral-900"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg">
+                🔒
+              </div>
+              <h3 className="text-base font-medium">{c.label}</h3>
+              <span className="mt-auto rounded-full border border-white/20 px-2 py-0.5 text-[11px] text-white/70">
+                En desarrollo
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
