@@ -20,6 +20,7 @@ import { Route as AuthenticatedBuilderIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
 import { Route as AuthenticatedSolutionsIdRouteImport } from './routes/_authenticated/solutions.$id'
 import { Route as AuthenticatedBuilderIdRouteImport } from './routes/_authenticated/builder.$id'
+import { Route as AuthenticatedSolutionsIdContratarRouteImport } from './routes/_authenticated/solutions.$id.contratar'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -79,6 +80,12 @@ const AuthenticatedBuilderIdRoute = AuthenticatedBuilderIdRouteImport.update({
   path: '/builder/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSolutionsIdContratarRoute =
+  AuthenticatedSolutionsIdContratarRouteImport.update({
+    id: '/contratar',
+    path: '/contratar',
+    getParentRoute: () => AuthenticatedSolutionsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,10 +94,11 @@ export interface FileRoutesByFullPath {
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/builder/$id': typeof AuthenticatedBuilderIdRoute
-  '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
+  '/solutions/$id': typeof AuthenticatedSolutionsIdRouteWithChildren
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/builder/': typeof AuthenticatedBuilderIndexRoute
   '/solutions/': typeof AuthenticatedSolutionsIndexRoute
+  '/solutions/$id/contratar': typeof AuthenticatedSolutionsIdContratarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -99,10 +107,11 @@ export interface FileRoutesByTo {
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/builder/$id': typeof AuthenticatedBuilderIdRoute
-  '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
+  '/solutions/$id': typeof AuthenticatedSolutionsIdRouteWithChildren
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/builder': typeof AuthenticatedBuilderIndexRoute
   '/solutions': typeof AuthenticatedSolutionsIndexRoute
+  '/solutions/$id/contratar': typeof AuthenticatedSolutionsIdContratarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -113,10 +122,11 @@ export interface FileRoutesById {
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/builder/$id': typeof AuthenticatedBuilderIdRoute
-  '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRoute
+  '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRouteWithChildren
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/_authenticated/builder/': typeof AuthenticatedBuilderIndexRoute
   '/_authenticated/solutions/': typeof AuthenticatedSolutionsIndexRoute
+  '/_authenticated/solutions/$id/contratar': typeof AuthenticatedSolutionsIdContratarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/solutions/$slug'
     | '/builder/'
     | '/solutions/'
+    | '/solutions/$id/contratar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/solutions/$slug'
     | '/builder'
     | '/solutions'
+    | '/solutions/$id/contratar'
   id:
     | '__root__'
     | '/'
@@ -156,6 +168,7 @@ export interface FileRouteTypes {
     | '/_authenticated/solutions/$slug'
     | '/_authenticated/builder/'
     | '/_authenticated/solutions/'
+    | '/_authenticated/solutions/$id/contratar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -243,15 +256,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBuilderIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/solutions/$id/contratar': {
+      id: '/_authenticated/solutions/$id/contratar'
+      path: '/contratar'
+      fullPath: '/solutions/$id/contratar'
+      preLoaderRoute: typeof AuthenticatedSolutionsIdContratarRouteImport
+      parentRoute: typeof AuthenticatedSolutionsIdRoute
+    }
   }
 }
+
+interface AuthenticatedSolutionsIdRouteChildren {
+  AuthenticatedSolutionsIdContratarRoute: typeof AuthenticatedSolutionsIdContratarRoute
+}
+
+const AuthenticatedSolutionsIdRouteChildren: AuthenticatedSolutionsIdRouteChildren =
+  {
+    AuthenticatedSolutionsIdContratarRoute:
+      AuthenticatedSolutionsIdContratarRoute,
+  }
+
+const AuthenticatedSolutionsIdRouteWithChildren =
+  AuthenticatedSolutionsIdRoute._addFileChildren(
+    AuthenticatedSolutionsIdRouteChildren,
+  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedBuilderIdRoute: typeof AuthenticatedBuilderIdRoute
-  AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRoute
+  AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRouteWithChildren
   AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
   AuthenticatedBuilderIndexRoute: typeof AuthenticatedBuilderIndexRoute
   AuthenticatedSolutionsIndexRoute: typeof AuthenticatedSolutionsIndexRoute
@@ -262,7 +297,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedBuilderIdRoute: AuthenticatedBuilderIdRoute,
-  AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRoute,
+  AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRouteWithChildren,
   AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
   AuthenticatedBuilderIndexRoute: AuthenticatedBuilderIndexRoute,
   AuthenticatedSolutionsIndexRoute: AuthenticatedSolutionsIndexRoute,
