@@ -14,7 +14,184 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      allowed_emails: {
+        Row: {
+          created_at: string
+          email: string
+          invited_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          invited_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          invited_by?: string | null
+        }
+        Relationships: []
+      }
+      builder_projects: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          inputs: Json
+          output: Json | null
+          source_solution_id: string | null
+          status: Database["public"]["Enums"]["builder_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          inputs?: Json
+          output?: Json | null
+          source_solution_id?: string | null
+          status?: Database["public"]["Enums"]["builder_status"]
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          inputs?: Json
+          output?: Json | null
+          source_solution_id?: string | null
+          status?: Database["public"]["Enums"]["builder_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "builder_projects_source_solution_id_fkey"
+            columns: ["source_solution_id"]
+            isOneToOne: false
+            referencedRelation: "solutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          company_name: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          industry: string | null
+          role: string | null
+          team_size: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          company_name?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          industry?: string | null
+          role?: string | null
+          team_size?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          company_name?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          industry?: string | null
+          role?: string | null
+          team_size?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_solutions: {
+        Row: {
+          id: string
+          saved_at: string
+          solution_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          saved_at?: string
+          solution_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          saved_at?: string
+          solution_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_solutions_solution_id_fkey"
+            columns: ["solution_id"]
+            isOneToOne: false
+            referencedRelation: "solutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solutions: {
+        Row: {
+          category: Database["public"]["Enums"]["solution_category"]
+          created_at: string
+          difficulty: Database["public"]["Enums"]["solution_difficulty"]
+          estimated_time: string
+          icon_name: string
+          id: string
+          is_featured: boolean
+          long_description: string
+          roi_estimate: string
+          short_description: string
+          slug: string
+          title: string
+          tools_required: string[]
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["solution_category"]
+          created_at?: string
+          difficulty: Database["public"]["Enums"]["solution_difficulty"]
+          estimated_time: string
+          icon_name?: string
+          id?: string
+          is_featured?: boolean
+          long_description: string
+          roi_estimate: string
+          short_description: string
+          slug: string
+          title: string
+          tools_required?: string[]
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["solution_category"]
+          created_at?: string
+          difficulty?: Database["public"]["Enums"]["solution_difficulty"]
+          estimated_time?: string
+          icon_name?: string
+          id?: string
+          is_featured?: boolean
+          long_description?: string
+          roi_estimate?: string
+          short_description?: string
+          slug?: string
+          title?: string
+          tools_required?: string[]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +200,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      builder_status: "generating" | "ready" | "error"
+      solution_category:
+        | "ventas"
+        | "marketing"
+        | "atencion"
+        | "finanzas"
+        | "operaciones"
+        | "rrhh"
+      solution_difficulty: "principiante" | "intermedio" | "avanzado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +335,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      builder_status: ["generating", "ready", "error"],
+      solution_category: [
+        "ventas",
+        "marketing",
+        "atencion",
+        "finanzas",
+        "operaciones",
+        "rrhh",
+      ],
+      solution_difficulty: ["principiante", "intermedio", "avanzado"],
+    },
   },
 } as const
