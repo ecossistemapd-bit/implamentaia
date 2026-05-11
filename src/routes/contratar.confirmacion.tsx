@@ -13,60 +13,52 @@ export const Route = createFileRoute("/contratar/confirmacion")({
   component: ConfirmacionPage,
 });
 
+const STEPS = [
+  "Revisamos tu solicitud y asignamos el implementador más adecuado para tu industria y solución.",
+  "El implementador te contacta para alinear alcance, plazos y presupuesto final. Sin compromiso.",
+  "Una vez acordado, comienza la implementación con acompañamiento completo hasta la entrega.",
+];
+
 function ConfirmacionPage() {
-  const { solution, email } = Route.useSearch();
   return (
     <div className="min-h-screen bg-[#f9f9f9]">
       <header className="flex items-center justify-between border-b border-border bg-background/80 px-6 py-3">
         <Logo />
       </header>
       <main className="mx-auto max-w-[520px] px-6 pt-20 pb-16 text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-foreground text-background">
-          <Check className="h-7 w-7" strokeWidth={3} />
+        <div
+          className="mx-auto flex items-center justify-center rounded-full bg-foreground text-background"
+          style={{ width: 56, height: 56 }}
+        >
+          <Check style={{ width: 24, height: 24 }} strokeWidth={3} />
         </div>
-        <h2 className="mt-5 text-2xl font-bold tracking-tight">
+        <h2 className="mt-4 text-2xl font-bold tracking-tight">
           ¡Solicitud enviada!
         </h2>
-        <p className="mt-3 text-[14px] leading-relaxed text-[#555]">
-          Recibimos tu solicitud para implementar{" "}
-          <span className="font-medium text-foreground">
-            {solution || "tu solución"}
-          </span>
-          .
-          <br />
-          Un implementador verificado se va a comunicar con vos en las próximas
-          24 horas hábiles
-          {email ? (
-            <>
-              {" "}
-              al email{" "}
-              <span className="font-medium text-foreground">{email}</span>
-            </>
-          ) : null}
-          .
+        <p className="mt-2.5 text-[14px] leading-relaxed text-[#555]">
+          Recibimos tu solicitud. Un implementador verificado te va a contactar
+          en las próximas 24 horas hábiles.
         </p>
 
         <div className="mt-7 rounded-[10px] bg-[#f5f5f5] p-5 text-left">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#999]">
+          <p className="mb-3.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#999]">
             ¿Qué sigue?
           </p>
-          <ol className="mt-3 space-y-2.5 text-[13px]">
-            {[
-              "Revisamos tu solicitud y asignamos el mejor implementador para tu caso",
-              "Te contactan para alinear alcance, plazos y presupuesto final",
-              "Una vez acordado, comenzamos la implementación",
-            ].map((t, i) => (
-              <li key={i} className="flex gap-2.5">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-foreground text-[10px] font-semibold text-background">
+          <ol className="flex flex-col gap-3.5">
+            {STEPS.map((t, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e5e5e5] text-[12px] font-semibold text-[#555]">
                   {i + 1}
                 </span>
-                <span>{t}</span>
+                <span className="text-[13px] leading-relaxed text-[#333]">
+                  {t}
+                </span>
               </li>
             ))}
           </ol>
         </div>
 
-        <div className="mt-7 flex flex-col gap-2.5">
+        <div className="mx-auto mt-7 flex max-w-[360px] flex-col gap-2.5">
           <Link
             to="/projects"
             className="inline-flex h-11 w-full items-center justify-center rounded-[10px] bg-foreground text-[14px] font-semibold text-background hover:bg-foreground/90"
