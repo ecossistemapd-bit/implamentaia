@@ -140,11 +140,11 @@ function ContratarPage() {
           <div className="mt-8 rounded-[10px] border border-[#e5e5e5] bg-white p-5">
             <Badge
               variant="outline"
-              className="rounded-full border-foreground/20 px-2.5 py-0.5 text-[10px] uppercase tracking-wider"
+              className="rounded-full border-foreground/20 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-gray-700"
             >
               {solution?.category ?? "—"}
             </Badge>
-            <div className="mt-1.5 text-[15px] font-semibold">
+            <div className="mt-1.5 text-[15px] font-semibold text-gray-900">
               {solution?.title ?? "Cargando…"}
             </div>
           </div>
