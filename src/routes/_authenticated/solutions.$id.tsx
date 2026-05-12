@@ -65,6 +65,14 @@ function SolutionByIdDetail() {
         id: string;
         title: string;
         short_description: string;
+        long_description: string | null;
+        category: CategoryKey | string;
+        difficulty: Difficulty | string;
+        estimated_time: string | null;
+        cover_image_url: string | null;
+        platform_investment: string | null;
+        development_time_minutes: number | null;
+        tokens_per_execution: number | null;
         tools_required: string[];
         integrations: string[];
         video_url: string | null;
