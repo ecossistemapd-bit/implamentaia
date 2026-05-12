@@ -492,6 +492,16 @@ function CompleteButton({
   );
 }
 
+function StatCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
+  return (
+    <div className="rounded-xl border border-white/8 bg-[#111111] p-4">
+      <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-500">{label}</div>
+      <div className="mt-1 text-lg font-semibold text-white">{value}</div>
+      {hint && <div className="mt-1.5 text-xs text-zinc-500">{hint}</div>}
+    </div>
+  );
+}
+
 function SectionHeader({ text, action }: { text: string; action?: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
