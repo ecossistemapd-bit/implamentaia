@@ -660,7 +660,7 @@ function StepArchivos({
   onComplete,
 }: {
   solutionId: string;
-  resources: { title: string; url: string; type?: string }[];
+  resources: { title: string; url: string; type?: string; description?: string; domain?: string }[];
   isCompleted: boolean;
   saving: boolean;
   onComplete: () => void;
