@@ -132,6 +132,7 @@ function SolutionsList() {
               const linkProps = { to: "/solutions/$id" as const, params: { id: s.id } };
               const completed = progressBySolution[s.id] ?? 0;
               const pct = Math.min(100, (completed / 5) * 100);
+              const isDone = completed >= 5;
               const catColor = CATEGORY_COLOR[s.category as CategoryKey] ?? CATEGORY_COLOR.default;
               const diffColor = DIFFICULTY_COLOR[s.difficulty as Difficulty];
               return (
