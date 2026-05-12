@@ -372,6 +372,42 @@ export type Database = {
           },
         ]
       }
+      solution_tools: {
+        Row: {
+          display_order: number | null
+          is_essential: boolean
+          solution_id: string
+          tool_id: string
+        }
+        Insert: {
+          display_order?: number | null
+          is_essential?: boolean
+          solution_id: string
+          tool_id: string
+        }
+        Update: {
+          display_order?: number | null
+          is_essential?: boolean
+          solution_id?: string
+          tool_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solution_tools_solution_id_fkey"
+            columns: ["solution_id"]
+            isOneToOne: false
+            referencedRelation: "solutions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solution_tools_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       solutions: {
         Row: {
           builder_questions: Json | null
@@ -453,6 +489,42 @@ export type Database = {
           tokens_per_execution?: number | null
           tools_required?: string[]
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      tools: {
+        Row: {
+          cost_label: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          logo_url: string | null
+          monthly_cost_usd: number | null
+          name: string
+          slug: string
+          website: string | null
+        }
+        Insert: {
+          cost_label?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          monthly_cost_usd?: number | null
+          name: string
+          slug: string
+          website?: string | null
+        }
+        Update: {
+          cost_label?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string | null
+          monthly_cost_usd?: number | null
+          name?: string
+          slug?: string
+          website?: string | null
         }
         Relationships: []
       }
