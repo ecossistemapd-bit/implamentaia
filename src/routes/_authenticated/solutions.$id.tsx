@@ -511,9 +511,15 @@ function SectionHeader({ text, action }: { text: string; action?: React.ReactNod
   );
 }
 
+function getToolInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const letters = (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? parts[0]?.[1] ?? "");
+  return letters.toUpperCase().slice(0, 2) || "?";
+}
+
+type ToolItem = { name: string; logo_url?: string | null; type?: "essential" | "optional" };
+
 function StepHerramientas({
-  solutionId,
-  userId,
   tools,
   isCompleted,
   saving,
@@ -526,40 +532,33 @@ function StepHerramientas({
   saving: boolean;
   onComplete: () => void;
 }) {
-  const unique = useMemo(() => Array.from(new Set(tools.filter(Boolean))), [tools]);
-  const storageKey = `tools_${solutionId}_${userId}`;
+  const items: ToolItem[] = useMemo(
+    () =>
+      Array.from(new Set(tools.filter(Boolean))).map((name) => ({
+        name,
+        logo_url: null,
+        type: "essential" as const,
+      })),
+    [tools],
+  );
+
+  // Visual-only state — resets on reload (per spec)
   const [understood, setUnderstood] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (typeof window === "undefined" || !userId) return;
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) setUnderstood(new Set(JSON.parse(raw)));
-    } catch {
-      /* ignore */
-    }
-  }, [storageKey, userId]);
+    if (isCompleted && items.length > 0) setUnderstood(new Set(items.map((i) => i.name)));
+  }, [isCompleted, items]);
 
-  // If step is already completed, treat all tools as understood
-  useEffect(() => {
-    if (isCompleted && unique.length > 0) setUnderstood(new Set(unique));
-  }, [isCompleted, unique]);
-
-  const toggle = (t: string) => {
+  const toggle = (name: string) => {
     setUnderstood((prev) => {
       const next = new Set(prev);
-      if (next.has(t)) next.delete(t);
-      else next.add(t);
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(Array.from(next)));
-      } catch {
-        /* ignore */
-      }
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
       return next;
     });
   };
 
-  const allDone = unique.length === 0 || understood.size >= unique.length;
+  const allDone = items.length === 0 || understood.size >= items.length;
 
   return (
     <div>
@@ -571,6 +570,7 @@ function StepHerramientas({
             saving={saving}
             disabled={!allDone}
             disabledLabel="Marcá todas las herramientas primero"
+            label="Marcar paso como completado →"
             isCompleted={isCompleted}
           />
         }
@@ -579,38 +579,69 @@ function StepHerramientas({
         Conocé las herramientas que usaremos en esta implementación.
       </p>
 
-      {unique.length === 0 ? (
+      {items.length === 0 ? (
         <div className="mt-6 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-10 text-center text-sm text-zinc-400">
           No hay herramientas asignadas a esta solución.
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {unique.map((t) => {
-            const isOk = understood.has(t);
+          {items.map((tool) => {
+            const isOk = understood.has(tool.name);
+            const isOptional = tool.type === "optional";
             return (
               <button
-                key={t}
-                onClick={() => toggle(t)}
-                className={`relative rounded-xl border p-6 text-center transition duration-200 ${
+                key={tool.name}
+                onClick={() => toggle(tool.name)}
+                className={`group relative overflow-hidden rounded-xl border p-6 text-center transition duration-200 ${
                   isOk
-                    ? "border-green-500 bg-zinc-900 shadow-lg shadow-green-500/10"
-                    : "border-zinc-800 bg-zinc-900 hover:scale-[1.02] hover:border-violet-500"
+                    ? "border-green-500 bg-secondary"
+                    : "border-white/8 bg-secondary hover:border-white/20"
                 }`}
               >
-                <span className="absolute left-3 top-3 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                  <span className="text-violet-400">●</span> Esencial
+                {/* Green overlay when understood */}
+                {isOk && (
+                  <span className="pointer-events-none absolute inset-0 bg-green-500/10" />
+                )}
+
+                {/* Type badge */}
+                <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      isOptional ? "bg-amber-400" : "bg-green-500"
+                    }`}
+                  />
+                  {isOptional ? "Opcional" : "Esencial"}
                 </span>
+
+                {/* Check icon when understood */}
                 {isOk && (
                   <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white">
                     <Check className="h-3 w-3" />
                   </span>
                 )}
-                <div className="mx-auto mt-4 flex h-[60px] w-[60px] items-center justify-center rounded-xl bg-zinc-800">
-                  {renderToolIcon(t)}
+
+                {/* Logo or initials */}
+                <div className="relative mx-auto mt-6 flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-zinc-900">
+                  {tool.logo_url ? (
+                    <img
+                      src={tool.logo_url}
+                      alt={tool.name}
+                      className="h-full w-full object-contain p-2"
+                    />
+                  ) : (
+                    <span className="text-lg font-bold tracking-tight text-white">
+                      {getToolInitials(tool.name)}
+                    </span>
+                  )}
                 </div>
-                <div className="mt-3 text-lg font-semibold text-white">{t}</div>
-                <div className="mt-1 text-sm text-zinc-400">
-                  {isOk ? "Marcada como entendida" : "Click para marcar como entendido"}
+
+                <div className="relative mt-3 text-lg font-semibold text-white">{tool.name}</div>
+                <div
+                  className={`relative mt-1 text-sm ${
+                    isOk ? "font-medium text-green-500" : "text-zinc-500"
+                  }`}
+                >
+                  {isOk ? "Entendido ✓" : "Click para marcar como entendido"}
                 </div>
               </button>
             );
