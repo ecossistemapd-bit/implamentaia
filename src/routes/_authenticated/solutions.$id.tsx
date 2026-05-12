@@ -412,30 +412,30 @@ function SolutionByIdDetail() {
                   {i > 0 && (
                     <div className={`h-px flex-1 transition ${prevCompleted ? "bg-green-500" : "bg-white/8"}`} />
                   )}
-                  <button
-                    onClick={() => setActiveStep(step.key)}
+                  <div
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition ${
                       isCompleted
                         ? "border-green-500 bg-green-500 text-white"
                         : isActive
                         ? "border-violet-500 bg-violet-500 text-white"
-                        : "border-white/10 bg-transparent text-zinc-600 hover:border-white/20"
+                        : "border-white/10 bg-transparent text-zinc-600"
                     }`}
-                    aria-label={step.label}
                   >
                     {isCompleted ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
-                  </button>
+                  </div>
                   {i < STEPS.length - 1 && (
                     <div className={`h-px flex-1 transition ${isCompleted ? "bg-green-500" : "bg-white/8"}`} />
                   )}
                 </div>
-                <span
-                  className={`mt-2.5 text-center text-xs transition ${
+                <button
+                  onClick={() => setActiveStep(step.key)}
+                  aria-label={step.label}
+                  className={`mt-2.5 w-full text-center text-xs transition hover:text-white ${
                     isActive ? "text-white font-medium" : isCompleted ? "text-green-500" : "text-zinc-600"
                   }`}
                 >
                   {step.label}
-                </span>
+                </button>
               </div>
             );
           })}
