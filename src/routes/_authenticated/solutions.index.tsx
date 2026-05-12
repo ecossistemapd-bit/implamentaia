@@ -163,13 +163,13 @@ function SolutionsList() {
                     </div>
                     {completed > 0 && (
                       <div className="mt-3">
-                        <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
+                        <div className="h-0.5 w-full overflow-hidden rounded-full bg-white/8">
                           <div
-                            className="h-full bg-gradient-to-r from-violet-500 to-green-500"
+                            className="h-full bg-green-500"
                             style={{ width: `${pct}%` }}
                           />
                         </div>
-                        <div className="mt-1.5 text-[11px] text-zinc-400">
+                        <div className="mt-1.5 text-[11px] text-zinc-500">
                           {completed} de 5 pasos
                         </div>
                       </div>
