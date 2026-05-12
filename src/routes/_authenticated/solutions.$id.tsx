@@ -217,9 +217,13 @@ function SolutionByIdDetail() {
     (DIFFICULTY_LABEL as Record<string, string>)[s.difficulty as Difficulty] ?? s.difficulty;
   const longDesc = s.long_description ?? s.short_description ?? "";
 
-  const scrollToSteps = () => {
-    if (typeof document === "undefined") return;
-    document.getElementById("solution-steps")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const goToJourney = () => {
+    setView("journey");
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const goToOverview = () => {
+    setView("overview");
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
