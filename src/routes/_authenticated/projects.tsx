@@ -1,9 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +10,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ArrowRight, Eye } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { ArrowRight, Eye, Trash2, FolderKanban } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/projects")({
   component: Projects,
@@ -49,12 +59,36 @@ function timeAgo(iso: string) {
   return `hace ${d} d`;
 }
 
+function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+  return (
+    <div className="border-l-4 border-teal-500 pl-4">
+      <h2 className="text-xl font-semibold text-slate-100">{title}</h2>
+      {subtitle && <p className="mt-0.5 text-sm text-slate-400">{subtitle}</p>}
+    </div>
+  );
+}
+
+function statusInfo(s: string) {
+  if (s === "ready" || s === "completed")
+    return { label: "Completado", cls: "bg-teal-500/15 text-teal-300 border-teal-500/30" };
+  if (s === "pending")
+    return { label: "Pendiente", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
+  if (s === "generating")
+    return { label: "En curso", cls: "bg-sky-500/15 text-sky-300 border-sky-500/30" };
+  return { label: s, cls: "bg-slate-700/50 text-slate-300 border-slate-600/40" };
+}
+
 function Projects() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const [promptModal, setPromptModal] = useState<{ open: boolean; content: string }>(
     { open: false, content: "" },
   );
+  const [confirm, setConfirm] = useState<
+    | { open: true; kind: "session" | "project"; id: string; label: string }
+    | { open: false }
+  >({ open: false });
 
   const { data: inProgress, isLoading: loadingSessions } = useQuery({
     queryKey: ["builder-sessions-in-progress", user?.id],
@@ -92,65 +126,124 @@ function Projects() {
     setPromptModal({ open: true, content: data?.generated_prompt ?? "Sin prompt generado." });
   };
 
+  const handleConfirmDelete = async () => {
+    if (!confirm.open || !user) return;
+    const { kind, id } = confirm;
+    if (kind === "project") {
+      // Optimistic update
+      qc.setQueryData<ProjectRow[]>(
+        ["builder-projects-all", user.id],
+        (old) => (old ?? []).filter((p) => p.id !== id),
+      );
+      const { error } = await supabase
+        .from("builder_projects")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
+      if (error) {
+        toast.error("No se pudo eliminar");
+        qc.invalidateQueries({ queryKey: ["builder-projects-all", user.id] });
+      } else {
+        toast.success("Proyecto eliminado");
+      }
+    } else {
+      qc.setQueryData<SessionRow[]>(
+        ["builder-sessions-in-progress", user.id],
+        (old) => (old ?? []).filter((s) => s.id !== id),
+      );
+      const { error } = await supabase
+        .from("builder_sessions")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
+      if (error) {
+        toast.error("No se pudo eliminar");
+        qc.invalidateQueries({ queryKey: ["builder-sessions-in-progress", user.id] });
+      } else {
+        toast.success("Sesión eliminada");
+      }
+    }
+    setConfirm({ open: false });
+  };
+
   return (
     <div className="mx-auto max-w-[960px] px-6 py-10">
-      <h1 className="text-[1.75rem] font-bold tracking-tight">Mis proyectos</h1>
-      <p className="mt-1 text-[13px] text-muted-foreground">
-        Tus implementaciones en curso y completadas.
-      </p>
+      <div className="border-l-4 border-teal-500 pl-4">
+        <h1 className="text-3xl font-bold tracking-tight text-white">
+          Mis <span className="text-teal-400">proyectos</span>
+        </h1>
+        <p className="mt-1 text-sm text-slate-400">
+          Tus implementaciones en curso y completadas.
+        </p>
+      </div>
 
       {/* En progreso */}
-      <section className="mt-8">
-        <h2 className="text-[14px] font-semibold uppercase tracking-wider text-muted-foreground">
-          En progreso
-        </h2>
-        <div className="mt-3 space-y-2">
+      <section className="mt-10">
+        <SectionHeader title="En progreso" subtitle="Sesiones del Builder activas" />
+        <div className="mt-4 space-y-3">
           {loadingSessions ? (
-            <div className="h-20 animate-pulse rounded-[10px] bg-muted" />
+            <div className="h-20 animate-pulse rounded-xl bg-slate-800/60" />
           ) : (inProgress ?? []).length === 0 ? (
-            <div className="rounded-[10px] border border-dashed border-border p-6 text-center text-[12px] text-muted-foreground">
-              No tenés implementaciones en curso.
-            </div>
+            <EmptyState text="No tenés implementaciones en curso." />
           ) : (
             (inProgress ?? []).map((s) => {
               const pct = Math.round(((s.current_step ?? 1) / 5) * 100);
               return (
                 <div
                   key={s.id}
-                  className="flex flex-col gap-3 rounded-[10px] border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="group relative flex flex-col gap-3 rounded-xl border border-slate-700/50 bg-slate-800/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-teal-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <div className="truncate text-[14px] font-semibold">
+                      <div className="truncate text-sm font-semibold text-slate-100">
                         {s.solutions?.title ?? "Solución"}
                       </div>
                       {s.status === "paused" && (
-                        <Badge variant="secondary" className="text-[10px]">Pausada</Badge>
+                        <span className="rounded-md border border-slate-600/40 bg-slate-700/40 px-2 py-0.5 text-[10px] font-medium text-slate-300">
+                          Pausada
+                        </span>
                       )}
                     </div>
-                    <div className="mt-1.5 flex items-center gap-2">
-                      <div className="text-[11px] text-muted-foreground whitespace-nowrap">
+                    <div className="mt-2 flex items-center gap-2">
+                      <div className="whitespace-nowrap text-xs text-slate-400">
                         Paso {s.current_step ?? 1} de 5
                       </div>
-                      <div className="h-1.5 w-32 overflow-hidden rounded-full bg-muted">
-                        <div className="h-full bg-foreground" style={{ width: `${pct}%` }} />
+                      <div className="h-1.5 w-32 overflow-hidden rounded-full bg-slate-700">
+                        <div className="h-full bg-teal-400" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
-                    <div className="mt-1.5 text-[11px] text-muted-foreground">
+                    <div className="mt-1.5 text-xs text-slate-500">
                       Última actividad: {timeAgo(s.updated_at)}
                     </div>
                   </div>
-                  <Button
-                    className="h-9 shrink-0 rounded-lg bg-foreground text-background hover:bg-foreground/90 text-[12px]"
-                    onClick={() => {
-                      try {
-                        localStorage.setItem(`builder_session_${s.solution_id}`, s.id);
-                      } catch {}
-                      navigate({ to: "/builder/$solutionId", params: { solutionId: s.solution_id } });
-                    }}
-                  >
-                    Continuar <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      className="h-9 shrink-0 rounded-xl bg-gradient-to-r from-teal-500 to-sky-500 px-5 text-sm font-semibold text-white shadow-lg shadow-teal-500/20 hover:from-teal-400 hover:to-sky-400"
+                      onClick={() => {
+                        try {
+                          localStorage.setItem(`builder_session_${s.solution_id}`, s.id);
+                        } catch {}
+                        navigate({ to: "/builder/$solutionId", params: { solutionId: s.solution_id } });
+                      }}
+                    >
+                      Continuar <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                    </Button>
+                    <button
+                      onClick={() =>
+                        setConfirm({
+                          open: true,
+                          kind: "session",
+                          id: s.id,
+                          label: s.solutions?.title ?? "esta sesión",
+                        })
+                      }
+                      title="Eliminar"
+                      aria-label="Eliminar"
+                      className="rounded-lg p-2 text-slate-400 opacity-0 transition hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               );
             })
@@ -159,58 +252,47 @@ function Projects() {
       </section>
 
       {/* Completados */}
-      <section className="mt-10">
-        <h2 className="text-[14px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Completados
-        </h2>
-        <div className="mt-3 space-y-2">
+      <section className="mt-12">
+        <SectionHeader title="Completados" subtitle="Tus proyectos finalizados" />
+        <div className="mt-4 space-y-3">
           {loadingProjects ? (
-            <div className="h-20 animate-pulse rounded-[10px] bg-muted" />
+            <div className="h-20 animate-pulse rounded-xl bg-slate-800/60" />
           ) : (projects ?? []).length === 0 ? (
-            <div className="rounded-[10px] border border-dashed border-border p-6 text-center text-[12px] text-muted-foreground">
-              Todavía no tenés proyectos completados.
-            </div>
+            <EmptyState text="Todavía no tenés proyectos completados." />
           ) : (
             (projects ?? []).map((p) => {
               const isImpl = p.type === "implementador";
-              const statusInfo =
-                p.status === "ready" || p.status === "completed"
-                  ? { label: "Completado", cls: "bg-emerald-100 text-emerald-700 border-emerald-200" }
-                  : p.status === "pending"
-                    ? { label: "Pendiente", cls: "bg-amber-100 text-amber-700 border-amber-200" }
-                    : p.status === "generating"
-                      ? { label: "En curso", cls: "bg-sky-100 text-sky-700 border-sky-200" }
-                      : { label: p.status, cls: "bg-muted text-foreground border-border" };
+              const st = statusInfo(p.status);
               return (
                 <div
                   key={p.id}
-                  className="flex flex-col gap-2 rounded-[10px] border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="group relative flex flex-col gap-2 rounded-xl border border-slate-700/50 bg-slate-800/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-teal-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-[14px] font-semibold">
+                    <div className="truncate text-sm font-semibold text-slate-100">
                       {p.solutions?.title ?? p.title}
                     </div>
-                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       {p.solutions?.category && (
-                        <span className="text-[11px] text-muted-foreground capitalize">
+                        <span className="text-xs capitalize text-slate-400">
                           {p.solutions.category}
                         </span>
                       )}
-                      <Badge
-                        className={`text-[10px] ${
+                      <span
+                        className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${
                           isImpl
-                            ? "bg-foreground text-background hover:bg-foreground/90"
-                            : "bg-muted text-foreground hover:bg-muted/80"
+                            ? "bg-teal-500/15 text-teal-300 border border-teal-500/30"
+                            : "bg-slate-700/40 text-slate-300 border border-slate-600/40"
                         }`}
                       >
                         {isImpl ? "Implementador" : "DIY"}
-                      </Badge>
-                      <span
-                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium ${statusInfo.cls}`}
-                      >
-                        {statusInfo.label}
                       </span>
-                      <span className="text-[11px] text-muted-foreground">
+                      <span
+                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium ${st.cls}`}
+                      >
+                        {st.label}
+                      </span>
+                      <span className="text-xs text-slate-500">
                         {new Date(p.created_at).toLocaleDateString("es", {
                           day: "numeric",
                           month: "short",
@@ -219,15 +301,32 @@ function Projects() {
                       </span>
                     </div>
                   </div>
-                  {p.builder_session_id && (
-                    <Button
-                      variant="outline"
-                      className="h-8 shrink-0 rounded-lg text-[11px]"
-                      onClick={() => openPrompt(p.builder_session_id!)}
+                  <div className="flex items-center gap-2">
+                    {p.builder_session_id && (
+                      <Button
+                        variant="outline"
+                        className="h-8 shrink-0 rounded-xl border-slate-600 bg-transparent text-xs text-slate-300 hover:border-teal-500 hover:text-teal-400"
+                        onClick={() => openPrompt(p.builder_session_id!)}
+                      >
+                        <Eye className="mr-1 h-3.5 w-3.5" /> Ver prompt generado
+                      </Button>
+                    )}
+                    <button
+                      onClick={() =>
+                        setConfirm({
+                          open: true,
+                          kind: "project",
+                          id: p.id,
+                          label: p.solutions?.title ?? p.title,
+                        })
+                      }
+                      title="Eliminar"
+                      aria-label="Eliminar"
+                      className="rounded-lg p-2 text-slate-400 opacity-0 transition hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
                     >
-                      <Eye className="mr-1 h-3.5 w-3.5" /> Ver prompt generado
-                    </Button>
-                  )}
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               );
             })
@@ -236,15 +335,54 @@ function Projects() {
       </section>
 
       <Dialog open={promptModal.open} onOpenChange={(o) => setPromptModal((s) => ({ ...s, open: o }))}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl border-slate-700 bg-slate-900 text-slate-100">
           <DialogHeader>
             <DialogTitle>Prompt generado</DialogTitle>
           </DialogHeader>
-          <div className="max-h-[60vh] overflow-y-auto rounded-lg bg-muted/60 p-4 font-mono text-[12px] whitespace-pre-wrap">
+          <div className="max-h-[60vh] overflow-y-auto rounded-lg bg-slate-800/60 p-4 font-mono text-xs whitespace-pre-wrap text-slate-200">
             {promptModal.content}
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={confirm.open}
+        onOpenChange={(o) => !o && setConfirm({ open: false })}
+      >
+        <AlertDialogContent className="border-slate-700 bg-slate-900 text-slate-100">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">¿Eliminar proyecto?</AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-400">
+              Esta acción no se puede deshacer. El proyecto y toda su configuración se eliminarán permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800 hover:text-slate-100">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 text-white hover:bg-red-500"
+            >
+              Sí, eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
+function EmptyState({ text }: { text: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/60 bg-slate-800/40 py-12 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-500/15">
+        <FolderKanban className="h-7 w-7 text-teal-400" />
+      </div>
+      <p className="mt-3 font-medium text-slate-300">{text}</p>
+      <p className="mt-1 text-sm text-slate-500">
+        Cuando inicies una implementación, va a aparecer acá.
+      </p>
     </div>
   );
 }
