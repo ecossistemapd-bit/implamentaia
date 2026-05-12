@@ -297,14 +297,14 @@ function SolutionByIdDetail() {
 
         {/* About + Experto */}
         <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[7fr_3fr]">
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
             <h2 className="text-xl font-bold text-white">Sobre esta solución</h2>
             <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-300">
               {longDesc || "Sin descripción disponible."}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
             <div className="flex items-center -space-x-2">
               {["bg-violet-500", "bg-emerald-500", "bg-amber-500"].map((c, i) => (
                 <div
