@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { z } from "zod";
+import { FEATURES } from "@/lib/features";
 
 const search = z.object({
   solution: z.string().optional().default(""),
@@ -10,6 +11,9 @@ const search = z.object({
 
 export const Route = createFileRoute("/contratar/confirmacion")({
   validateSearch: search,
+  beforeLoad: () => {
+    if (!FEATURES.MARKETPLACE) throw redirect({ to: "/dashboard" });
+  },
   component: ConfirmacionPage,
 });
 
