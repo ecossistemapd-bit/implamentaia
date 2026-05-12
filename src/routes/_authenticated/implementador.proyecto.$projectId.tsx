@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Copy } from "lucide-react";
@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useRole } from "@/hooks/use-role";
+import { FEATURES } from "@/lib/features";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -20,6 +21,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 export const Route = createFileRoute(
   "/_authenticated/implementador/proyecto/$projectId",
 )({
+  beforeLoad: () => {
+    if (!FEATURES.MARKETPLACE) throw redirect({ to: "/dashboard" });
+  },
   component: ProjectDetail,
 });
 
