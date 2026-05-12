@@ -47,7 +47,7 @@ function LoginPage() {
       if (mode === "signin") {
         const { error } = await supabase.auth.signInWithPassword(values);
         if (error) throw error;
-        toast.success("Bienvenido");
+        toast.success("Bienvenido", { duration: 4000 });
         navigate({ to: "/dashboard" });
       } else {
         const { error } = await supabase.auth.signUp({
@@ -61,11 +61,11 @@ function LoginPage() {
             : error.message;
           throw new Error(msg);
         }
-        toast.success("Cuenta creada. Revisá tu correo para confirmar.");
+        toast.success("Cuenta creada. Revisá tu correo para confirmar.", { duration: 4000 });
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Algo salió mal";
-      toast.error(msg);
+      toast.error(msg, { duration: 4000 });
     } finally {
       setSubmitting(false);
     }

@@ -128,10 +128,10 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
   const updateRole = async (id: string, newRole: string) => {
     const { error } = await supabase.from("profiles").update({ role: newRole }).eq("id", id);
     if (error) {
-      toast.error("Error: " + error.message);
+      toast.error("Error: " + error.message, { duration: 4000 });
       return;
     }
-    toast.success("✓ Guardado");
+    toast.success("✓ Guardado", { duration: 4000 });
     qc.invalidateQueries({ queryKey: ["admin-users"] });
   };
 
@@ -278,10 +278,10 @@ function ProjectsTab({ filterUserId, onClearFilter }: { filterUserId: string | n
       .update({ implementador_id: implId, status: "assigned" as never })
       .eq("id", projectId);
     if (error) {
-      toast.error("Error: " + error.message);
+      toast.error("Error: " + error.message, { duration: 4000 });
       return;
     }
-    toast.success("✓ Asignado");
+    toast.success("✓ Asignado", { duration: 4000 });
     qc.invalidateQueries({ queryKey: ["admin-projects"] });
   };
 
@@ -452,10 +452,10 @@ function SolutionsTab() {
       .update({ resources: resources as never })
       .eq("id", id);
     if (error) {
-      toast.error("Error: " + error.message);
+      toast.error("Error: " + error.message, { duration: 4000 });
       return false;
     }
-    toast.success("✓ Links actualizados");
+    toast.success("✓ Links actualizados", { duration: 4000 });
     qc.invalidateQueries({ queryKey: ["admin-solutions"] });
     return true;
   };
@@ -541,7 +541,7 @@ function ResourcesEditor({
 
   const addDraft = () => {
     if (!draft.title.trim() || !draft.url.trim()) {
-      toast.error("Título y URL son obligatorios");
+      toast.error("Título y URL son obligatorios", { duration: 4000 });
       return;
     }
     const next: ResourceLink = {

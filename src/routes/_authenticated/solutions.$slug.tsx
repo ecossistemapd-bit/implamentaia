@@ -55,7 +55,7 @@ function SolutionDetail() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["saved", slug] });
-      toast.success(saved ? "Removido de guardados" : "Guardado");
+      toast.success(saved ? "Removido de guardados" : "Guardado", { duration: 4000 });
     },
   });
 

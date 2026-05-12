@@ -141,10 +141,10 @@ function Projects() {
         .eq("id", id)
         .eq("user_id", user.id);
       if (error) {
-        toast.error("No se pudo eliminar");
+        toast.error("No se pudo eliminar", { duration: 4000 });
         qc.invalidateQueries({ queryKey: ["builder-projects-all", user.id] });
       } else {
-        toast.success("Proyecto eliminado");
+        toast.success("Proyecto eliminado", { duration: 4000 });
       }
     } else {
       qc.setQueryData<SessionRow[]>(
@@ -157,10 +157,10 @@ function Projects() {
         .eq("id", id)
         .eq("user_id", user.id);
       if (error) {
-        toast.error("No se pudo eliminar");
+        toast.error("No se pudo eliminar", { duration: 4000 });
         qc.invalidateQueries({ queryKey: ["builder-sessions-in-progress", user.id] });
       } else {
-        toast.success("Sesión eliminada");
+        toast.success("Sesión eliminada", { duration: 4000 });
       }
     }
     setConfirm({ open: false });

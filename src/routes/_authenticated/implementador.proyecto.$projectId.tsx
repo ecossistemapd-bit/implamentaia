@@ -112,17 +112,17 @@ function ProjectDetail() {
       .eq("id", projectId);
     setSaving(false);
     if (error) {
-      toast.error("Error al guardar: " + error.message);
+      toast.error("Error al guardar: " + error.message, { duration: 4000 });
       return;
     }
-    toast.success("Cambios guardados ✓");
+    toast.success("Cambios guardados ✓", { duration: 4000 });
     refetch();
   };
 
   const copyPrompt = async () => {
     if (!s?.generated_prompt) return;
     await navigator.clipboard.writeText(s.generated_prompt);
-    toast.success("Prompt copiado");
+    toast.success("Prompt copiado", { duration: 4000 });
   };
 
   return (
