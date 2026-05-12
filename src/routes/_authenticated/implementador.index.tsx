@@ -1,12 +1,16 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { ClipboardList, Clock, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useRole } from "@/hooks/use-role";
+import { FEATURES } from "@/lib/features";
 
 export const Route = createFileRoute("/_authenticated/implementador/")({
+  beforeLoad: () => {
+    if (!FEATURES.MARKETPLACE) throw redirect({ to: "/dashboard" });
+  },
   component: ImplementerPanel,
 });
 
