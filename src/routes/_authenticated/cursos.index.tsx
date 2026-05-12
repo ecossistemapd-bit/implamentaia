@@ -26,25 +26,25 @@ type ThumbStyle = {
 
 const THUMB_BY_KEY: Record<string, ThumbStyle> = {
   lovable: {
-    gradient: "from-purple-900 via-violet-800 to-slate-900",
+    gradient: "from-purple-900 via-violet-800 to-zinc-900",
     badge: "bg-violet-500/20 text-violet-300 border-violet-500/40",
     initial: "L",
     tagline: "Formación Lovable",
   },
   claude: {
-    gradient: "from-orange-900 via-amber-800 to-slate-900",
+    gradient: "from-orange-900 via-amber-800 to-zinc-900",
     badge: "bg-amber-500/20 text-amber-300 border-amber-500/40",
     initial: "C",
     tagline: "Formación Claude",
   },
   n8n: {
-    gradient: "from-green-900 via-emerald-800 to-slate-900",
+    gradient: "from-green-900 via-emerald-800 to-zinc-900",
     badge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
     initial: "n8n",
     tagline: "Formación n8n",
   },
   default: {
-    gradient: "from-teal-900 via-sky-900 to-slate-900",
+    gradient: "from-teal-900 via-sky-900 to-zinc-900",
     badge: "bg-teal-500/20 text-teal-300 border-teal-500/40",
     initial: "AI",
     tagline: "Formación IA",
@@ -63,10 +63,10 @@ const FILTERS = ["Todos", "No-Code", "IA", "Automatización"] as const;
 type Filter = (typeof FILTERS)[number];
 
 const COMING_SOON = [
-  { title: "ChatGPT para Negocios", category: "IA", gradient: "from-emerald-900 via-teal-800 to-slate-900" },
-  { title: "Make (Integromat)", category: "Automatización", gradient: "from-fuchsia-900 via-purple-800 to-slate-900" },
-  { title: "WhatsApp Business API", category: "Automatización", gradient: "from-green-900 via-lime-800 to-slate-900" },
-  { title: "Meta Ads con IA", category: "Marketing", gradient: "from-blue-900 via-indigo-800 to-slate-900" },
+  { title: "ChatGPT para Negocios", category: "IA", gradient: "from-emerald-900 via-teal-800 to-zinc-900" },
+  { title: "Make (Integromat)", category: "Automatización", gradient: "from-fuchsia-900 via-purple-800 to-zinc-900" },
+  { title: "WhatsApp Business API", category: "Automatización", gradient: "from-green-900 via-lime-800 to-zinc-900" },
+  { title: "Meta Ads con IA", category: "Marketing", gradient: "from-blue-900 via-indigo-800 to-zinc-900" },
 ];
 
 function categoryMatches(filter: Filter, cat: string | null) {
@@ -104,8 +104,8 @@ function Thumbnail({
       </div>
       <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent" />
       {locked && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm">
-          <Lock className="h-8 w-8 text-slate-300" />
+        <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm">
+          <Lock className="h-8 w-8 text-zinc-300" />
         </div>
       )}
     </div>
@@ -172,20 +172,20 @@ function CursosPage() {
     <div className="mx-auto max-w-7xl px-6 py-12">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold text-slate-100">
+        <h1 className="text-4xl font-bold text-zinc-100">
           Cursos de <span className="text-teal-400">IA</span>
         </h1>
-        <p className="mt-2 text-slate-400">
+        <p className="mt-2 text-zinc-400">
           Capacitación práctica en las herramientas que usan los mejores implementadores.
         </p>
 
         <div className="relative mt-6">
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar cursos..."
-            className="w-full rounded-xl border border-slate-700 bg-slate-800/80 py-3 pl-11 pr-4 text-slate-100 placeholder:text-slate-500 outline-none focus:border-teal-500/60 focus:ring-2 focus:ring-teal-500/20"
+            className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 py-3 pl-11 pr-4 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-teal-500/60 focus:ring-2 focus:ring-teal-500/20"
           />
         </div>
 
@@ -199,7 +199,7 @@ function CursosPage() {
                 className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
                   active
                     ? "border-teal-500 bg-teal-500 text-white"
-                    : "border-slate-700 bg-slate-800/60 text-slate-300 hover:border-slate-600 hover:text-slate-100"
+                    : "border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-zinc-700 hover:text-zinc-100"
                 }`}
               >
                 {f}
@@ -213,7 +213,7 @@ function CursosPage() {
       {featured && (
         <section className="mt-10">
           <div className="mb-3 flex items-center gap-3 border-l-4 border-teal-500 pl-3">
-            <h2 className="text-xl font-semibold text-slate-100">Destacado</h2>
+            <h2 className="text-xl font-semibold text-zinc-100">Destacado</h2>
           </div>
           <FeaturedCard
             course={featured}
@@ -227,7 +227,7 @@ function CursosPage() {
       {rest.length > 0 && (
         <section className="mt-12">
           <div className="mb-4 flex items-center gap-3 border-l-4 border-teal-500 pl-3">
-            <h2 className="text-xl font-semibold text-slate-100">Herramientas de IA</h2>
+            <h2 className="text-xl font-semibold text-zinc-100">Herramientas de IA</h2>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {rest.map((c) => (
@@ -243,7 +243,7 @@ function CursosPage() {
       )}
 
       {filtered.length === 0 && (
-        <div className="mt-10 rounded-xl border border-dashed border-slate-700 bg-slate-800/40 p-10 text-center text-slate-400">
+        <div className="mt-10 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/40 p-10 text-center text-zinc-400">
           No encontramos cursos con esos filtros.
         </div>
       )}
@@ -251,13 +251,13 @@ function CursosPage() {
       {/* Coming soon */}
       <section className="mt-14">
         <div className="mb-4 flex items-center gap-3 border-l-4 border-teal-500 pl-3">
-          <h2 className="text-xl font-semibold text-slate-100">Próximamente</h2>
+          <h2 className="text-xl font-semibold text-zinc-100">Próximamente</h2>
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {COMING_SOON.map((c) => (
             <div
               key={c.title}
-              className="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/60"
+              className="overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900/60"
             >
               <Thumbnail
                 style={{
@@ -272,8 +272,8 @@ function CursosPage() {
                 <span className="inline-block rounded-full border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold tracking-wide text-amber-300">
                   MUY PRONTO
                 </span>
-                <h3 className="mt-2 line-clamp-2 text-sm font-semibold text-slate-100">{c.title}</h3>
-                <p className="mt-1 text-xs text-slate-500">Disponible próximamente</p>
+                <h3 className="mt-2 line-clamp-2 text-sm font-semibold text-zinc-100">{c.title}</h3>
+                <p className="mt-1 text-xs text-zinc-600">Disponible próximamente</p>
               </div>
             </div>
           ))}
@@ -307,7 +307,7 @@ function CourseCard({
   return (
     <button
       onClick={onClick}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/80 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-teal-500/50 hover:shadow-2xl hover:shadow-black/50"
+      className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900/80 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-teal-500/50 hover:shadow-2xl hover:shadow-black/50"
     >
       <div className="relative overflow-hidden">
         <div className="transition-transform duration-200 group-hover:scale-[1.03]">
@@ -326,7 +326,7 @@ function CourseCard({
       <div className="flex flex-1 flex-col p-4">
         <h3 className="line-clamp-2 text-base font-semibold text-white">{course.title}</h3>
 
-        <div className="mt-2 flex items-center gap-4 text-xs text-slate-400">
+        <div className="mt-2 flex items-center gap-4 text-xs text-zinc-400">
           <span className="flex items-center gap-1.5">
             <Users className="h-3.5 w-3.5" />
             Sé el primero
@@ -339,10 +339,10 @@ function CourseCard({
 
         {inProgress ? (
           <div className="mt-4">
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-zinc-400">
               {progress.done} de {progress.total} módulos completados
             </div>
-            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
               <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
             </div>
           </div>
@@ -356,7 +356,7 @@ function CourseCard({
               Continuar →
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-md border border-slate-600 px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors group-hover:border-teal-500/50 group-hover:text-teal-300">
+            <span className="inline-flex items-center gap-1 rounded-md border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-200 transition-colors group-hover:border-teal-500/50 group-hover:text-teal-300">
               Ver curso →
             </span>
           )}
@@ -381,12 +381,12 @@ function FeaturedCard({
   const hasModules = progress.total > 0;
 
   return (
-    <div className={`overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br ${style.gradient} shadow-2xl shadow-black/40`}>
+    <div className={`overflow-hidden rounded-2xl border border-zinc-800/50 bg-gradient-to-br ${style.gradient} shadow-2xl shadow-black/40`}>
       <div className="grid grid-cols-1 gap-0 lg:grid-cols-5">
         <div className="lg:col-span-3">
           <Thumbnail style={style} size="lg" />
         </div>
-        <div className="flex flex-col justify-center bg-slate-900/70 p-8 backdrop-blur-sm lg:col-span-2">
+        <div className="flex flex-col justify-center bg-zinc-900/70 p-8 backdrop-blur-sm lg:col-span-2">
           <div className="flex items-center gap-2">
             {course.category && (
               <span className="rounded-md border border-teal-500/40 bg-teal-500/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-teal-300">
@@ -399,9 +399,9 @@ function FeaturedCard({
           </div>
           <h3 className="mt-3 text-3xl font-bold text-white">{course.title}</h3>
           {course.description && (
-            <p className="mt-2 line-clamp-3 text-sm text-slate-300">{course.description}</p>
+            <p className="mt-2 line-clamp-3 text-sm text-zinc-300">{course.description}</p>
           )}
-          <div className="mt-4 flex items-center gap-5 text-sm text-slate-400">
+          <div className="mt-4 flex items-center gap-5 text-sm text-zinc-400">
             <span className="flex items-center gap-1.5">
               <Users className="h-4 w-4" /> Sé el primero
             </span>
@@ -413,10 +413,10 @@ function FeaturedCard({
 
           {inProgress && (
             <div className="mt-5">
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-zinc-400">
                 {progress.done} de {progress.total} completados
               </div>
-              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
                 <div className="h-full bg-teal-400" style={{ width: `${pct}%` }} />
               </div>
             </div>

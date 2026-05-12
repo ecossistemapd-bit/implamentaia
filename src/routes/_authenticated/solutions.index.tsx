@@ -87,19 +87,19 @@ function SolutionsList() {
     <div className="mx-auto max-w-[1100px] px-6 py-10">
       <header>
         <h1 className="text-3xl font-bold tracking-tight text-white">Soluciones de <span className="text-teal-400">IA</span></h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-zinc-400">
           Implementaciones reales y listas para tu empresa.
         </p>
       </header>
 
       <div className="sticky top-0 z-10 mt-4 space-y-3 bg-background/85 py-3 backdrop-blur">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Buscar soluciones..."
-            className="h-10 rounded-lg border-slate-700 bg-slate-800 pl-9 text-sm text-white placeholder:text-slate-500"
+            className="h-10 rounded-lg border-zinc-800 bg-zinc-900 pl-9 text-sm text-white placeholder:text-zinc-600"
           />
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -125,7 +125,7 @@ function SolutionsList() {
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading
           ? Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-[200px] animate-pulse rounded-xl bg-slate-800" />
+              <div key={i} className="h-[200px] animate-pulse rounded-xl bg-zinc-900" />
             ))
           : filtered.map((s) => {
               const Icon = getLucideIcon(s.icon_name);
@@ -138,12 +138,12 @@ function SolutionsList() {
                 <Link
                   key={s.id}
                   {...linkProps}
-                  className="group flex flex-col overflow-hidden rounded-xl border border-slate-700 bg-slate-800 transition duration-200 hover:scale-[1.01] hover:border-teal-500"
+                  className="group flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 transition duration-200 hover:scale-[1.01] hover:border-teal-500"
                 >
                   {/* Card header with icon */}
-                  <div className="flex h-28 items-center justify-center bg-slate-700/30">
+                  <div className="flex h-28 items-center justify-center bg-zinc-800/30">
                     <div
-                      className="flex h-20 w-20 items-center justify-center rounded-2xl border border-slate-600/50 bg-slate-700/50"
+                      className="flex h-20 w-20 items-center justify-center rounded-2xl border border-zinc-700/50 bg-zinc-800/50"
                       style={{ boxShadow: "0 0 24px rgba(20, 184, 166, 0.10)" }}
                     >
                       <Icon className="h-9 w-9 text-teal-400" strokeWidth={1.5} />
@@ -153,7 +153,7 @@ function SolutionsList() {
                     <h3 className="line-clamp-1 text-base font-semibold leading-tight text-white">
                       {s.title}
                     </h3>
-                    <p className="mt-2 line-clamp-2 text-sm leading-snug text-slate-400">
+                    <p className="mt-2 line-clamp-2 text-sm leading-snug text-zinc-400">
                       {s.short_description}
                     </p>
                     <div className="mt-auto flex flex-wrap gap-1.5 pt-4">
@@ -166,13 +166,13 @@ function SolutionsList() {
                     </div>
                     {completed > 0 && (
                       <div className="mt-3">
-                        <div className="h-1 w-full overflow-hidden rounded-full bg-slate-700">
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
                           <div
                             className="h-full bg-gradient-to-r from-teal-500 to-emerald-500"
                             style={{ width: `${pct}%` }}
                           />
                         </div>
-                        <div className="mt-1.5 text-[11px] text-slate-400">
+                        <div className="mt-1.5 text-[11px] text-zinc-400">
                           {completed} de 5 pasos
                         </div>
                       </div>
@@ -183,15 +183,15 @@ function SolutionsList() {
             })}
       </div>
       {!isLoading && filtered.length === 0 && (
-        <div className="mt-8 rounded-xl border border-dashed border-slate-700 bg-slate-800/40 p-10 text-center">
-          <p className="text-sm text-slate-400">No encontramos soluciones con esos filtros.</p>
+        <div className="mt-8 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/40 p-10 text-center">
+          <p className="text-sm text-zinc-400">No encontramos soluciones con esos filtros.</p>
         </div>
       )}
 
       {/* Coming soon */}
       <section className="mt-12">
         <div className="mb-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
             Próximamente
           </h2>
         </div>
@@ -199,13 +199,13 @@ function SolutionsList() {
           {comingSoon.map((c) => (
             <div
               key={c.label}
-              className="flex min-h-[120px] flex-col rounded-xl border border-slate-700 bg-slate-800/40 p-4"
+              className="flex min-h-[120px] flex-col rounded-xl border border-zinc-800 bg-zinc-900/40 p-4"
             >
-              <div className="flex items-center gap-2 text-slate-300">
+              <div className="flex items-center gap-2 text-zinc-300">
                 <span className="text-base">{c.icon}</span>
                 <h3 className="text-sm font-medium">{c.label}</h3>
               </div>
-              <span className="mt-auto text-[11px] uppercase tracking-wider text-slate-500">
+              <span className="mt-auto text-[11px] uppercase tracking-wider text-zinc-600">
                 En desarrollo
               </span>
             </div>
@@ -223,7 +223,7 @@ const CATEGORY_COLOR: Record<string, string> = {
   finanzas: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
   operaciones: "border-amber-500/30 bg-amber-500/10 text-amber-300",
   rrhh: "border-pink-500/30 bg-pink-500/10 text-pink-300",
-  default: "border-slate-600 bg-slate-700/50 text-slate-300",
+  default: "border-zinc-700 bg-zinc-800/50 text-zinc-300",
 };
 
 const DIFFICULTY_COLOR: Record<Difficulty, string> = {
@@ -248,7 +248,7 @@ function FilterChip({
       className={`h-8 rounded-full border px-3.5 text-xs font-medium transition ${
         active
           ? "border-teal-500 bg-teal-500 text-white"
-          : "border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600 hover:text-white"
+          : "border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-zinc-700 hover:text-white"
       }`}
     >
       {children}

@@ -21,10 +21,10 @@ type Module = {
 
 function thumbGradient(title: string) {
   const t = title.toLowerCase();
-  if (t.includes("lovable")) return { gradient: "from-purple-900 via-violet-800 to-slate-900", initial: "L" };
-  if (t.includes("claude")) return { gradient: "from-orange-900 via-amber-800 to-slate-900", initial: "C" };
-  if (t.includes("n8n")) return { gradient: "from-green-900 via-emerald-800 to-slate-900", initial: "n8n" };
-  return { gradient: "from-teal-900 via-sky-900 to-slate-900", initial: "AI" };
+  if (t.includes("lovable")) return { gradient: "from-purple-900 via-violet-800 to-zinc-900", initial: "L" };
+  if (t.includes("claude")) return { gradient: "from-orange-900 via-amber-800 to-zinc-900", initial: "C" };
+  if (t.includes("n8n")) return { gradient: "from-green-900 via-emerald-800 to-zinc-900", initial: "n8n" };
+  return { gradient: "from-teal-900 via-sky-900 to-zinc-900", initial: "AI" };
 }
 
 function levelClass(level: string | null) {
@@ -124,13 +124,13 @@ function CourseDetailPage() {
   const inProgress = done > 0;
 
   return (
-    <div className="min-h-screen bg-slate-950">
-      <header className="border-b border-slate-800 bg-slate-900/70 px-6 py-3 backdrop-blur-sm">
+    <div className="min-h-screen bg-zinc-950">
+      <header className="border-b border-zinc-900 bg-zinc-900/70 px-6 py-3 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <Link to="/cursos" className="flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-teal-400">
+          <Link to="/cursos" className="flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-teal-400">
             <ArrowLeft className="h-4 w-4" /> Cursos
           </Link>
-          <span className="text-sm text-slate-400">
+          <span className="text-sm text-zinc-400">
             {done} / {total} completados
           </span>
         </div>
@@ -138,13 +138,13 @@ function CourseDetailPage() {
 
       {/* Hero */}
       <section className="mx-auto mt-6 max-w-6xl px-6">
-        <div className={`relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br ${style.gradient} shadow-2xl shadow-black/40`}>
+        <div className={`relative overflow-hidden rounded-2xl border border-zinc-800/50 bg-gradient-to-br ${style.gradient} shadow-2xl shadow-black/40`}>
           <div className="relative aspect-[16/6] w-full">
             <div className="absolute inset-0 opacity-20" style={{
               backgroundImage:
                 "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15) 0, transparent 40%), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0, transparent 40%)",
             }} />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/40 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-8">
               <div className="flex flex-wrap items-center gap-2">
                 {course?.category && (
@@ -158,9 +158,9 @@ function CourseDetailPage() {
               </div>
               <h1 className="mt-3 text-3xl font-bold text-white md:text-4xl">{course?.title}</h1>
               {course?.description && (
-                <p className="mt-2 max-w-3xl text-sm text-slate-300">{course.description}</p>
+                <p className="mt-2 max-w-3xl text-sm text-zinc-300">{course.description}</p>
               )}
-              <div className="mt-4 flex flex-wrap items-center gap-5 text-sm text-slate-300">
+              <div className="mt-4 flex flex-wrap items-center gap-5 text-sm text-zinc-300">
                 <span className="flex items-center gap-1.5">
                   <Users className="h-4 w-4" /> Sé el primero
                 </span>
@@ -177,7 +177,7 @@ function CourseDetailPage() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[65%_35%]">
           {/* Player */}
           <div>
-            <div className="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900 shadow-xl shadow-black/30">
+            <div className="overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900 shadow-xl shadow-black/30">
               {selected?.video_url ? (
                 <iframe
                   src={selected.video_url}
@@ -186,7 +186,7 @@ function CourseDetailPage() {
                 />
               ) : (
                 <div className={`relative flex aspect-video w-full items-center justify-center bg-gradient-to-br ${style.gradient}`}>
-                  <div className="absolute inset-0 bg-slate-950/60" />
+                  <div className="absolute inset-0 bg-zinc-950/60" />
                   <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
                     <Play className="h-8 w-8 fill-white text-white" />
                   </div>
@@ -198,10 +198,10 @@ function CourseDetailPage() {
             </div>
 
             {selected && (
-              <div className="mt-5 rounded-xl border border-slate-700/50 bg-slate-800/80 p-6 shadow-xl shadow-black/20">
-                <h2 className="text-xl font-semibold text-slate-100">{selected.title}</h2>
+              <div className="mt-5 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-6 shadow-xl shadow-black/20">
+                <h2 className="text-xl font-semibold text-zinc-100">{selected.title}</h2>
                 {selected.description && (
-                  <p className="mt-2 text-sm text-slate-300">{selected.description}</p>
+                  <p className="mt-2 text-sm text-zinc-300">{selected.description}</p>
                 )}
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -220,7 +220,7 @@ function CourseDetailPage() {
                   {nextModule && (
                     <button
                       onClick={() => setSelectedId(nextModule.id)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-slate-600 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:border-teal-500/50 hover:text-teal-300"
+                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:border-teal-500/50 hover:text-teal-300"
                     >
                       Siguiente módulo <ChevronRight className="h-4 w-4" />
                     </button>
@@ -228,11 +228,11 @@ function CourseDetailPage() {
                 </div>
 
                 <div className="mt-6">
-                  <div className="flex items-center justify-between text-xs text-slate-400">
+                  <div className="flex items-center justify-between text-xs text-zinc-400">
                     <span>Progreso del curso</span>
                     <span>{done} de {total} completados</span>
                   </div>
-                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
                     <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
@@ -242,9 +242,9 @@ function CourseDetailPage() {
 
           {/* Modules sidebar */}
           <aside>
-            <div className="rounded-xl border border-slate-700/50 bg-slate-800/80 p-4 shadow-xl shadow-black/20">
+            <div className="rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-xl shadow-black/20">
               <div className="mb-3 flex items-center justify-between">
-                <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">Módulos</div>
+                <div className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Módulos</div>
                 <button
                   onClick={() => modules && modules[0] && setSelectedId(modules[0].id)}
                   className="text-xs font-semibold text-teal-400 hover:text-teal-300"
@@ -265,7 +265,7 @@ function CourseDetailPage() {
                       className={`flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors ${
                         isActive
                           ? "border border-teal-500/40 bg-teal-500/10"
-                          : "border border-transparent hover:bg-slate-700/40"
+                          : "border border-transparent hover:bg-zinc-800/40"
                       }`}
                     >
                       <div
@@ -274,35 +274,35 @@ function CourseDetailPage() {
                             ? "bg-teal-500 text-white"
                             : isActive
                               ? "border-2 border-teal-400 text-teal-300"
-                              : "border-2 border-slate-600 text-slate-400"
+                              : "border-2 border-zinc-700 text-zinc-400"
                         }`}
                       >
                         {isDone ? <Check className="h-3 w-3" strokeWidth={3} /> : idx + 1}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className={`truncate text-sm font-medium ${isActive ? "text-teal-200" : "text-slate-100"}`}>
+                        <div className={`truncate text-sm font-medium ${isActive ? "text-teal-200" : "text-zinc-100"}`}>
                           {m.title}
                         </div>
                         {m.duration_minutes != null && (
-                          <div className="text-xs text-slate-500">{m.duration_minutes} min</div>
+                          <div className="text-xs text-zinc-600">{m.duration_minutes} min</div>
                         )}
                       </div>
                     </button>
                   );
                 })}
                 {modules && modules.length === 0 && (
-                  <p className="px-3 py-8 text-center text-sm text-slate-500">
+                  <p className="px-3 py-8 text-center text-sm text-zinc-600">
                     Estamos preparando los módulos. Volvé pronto.
                   </p>
                 )}
               </div>
 
               {total > 0 && (
-                <div className="mt-5 border-t border-slate-700/50 pt-4">
-                  <div className="text-xs text-slate-400">
+                <div className="mt-5 border-t border-zinc-800/50 pt-4">
+                  <div className="text-xs text-zinc-400">
                     {done} de {total} módulos completados
                   </div>
-                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
                     <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
                   </div>
                 </div>

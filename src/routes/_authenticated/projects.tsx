@@ -62,8 +62,8 @@ function timeAgo(iso: string) {
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="border-l-4 border-teal-500 pl-4">
-      <h2 className="text-xl font-semibold text-slate-100">{title}</h2>
-      {subtitle && <p className="mt-0.5 text-sm text-slate-400">{subtitle}</p>}
+      <h2 className="text-xl font-semibold text-zinc-100">{title}</h2>
+      {subtitle && <p className="mt-0.5 text-sm text-zinc-400">{subtitle}</p>}
     </div>
   );
 }
@@ -75,7 +75,7 @@ function statusInfo(s: string) {
     return { label: "Pendiente", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
   if (s === "generating")
     return { label: "En curso", cls: "bg-sky-500/15 text-sky-300 border-sky-500/30" };
-  return { label: s, cls: "bg-slate-700/50 text-slate-300 border-slate-600/40" };
+  return { label: s, cls: "bg-zinc-800/50 text-zinc-300 border-zinc-700/40" };
 }
 
 function Projects() {
@@ -172,7 +172,7 @@ function Projects() {
         <h1 className="text-3xl font-bold tracking-tight text-white">
           Mis <span className="text-teal-400">proyectos</span>
         </h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-zinc-400">
           Tus implementaciones en curso y completadas.
         </p>
       </div>
@@ -182,7 +182,7 @@ function Projects() {
         <SectionHeader title="En progreso" subtitle="Sesiones del Builder activas" />
         <div className="mt-4 space-y-3">
           {loadingSessions ? (
-            <div className="h-20 animate-pulse rounded-xl bg-slate-800/60" />
+            <div className="h-20 animate-pulse rounded-xl bg-zinc-900/60" />
           ) : (inProgress ?? []).length === 0 ? (
             <EmptyState text="No tenés implementaciones en curso." />
           ) : (
@@ -191,28 +191,28 @@ function Projects() {
               return (
                 <div
                   key={s.id}
-                  className="group relative flex flex-col gap-3 rounded-xl border border-slate-700/50 bg-slate-800/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-teal-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
+                  className="group relative flex flex-col gap-3 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-teal-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <div className="truncate text-sm font-semibold text-slate-100">
+                      <div className="truncate text-sm font-semibold text-zinc-100">
                         {s.solutions?.title ?? "Solución"}
                       </div>
                       {s.status === "paused" && (
-                        <span className="rounded-md border border-slate-600/40 bg-slate-700/40 px-2 py-0.5 text-[10px] font-medium text-slate-300">
+                        <span className="rounded-md border border-zinc-700/40 bg-zinc-800/40 px-2 py-0.5 text-[10px] font-medium text-zinc-300">
                           Pausada
                         </span>
                       )}
                     </div>
                     <div className="mt-2 flex items-center gap-2">
-                      <div className="whitespace-nowrap text-xs text-slate-400">
+                      <div className="whitespace-nowrap text-xs text-zinc-400">
                         Paso {s.current_step ?? 1} de 5
                       </div>
-                      <div className="h-1.5 w-32 overflow-hidden rounded-full bg-slate-700">
+                      <div className="h-1.5 w-32 overflow-hidden rounded-full bg-zinc-800">
                         <div className="h-full bg-teal-400" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
-                    <div className="mt-1.5 text-xs text-slate-500">
+                    <div className="mt-1.5 text-xs text-zinc-600">
                       Última actividad: {timeAgo(s.updated_at)}
                     </div>
                   </div>
@@ -239,7 +239,7 @@ function Projects() {
                       }
                       title="Eliminar"
                       aria-label="Eliminar"
-                      className="rounded-lg p-2 text-slate-400 opacity-0 transition hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
+                      className="rounded-lg p-2 text-zinc-400 opacity-0 transition hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -256,7 +256,7 @@ function Projects() {
         <SectionHeader title="Completados" subtitle="Tus proyectos finalizados" />
         <div className="mt-4 space-y-3">
           {loadingProjects ? (
-            <div className="h-20 animate-pulse rounded-xl bg-slate-800/60" />
+            <div className="h-20 animate-pulse rounded-xl bg-zinc-900/60" />
           ) : (projects ?? []).length === 0 ? (
             <EmptyState text="Todavía no tenés proyectos completados." />
           ) : (
@@ -266,15 +266,15 @@ function Projects() {
               return (
                 <div
                   key={p.id}
-                  className="group relative flex flex-col gap-2 rounded-xl border border-slate-700/50 bg-slate-800/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-teal-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
+                  className="group relative flex flex-col gap-2 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-teal-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-semibold text-slate-100">
+                    <div className="truncate text-sm font-semibold text-zinc-100">
                       {p.solutions?.title ?? p.title}
                     </div>
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       {p.solutions?.category && (
-                        <span className="text-xs capitalize text-slate-400">
+                        <span className="text-xs capitalize text-zinc-400">
                           {p.solutions.category}
                         </span>
                       )}
@@ -282,7 +282,7 @@ function Projects() {
                         className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${
                           isImpl
                             ? "bg-teal-500/15 text-teal-300 border border-teal-500/30"
-                            : "bg-slate-700/40 text-slate-300 border border-slate-600/40"
+                            : "bg-zinc-800/40 text-zinc-300 border border-zinc-700/40"
                         }`}
                       >
                         {isImpl ? "Implementador" : "DIY"}
@@ -292,7 +292,7 @@ function Projects() {
                       >
                         {st.label}
                       </span>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-zinc-600">
                         {new Date(p.created_at).toLocaleDateString("es", {
                           day: "numeric",
                           month: "short",
@@ -305,7 +305,7 @@ function Projects() {
                     {p.builder_session_id && (
                       <Button
                         variant="outline"
-                        className="h-8 shrink-0 rounded-xl border-slate-600 bg-transparent text-xs text-slate-300 hover:border-teal-500 hover:text-teal-400"
+                        className="h-8 shrink-0 rounded-xl border-zinc-700 bg-transparent text-xs text-zinc-300 hover:border-teal-500 hover:text-teal-400"
                         onClick={() => openPrompt(p.builder_session_id!)}
                       >
                         <Eye className="mr-1 h-3.5 w-3.5" /> Ver prompt generado
@@ -322,7 +322,7 @@ function Projects() {
                       }
                       title="Eliminar"
                       aria-label="Eliminar"
-                      className="rounded-lg p-2 text-slate-400 opacity-0 transition hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
+                      className="rounded-lg p-2 text-zinc-400 opacity-0 transition hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -335,11 +335,11 @@ function Projects() {
       </section>
 
       <Dialog open={promptModal.open} onOpenChange={(o) => setPromptModal((s) => ({ ...s, open: o }))}>
-        <DialogContent className="max-w-2xl border-slate-700 bg-slate-900 text-slate-100">
+        <DialogContent className="max-w-2xl border-zinc-800 bg-zinc-900 text-zinc-100">
           <DialogHeader>
             <DialogTitle>Prompt generado</DialogTitle>
           </DialogHeader>
-          <div className="max-h-[60vh] overflow-y-auto rounded-lg bg-slate-800/60 p-4 font-mono text-xs whitespace-pre-wrap text-slate-200">
+          <div className="max-h-[60vh] overflow-y-auto rounded-lg bg-zinc-900/60 p-4 font-mono text-xs whitespace-pre-wrap text-zinc-200">
             {promptModal.content}
           </div>
         </DialogContent>
@@ -349,15 +349,15 @@ function Projects() {
         open={confirm.open}
         onOpenChange={(o) => !o && setConfirm({ open: false })}
       >
-        <AlertDialogContent className="border-slate-700 bg-slate-900 text-slate-100">
+        <AlertDialogContent className="border-zinc-800 bg-zinc-900 text-zinc-100">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">¿Eliminar proyecto?</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogDescription className="text-zinc-400">
               Esta acción no se puede deshacer. El proyecto y toda su configuración se eliminarán permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800 hover:text-slate-100">
+            <AlertDialogCancel className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
@@ -375,12 +375,12 @@ function Projects() {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/60 bg-slate-800/40 py-12 text-center">
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800/60 bg-zinc-900/40 py-12 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-500/15">
         <FolderKanban className="h-7 w-7 text-teal-400" />
       </div>
-      <p className="mt-3 font-medium text-slate-300">{text}</p>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-3 font-medium text-zinc-300">{text}</p>
+      <p className="mt-1 text-sm text-zinc-600">
         Cuando inicies una implementación, va a aparecer acá.
       </p>
     </div>

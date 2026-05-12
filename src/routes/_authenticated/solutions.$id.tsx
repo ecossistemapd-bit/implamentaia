@@ -120,7 +120,7 @@ function SolutionByIdDetail() {
   if (isLoading || !s) {
     return (
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="h-8 w-64 animate-pulse rounded bg-slate-800" />
+        <div className="h-8 w-64 animate-pulse rounded bg-zinc-900" />
       </div>
     );
   }
@@ -132,7 +132,7 @@ function SolutionByIdDetail() {
         <div>
           <Link
             to="/solutions"
-            className="inline-flex items-center gap-1.5 text-sm text-slate-400 transition hover:text-white"
+            className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" /> Soluciones
           </Link>
@@ -140,23 +140,23 @@ function SolutionByIdDetail() {
             <TitleWithAccent text={s.title} />
           </h1>
           {s.short_description && (
-            <p className="mt-2 max-w-xl text-sm text-slate-400">{s.short_description}</p>
+            <p className="mt-2 max-w-xl text-sm text-zinc-400">{s.short_description}</p>
           )}
         </div>
 
         {/* Progress card */}
-        <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 md:w-[240px]">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 md:w-[240px]">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
             Progreso
           </div>
           <div className="mt-1 text-4xl font-bold text-teal-400">{progressPct}%</div>
-          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
             <div
               className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all"
               style={{ width: `${progressPct}%` }}
             />
           </div>
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-400">
+          <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-400">
             <Trophy className="h-3.5 w-3.5 text-teal-400" />
             {completedCount} de {STEPS.length} etapas completadas
           </div>
@@ -177,7 +177,7 @@ function SolutionByIdDetail() {
                   {i > 0 && (
                     <div
                       className={`h-0.5 flex-1 transition ${
-                        prevCompleted ? "bg-teal-500" : "bg-slate-700"
+                        prevCompleted ? "bg-teal-500" : "bg-zinc-800"
                       }`}
                     />
                   )}
@@ -188,7 +188,7 @@ function SolutionByIdDetail() {
                         ? "border-teal-500 bg-teal-500 text-white"
                         : isActive
                         ? "border-teal-500 bg-teal-500 text-white shadow-lg shadow-teal-500/30"
-                        : "border-slate-600 bg-slate-800 text-slate-400 hover:border-slate-500"
+                        : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600"
                     }`}
                     aria-label={step.label}
                   >
@@ -197,7 +197,7 @@ function SolutionByIdDetail() {
                   {i < STEPS.length - 1 && (
                     <div
                       className={`h-0.5 flex-1 transition ${
-                        isCompleted ? "bg-teal-500" : "bg-slate-700"
+                        isCompleted ? "bg-teal-500" : "bg-zinc-800"
                       }`}
                     />
                   )}
@@ -207,8 +207,8 @@ function SolutionByIdDetail() {
                     isActive
                       ? "font-bold text-teal-400"
                       : isCompleted
-                      ? "text-slate-300"
-                      : "text-slate-500"
+                      ? "text-zinc-300"
+                      : "text-zinc-600"
                   }`}
                 >
                   {step.label}
@@ -346,12 +346,12 @@ function StepHerramientas({ tools, onComplete }: { tools: string[]; onComplete: 
           </Button>
         }
       />
-      <p className="mt-2 text-sm text-slate-400">
+      <p className="mt-2 text-sm text-zinc-400">
         Conocé las herramientas que usaremos en esta implementación.
       </p>
 
       {unique.length === 0 ? (
-        <div className="mt-6 rounded-xl border border-dashed border-slate-700 bg-slate-800/50 p-10 text-center text-sm text-slate-400">
+        <div className="mt-6 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-10 text-center text-sm text-zinc-400">
           No hay herramientas asignadas a esta solución.
         </div>
       ) : (
@@ -364,11 +364,11 @@ function StepHerramientas({ tools, onComplete }: { tools: string[]; onComplete: 
                 onClick={() => toggle(t)}
                 className={`relative rounded-xl border p-6 text-center transition duration-200 ${
                   isOk
-                    ? "border-teal-500 bg-slate-800 shadow-lg shadow-teal-500/10"
-                    : "border-slate-700 bg-slate-800 hover:scale-[1.02] hover:border-teal-500"
+                    ? "border-teal-500 bg-zinc-900 shadow-lg shadow-teal-500/10"
+                    : "border-zinc-800 bg-zinc-900 hover:scale-[1.02] hover:border-teal-500"
                 }`}
               >
-                <span className="absolute left-3 top-3 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                <span className="absolute left-3 top-3 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
                   <span className="text-teal-400">●</span> Esencial
                 </span>
                 {isOk && (
@@ -376,11 +376,11 @@ function StepHerramientas({ tools, onComplete }: { tools: string[]; onComplete: 
                     <Check className="h-3 w-3" />
                   </span>
                 )}
-                <div className="mx-auto mt-4 flex h-[60px] w-[60px] items-center justify-center rounded-xl bg-slate-700">
+                <div className="mx-auto mt-4 flex h-[60px] w-[60px] items-center justify-center rounded-xl bg-zinc-800">
                   {renderToolIcon(t)}
                 </div>
                 <div className="mt-3 text-lg font-semibold text-white">{t}</div>
-                <div className="mt-1 text-sm text-slate-400">
+                <div className="mt-1 text-sm text-zinc-400">
                   {isOk ? "Marcada como entendida" : "Click para marcar como entendido"}
                 </div>
               </button>
@@ -438,17 +438,17 @@ function StepArchivos({
           </Button>
         }
       />
-      <p className="mt-2 text-sm text-slate-400">
+      <p className="mt-2 text-sm text-zinc-400">
         Descargá los materiales necesarios para implementar esta solución.
       </p>
 
-      <h3 className="mt-8 text-sm font-semibold uppercase tracking-wider text-slate-400">
+      <h3 className="mt-8 text-sm font-semibold uppercase tracking-wider text-zinc-400">
         Links útiles
       </h3>
       {resources.length === 0 ? (
-        <div className="mt-3 flex flex-col items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 py-10 text-center">
-          <Clock className="h-6 w-6 text-slate-500" />
-          <p className="text-sm text-slate-400">Los recursos estarán disponibles próximamente</p>
+        <div className="mt-3 flex flex-col items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 py-10 text-center">
+          <Clock className="h-6 w-6 text-zinc-600" />
+          <p className="text-sm text-zinc-400">Los recursos estarán disponibles próximamente</p>
         </div>
       ) : (
         <div className="mt-3 space-y-2">
@@ -462,15 +462,15 @@ function StepArchivos({
             return (
               <div
                 key={i}
-                className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800 p-4"
+                className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 p-4"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-700">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800">
                     <Link2 className="h-4 w-4 text-teal-400" />
                   </div>
                   <div className="min-w-0">
                     <div className="truncate text-sm font-medium text-white">{r.title}</div>
-                    <div className="truncate text-xs text-slate-400">{domain}</div>
+                    <div className="truncate text-xs text-zinc-400">{domain}</div>
                   </div>
                 </div>
                 <a href={r.url} target="_blank" rel="noreferrer">
@@ -487,29 +487,29 @@ function StepArchivos({
         </div>
       )}
 
-      <h3 className="mt-10 text-sm font-semibold uppercase tracking-wider text-slate-400">
+      <h3 className="mt-10 text-sm font-semibold uppercase tracking-wider text-zinc-400">
         Tu prompt personalizado
       </h3>
       {session?.generated_prompt ? (
-        <div className="mt-3 rounded-xl border border-slate-700 bg-slate-800">
-          <div className="flex items-center justify-between border-b border-slate-700 px-4 py-2">
-            <span className="text-xs text-slate-400">Generado por el Builder</span>
+        <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900">
+          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
+            <span className="text-xs text-zinc-400">Generado por el Builder</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={copyPrompt}
-              className="text-teal-400 hover:bg-slate-700 hover:text-teal-300"
+              className="text-teal-400 hover:bg-zinc-800 hover:text-teal-300"
             >
               <Copy className="mr-1 h-3.5 w-3.5" /> Copiar
             </Button>
           </div>
-          <pre className="max-h-72 overflow-auto whitespace-pre-wrap bg-slate-900 p-4 font-mono text-xs text-slate-300">
+          <pre className="max-h-72 overflow-auto whitespace-pre-wrap bg-zinc-900 p-4 font-mono text-xs text-zinc-300">
             {session.generated_prompt}
           </pre>
         </div>
       ) : (
-        <div className="mt-3 rounded-xl border border-slate-700 bg-slate-800 p-6 text-center">
-          <p className="text-sm text-slate-400">
+        <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900 p-6 text-center">
+          <p className="text-sm text-zinc-400">
             Generá tu prompt personalizado con el Builder.
           </p>
           <Button
@@ -547,26 +547,26 @@ function StepVideo({
           </Button>
         }
       />
-      <p className="mt-2 text-sm text-slate-400">Seguí el tutorial paso a paso.</p>
+      <p className="mt-2 text-sm text-zinc-400">Seguí el tutorial paso a paso.</p>
 
       <div className="mt-6">
         {videoUrl ? (
           <>
             <iframe
               src={videoUrl}
-              className="aspect-video w-full overflow-hidden rounded-xl bg-slate-900"
+              className="aspect-video w-full overflow-hidden rounded-xl bg-zinc-900"
               allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
             />
-            <p className="mt-2 text-sm text-slate-400">{title}</p>
+            <p className="mt-2 text-sm text-zinc-400">{title}</p>
           </>
         ) : (
-          <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800">
+          <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-900">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-teal-500/20 ring-2 ring-teal-500/30">
               <Play className="h-9 w-9 fill-teal-400 text-teal-400" />
             </div>
-            <p className="text-sm font-medium text-slate-300">Video disponible próximamente</p>
-            <p className="text-xs text-slate-500">Estamos preparando el tutorial de esta solución.</p>
+            <p className="text-sm font-medium text-zinc-300">Video disponible próximamente</p>
+            <p className="text-xs text-zinc-600">Estamos preparando el tutorial de esta solución.</p>
           </div>
         )}
       </div>
@@ -628,15 +628,15 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
   return (
     <div>
       <SectionHeader text="Comentarios de la Solución" />
-      <p className="mt-2 text-sm text-slate-400">
+      <p className="mt-2 text-sm text-zinc-400">
         Dejá tu evaluación y mirá qué piensan otros.
       </p>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[3fr_2fr]">
         {/* Tu evaluación */}
-        <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
           <div className="text-sm font-semibold text-white">Tu evaluación</div>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-zinc-400">
             ¿Qué tan probable es que recomiendes esta solución?
           </p>
 
@@ -648,14 +648,14 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
                 className={`h-11 w-11 rounded-lg text-sm font-medium transition ${
                   rating === n
                     ? "scale-110 bg-teal-500 text-white shadow-md shadow-teal-500/30"
-                    : "bg-slate-700 text-slate-300 hover:bg-teal-500 hover:text-white"
+                    : "bg-zinc-800 text-zinc-300 hover:bg-teal-500 hover:text-white"
                 }`}
               >
                 {n}
               </button>
             ))}
           </div>
-          <div className="mt-2 flex justify-between text-xs text-slate-500">
+          <div className="mt-2 flex justify-between text-xs text-zinc-600">
             <span>Nada probable</span>
             <span>Muy probable</span>
           </div>
@@ -664,7 +664,7 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Comentario sobre tu implementación (opcional)..."
-            className="mt-5 min-h-24 w-full resize-none rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm text-slate-200 placeholder:text-slate-500 focus:border-teal-500 focus:outline-none"
+            className="mt-5 min-h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-teal-500 focus:outline-none"
           />
 
           <Button
@@ -680,13 +680,13 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
         <div>
           <div className="flex items-center text-sm font-semibold text-white">
             Comentarios de la comunidad
-            <span className="ml-2 rounded-full bg-slate-700 px-2 py-0.5 text-xs text-slate-300">
+            <span className="ml-2 rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300">
               {comments?.length ?? 0}
             </span>
           </div>
           <div className="mt-3 space-y-3">
             {!comments || comments.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-slate-700 bg-slate-800/50 p-6 text-center text-sm text-slate-500">
+              <p className="rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-6 text-center text-sm text-zinc-600">
                 Sé el primero en comentar.
               </p>
             ) : (
@@ -696,14 +696,14 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
                 return (
                   <div
                     key={c.id}
-                    className="rounded-xl border border-slate-700 bg-slate-800 p-4"
+                    className="rounded-xl border border-zinc-800 bg-zinc-900 p-4"
                   >
                     <div className="flex items-center gap-2">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-500/20 text-xs font-bold text-teal-300">
                         {initial}
                       </div>
                       <span className="text-sm font-medium text-white">Usuario</span>
-                      <span className="text-xs text-slate-500">{time}</span>
+                      <span className="text-xs text-zinc-600">{time}</span>
                       {c.rating !== null && (
                         <span className="ml-auto rounded-md bg-teal-500/15 px-2 py-0.5 text-xs font-semibold text-teal-300">
                           {c.rating}/10
@@ -711,7 +711,7 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
                       )}
                     </div>
                     {c.comment && (
-                      <p className="mt-2 text-sm text-slate-300">{c.comment}</p>
+                      <p className="mt-2 text-sm text-zinc-300">{c.comment}</p>
                     )}
                   </div>
                 );
@@ -736,12 +736,12 @@ function StepConclusion({
   return (
     <div className="mx-auto max-w-3xl">
       {/* Celebration card */}
-      <div className="rounded-2xl border border-teal-500/30 bg-gradient-to-br from-teal-900/30 to-slate-800 p-10 text-center">
+      <div className="rounded-2xl border border-teal-500/30 bg-gradient-to-br from-teal-900/30 to-zinc-900 p-10 text-center">
         <div className="text-6xl">🏆</div>
         <h2 className="mt-4 bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-3xl font-bold text-transparent">
           ¡Implementación Completada!
         </h2>
-        <p className="mt-2 text-sm text-slate-300">
+        <p className="mt-2 text-sm text-zinc-300">
           Felicitaciones. Completaste todas las etapas de esta solución.
         </p>
       </div>
@@ -749,25 +749,25 @@ function StepConclusion({
       {/* Bottom grid */}
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* Tu Progreso */}
-        <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold text-white">Tu Progreso</div>
             <span className="rounded-full bg-teal-500/20 px-3 py-1 text-xs font-semibold text-teal-300">
               100% COMPLETADO
             </span>
           </div>
-          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
             <div className="h-full w-full bg-gradient-to-r from-teal-500 to-emerald-500" />
           </div>
           <div className="mt-4 space-y-2">
             {allFour.map((k) => (
               <div
                 key={k}
-                className="flex items-center gap-2 rounded-lg bg-slate-900/60 px-3 py-2 text-xs text-slate-300"
+                className="flex items-center gap-2 rounded-lg bg-zinc-900/60 px-3 py-2 text-xs text-zinc-300"
               >
                 <Check
                   className={`h-3.5 w-3.5 ${
-                    completedSet.has(k) ? "text-teal-400" : "text-slate-600"
+                    completedSet.has(k) ? "text-teal-400" : "text-zinc-700"
                   }`}
                 />
                 <span className="capitalize">{k}</span>
@@ -777,14 +777,14 @@ function StepConclusion({
         </div>
 
         {/* Lo que recibís */}
-        <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
           <div className="text-sm font-semibold text-white">Lo que recibís</div>
           <div className="mt-4 space-y-3">
             <div className="flex items-start gap-3">
               <Award className="mt-0.5 h-5 w-5 shrink-0 text-teal-400" />
               <div>
                 <div className="text-sm font-medium text-white">Acceso permanente</div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-zinc-400">
                   Volvé a los materiales cuando quieras.
                 </div>
               </div>
@@ -793,7 +793,7 @@ function StepConclusion({
               <FileText className="mt-0.5 h-5 w-5 shrink-0 text-teal-400" />
               <div>
                 <div className="text-sm font-medium text-white">Prompt personalizado</div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-zinc-400">
                   Tu configuración guardada en Mis Proyectos.
                 </div>
               </div>
@@ -802,7 +802,7 @@ function StepConclusion({
               <Lock className="mt-0.5 h-5 w-5 shrink-0 text-teal-400" />
               <div>
                 <div className="text-sm font-medium text-white">Acceso a la comunidad</div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-zinc-400">
                   Compartí tu experiencia y aprendé de otros.
                 </div>
               </div>

@@ -136,7 +136,7 @@ function Dashboard() {
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-white">
               {tod}, <span className="text-teal-400">{greetName}</span>! 👋
             </h1>
-            <p className="mt-2 max-w-lg text-sm text-slate-400">
+            <p className="mt-2 max-w-lg text-sm text-zinc-400">
               Seguí construyendo tu negocio con IA. Explorá soluciones, avanzá en tus cursos.
             </p>
             <Link
@@ -147,7 +147,7 @@ function Dashboard() {
             </Link>
           </div>
 
-          <div className="rounded-2xl border border-teal-500/30 bg-slate-800 p-5">
+          <div className="rounded-2xl border border-teal-500/30 bg-zinc-900 p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-semibold text-teal-400">
                 <Calendar className="h-4 w-4" /> Próxima Sesión
@@ -157,10 +157,10 @@ function Dashboard() {
               </span>
             </div>
             <div className="mt-4 flex flex-col items-center justify-center py-4 text-center">
-              <Calendar className="h-10 w-10 text-slate-600" strokeWidth={1.5} />
-              <p className="mt-2 text-sm text-slate-300">Sesiones en vivo próximamente</p>
+              <Calendar className="h-10 w-10 text-zinc-700" strokeWidth={1.5} />
+              <p className="mt-2 text-sm text-zinc-300">Sesiones en vivo próximamente</p>
             </div>
-            <div className="mt-3 rounded-xl bg-teal-500/10 p-3 text-sm text-slate-400">
+            <div className="mt-3 rounded-xl bg-teal-500/10 p-3 text-sm text-zinc-400">
               Las sesiones se anuncian por email
             </div>
           </div>
@@ -169,11 +169,11 @@ function Dashboard() {
         {/* Stats */}
         <section className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
           {stats.map((s) => (
-            <div key={s.label} className="rounded-xl border border-slate-700 bg-slate-800 p-5 transition hover:scale-[1.02] hover:border-teal-500/50">
+            <div key={s.label} className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:scale-[1.02] hover:border-teal-500/50">
               <s.icon className="h-5 w-5 text-teal-400" strokeWidth={1.75} />
               <div className="mt-3 text-3xl font-bold text-teal-400">{s.value}</div>
-              <div className="mt-1 text-xs text-slate-400">{s.label}</div>
-              <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-slate-700">
+              <div className="mt-1 text-xs text-zinc-400">{s.label}</div>
+              <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
                 <div className="h-full bg-teal-400 transition-all" style={{ width: `${Math.min(100, s.value * 20)}%` }} />
               </div>
             </div>
@@ -189,20 +189,20 @@ function Dashboard() {
         {/* Actividad reciente */}
         <section className="mt-8">
           <h2 className="mb-4 text-lg font-semibold text-white">Actividad reciente</h2>
-          <div className="rounded-2xl border border-slate-700/50 bg-slate-800/30 p-4">
+          <div className="rounded-2xl border border-zinc-800/50 bg-zinc-900/30 p-4">
             {(data?.recent.length ?? 0) === 0 ? (
-              <div className="py-8 text-center text-sm text-slate-500">
+              <div className="py-8 text-center text-sm text-zinc-600">
                 Tu actividad aparecerá aquí mientras avanzás.
               </div>
             ) : (
-              <ul className="divide-y divide-slate-700/40">
+              <ul className="divide-y divide-zinc-800/40">
                 {(data?.recent ?? []).map((a, i) => (
                   <li key={i} className="flex items-center gap-3 py-3 text-sm">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-500/10 text-teal-400">
                       <Activity className="h-4 w-4" />
                     </div>
-                    <span className="flex-1 text-slate-200">{a.label}</span>
-                    <span className="text-xs text-slate-500">{relativeTime(a.date)}</span>
+                    <span className="flex-1 text-zinc-200">{a.label}</span>
+                    <span className="text-xs text-zinc-600">{relativeTime(a.date)}</span>
                   </li>
                 ))}
               </ul>
@@ -217,8 +217,8 @@ function Dashboard() {
 function EnProgreso({ inProgress }: { inProgress: Array<{ id: string; title: string; completed: number }> }) {
   const [tab, setTab] = useState<"sol" | "cur">("sol");
   return (
-    <div className="rounded-2xl border border-slate-700 bg-slate-800/50 p-6">
-      <div className="mb-4 flex items-center gap-2 border-b border-slate-700/50">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+      <div className="mb-4 flex items-center gap-2 border-b border-zinc-800/50">
         {([["sol", "Soluciones"], ["cur", "Cursos"]] as const).map(([k, l]) => (
           <button
             key={k}
@@ -226,7 +226,7 @@ function EnProgreso({ inProgress }: { inProgress: Array<{ id: string; title: str
             className={`-mb-px border-b-2 px-3 pb-2 text-sm transition ${
               tab === k
                 ? "border-teal-400 text-teal-400"
-                : "border-transparent text-slate-400 hover:text-slate-200"
+                : "border-transparent text-zinc-400 hover:text-zinc-200"
             }`}
           >
             {l}
@@ -245,19 +245,19 @@ function EnProgreso({ inProgress }: { inProgress: Array<{ id: string; title: str
                   key={s.id}
                   to="/solutions/$id"
                   params={{ id: s.id }}
-                  className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-800 p-3 transition hover:border-teal-500/50"
+                  className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-3 transition hover:border-teal-500/50"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-500/10 text-teal-400">
                     <Sparkles className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium text-slate-100">{s.title}</div>
-                    <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-slate-700">
+                    <div className="truncate text-sm font-medium text-zinc-100">{s.title}</div>
+                    <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
                       <div className="h-full bg-teal-400" style={{ width: `${pct}%` }} />
                     </div>
-                    <div className="mt-1 text-[11px] text-slate-500">{s.completed} de 5 pasos</div>
+                    <div className="mt-1 text-[11px] text-zinc-600">{s.completed} de 5 pasos</div>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-slate-400" />
+                  <ArrowRight className="h-4 w-4 text-zinc-400" />
                 </Link>
               );
             })}
@@ -272,9 +272,9 @@ function EnProgreso({ inProgress }: { inProgress: Array<{ id: string; title: str
 
 function Empty({ text, cta, to }: { text: string; cta: string; to: "/solutions" | "/cursos" }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700 py-10 text-center">
-      <Sparkles className="h-8 w-8 text-slate-600" />
-      <p className="mt-2 text-sm text-slate-400">{text}</p>
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800 py-10 text-center">
+      <Sparkles className="h-8 w-8 text-zinc-700" />
+      <p className="mt-2 text-sm text-zinc-400">{text}</p>
       <Link
         to={to}
         className="mt-3 inline-flex items-center gap-1 rounded-lg border border-teal-500/40 bg-teal-500/10 px-4 py-2 text-sm font-medium text-teal-400 hover:bg-teal-500/20"
@@ -287,7 +287,7 @@ function Empty({ text, cta, to }: { text: string; cta: string; to: "/solutions" 
 
 function Recomendacion({ sol }: { sol: { id: string; title: string; short_description: string } | null }) {
   return (
-    <div className="rounded-2xl border border-teal-500/20 bg-slate-800 p-6">
+    <div className="rounded-2xl border border-teal-500/20 bg-zinc-900 p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-teal-400">
           <Bot className="h-4 w-4" /> Recomendación de IA
@@ -300,21 +300,21 @@ function Recomendacion({ sol }: { sol: { id: string; title: string; short_descri
         <Link
           to="/solutions/$id"
           params={{ id: sol.id }}
-          className="mt-4 block rounded-xl border border-slate-700 bg-slate-900/50 p-4 transition hover:border-teal-500/50"
+          className="mt-4 block rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 transition hover:border-teal-500/50"
         >
           <div className="flex items-start gap-3">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400">
               <Sparkles className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-slate-100">{sol.title}</h3>
-              <p className="mt-1 line-clamp-2 text-xs text-slate-400">{sol.short_description}</p>
+              <h3 className="font-semibold text-zinc-100">{sol.title}</h3>
+              <p className="mt-1 line-clamp-2 text-xs text-zinc-400">{sol.short_description}</p>
             </div>
             <ArrowRight className="h-5 w-5 shrink-0 text-teal-400" />
           </div>
         </Link>
       ) : (
-        <p className="mt-4 text-sm text-slate-400">Cargando recomendación…</p>
+        <p className="mt-4 text-sm text-zinc-400">Cargando recomendación…</p>
       )}
     </div>
   );
