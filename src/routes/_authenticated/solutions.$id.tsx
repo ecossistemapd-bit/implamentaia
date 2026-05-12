@@ -234,7 +234,7 @@ function SolutionByIdDetail() {
         </Link>
 
         {/* Header — 2 columns */}
-        <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-[3fr_2fr] md:items-center">
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[3fr_2fr] md:items-center">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
@@ -272,7 +272,7 @@ function SolutionByIdDetail() {
         </div>
 
         {/* Stat cards — 2 rows of 3 */}
-        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <StatCard label="Categoría" value={categoryLabel} />
           <StatCard label="Nivel" value={difficultyLabel} />
           <StatCard label="Tiempo Estimado" value={s.estimated_time || "Variable"} />
@@ -296,15 +296,15 @@ function SolutionByIdDetail() {
         </div>
 
         {/* About + Experto */}
-        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[7fr_3fr]">
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
+        <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[7fr_3fr]">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
             <h2 className="text-xl font-bold text-white">Sobre esta solución</h2>
             <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-300">
               {longDesc || "Sin descripción disponible."}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
             <div className="flex items-center -space-x-2">
               {["bg-violet-500", "bg-emerald-500", "bg-amber-500"].map((c, i) => (
                 <div
@@ -375,7 +375,7 @@ function SolutionByIdDetail() {
       </div>
 
       {/* Step navigator */}
-      <div className="mt-10">
+      <div className="mt-6">
         <div className="flex items-start">
           {STEPS.map((step, i) => {
             const isCompleted = completedSet.has(step.key);
@@ -419,7 +419,7 @@ function SolutionByIdDetail() {
       </div>
 
       {/* Step content */}
-      <div className="mt-10">
+      <div className="mt-6">
         {activeStep === "herramientas" && (
           <StepHerramientas
             solutionId={id}
@@ -551,6 +551,82 @@ function getToolInitials(name: string) {
   return letters.toUpperCase().slice(0, 2) || "?";
 }
 
+const TOOL_DOMAIN: Record<string, string> = {
+  n8n: "n8n.io",
+  openai: "openai.com",
+  "chat gpt": "openai.com",
+  chatgpt: "openai.com",
+  gpt: "openai.com",
+  claude: "anthropic.com",
+  anthropic: "anthropic.com",
+  gemini: "gemini.google.com",
+  whatsapp: "whatsapp.com",
+  "z-api": "z-api.io",
+  zapi: "z-api.io",
+  evolution: "evolution-api.com",
+  hubspot: "hubspot.com",
+  kommo: "kommo.com",
+  supabase: "supabase.com",
+  meta: "meta.com",
+  facebook: "facebook.com",
+  instagram: "instagram.com",
+  elevenlabs: "elevenlabs.io",
+  heygen: "heygen.com",
+  zapier: "zapier.com",
+  make: "make.com",
+  airtable: "airtable.com",
+  notion: "notion.so",
+  slack: "slack.com",
+  google: "google.com",
+  "google sheets": "google.com",
+  sheets: "google.com",
+  gmail: "gmail.com",
+  twilio: "twilio.com",
+  stripe: "stripe.com",
+  lovable: "lovable.dev",
+  pipedrive: "pipedrive.com",
+  salesforce: "salesforce.com",
+  telegram: "telegram.org",
+  discord: "discord.com",
+};
+
+function getToolDomain(name: string): string | null {
+  const key = name.trim().toLowerCase();
+  if (TOOL_DOMAIN[key]) return TOOL_DOMAIN[key];
+  for (const [k, v] of Object.entries(TOOL_DOMAIN)) {
+    if (key.includes(k)) return v;
+  }
+  // Fallback: guess <slug>.com from a single-word name
+  const slug = key.replace(/[^a-z0-9]/g, "");
+  if (slug.length >= 3 && !key.includes(" ")) return `${slug}.com`;
+  return null;
+}
+
+function ToolLogo({ name, logoUrl, website }: { name: string; logoUrl?: string | null; website?: string | null }) {
+  const initials = getToolInitials(name);
+  const domain = website || getToolDomain(name);
+  const initialSrc = logoUrl || (domain ? `https://logo.clearbit.com/${domain}` : null);
+  const [src, setSrc] = useState<string | null>(initialSrc);
+
+  if (!src) {
+    return (
+      <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-zinc-900">
+        <span className="text-lg font-bold tracking-tight text-white">{initials}</span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+      <img
+        src={src}
+        alt={name}
+        className="h-full w-full object-contain"
+        onError={() => setSrc(null)}
+      />
+    </div>
+  );
+}
+
 type ToolItem = { name: string; logo_url?: string | null; type?: "essential" | "optional" };
 
 function StepHerramientas({
@@ -655,18 +731,8 @@ function StepHerramientas({
                 )}
 
                 {/* Logo or initials */}
-                <div className="relative mx-auto mt-6 flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-zinc-900">
-                  {tool.logo_url ? (
-                    <img
-                      src={tool.logo_url}
-                      alt={tool.name}
-                      className="h-full w-full object-contain p-2"
-                    />
-                  ) : (
-                    <span className="text-lg font-bold tracking-tight text-white">
-                      {getToolInitials(tool.name)}
-                    </span>
-                  )}
+                <div className="relative mx-auto mt-6 flex items-center justify-center">
+                  <ToolLogo name={tool.name} logoUrl={tool.logo_url} />
                 </div>
 
                 <div className="relative mt-3 text-lg font-semibold text-white">{tool.name}</div>
