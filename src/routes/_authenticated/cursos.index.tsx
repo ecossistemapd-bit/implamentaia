@@ -198,7 +198,7 @@ function CursosPage() {
                 onClick={() => setFilter(f)}
                 className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
                   active
-                    ? "border-teal-500 bg-teal-500 text-white"
+                    ? "border-white bg-white text-black"
                     : "border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-zinc-700 hover:text-zinc-100"
                 }`}
               >
@@ -424,7 +424,7 @@ function FeaturedCard({
 
           <button
             onClick={onClick}
-            className="mt-6 inline-flex w-fit items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-sky-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-500/20 transition-transform hover:scale-[1.02]"
+            className="mt-6 inline-flex w-fit items-center gap-2 rounded-lg bg-white text-black hover:bg-zinc-100"
           >
             <Sparkles className="h-4 w-4" />
             {inProgress ? "Continuar donde lo dejé" : "Comenzar curso"}

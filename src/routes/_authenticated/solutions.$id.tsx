@@ -185,9 +185,9 @@ function SolutionByIdDetail() {
                     onClick={() => setActiveStep(step.key)}
                     className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 transition ${
                       isCompleted
-                        ? "border-teal-500 bg-teal-500 text-white"
+                        ? "border-white bg-white text-black"
                         : isActive
-                        ? "border-teal-500 bg-teal-500 text-white shadow-lg shadow-teal-500/30"
+                        ? "border-white bg-white text-black shadow-lg shadow-teal-500/30"
                         : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600"
                     }`}
                     aria-label={step.label}
@@ -810,7 +810,7 @@ function StepConclusion({
           </div>
           <Button
             onClick={onFinalize}
-            className="mt-6 h-12 w-full rounded-xl bg-gradient-to-r from-teal-500 to-sky-500 py-3 font-bold text-white shadow-lg shadow-teal-500/30 hover:from-teal-600 hover:to-sky-600"
+            className="mt-6 h-12 w-full rounded-xl bg-white text-black hover:bg-zinc-100"
           >
             Finalizar implementación
           </Button>

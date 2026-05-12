@@ -218,7 +218,7 @@ function Projects() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
-                      className="h-9 shrink-0 rounded-xl bg-gradient-to-r from-teal-500 to-sky-500 px-5 text-sm font-semibold text-white shadow-lg shadow-teal-500/20 hover:from-teal-400 hover:to-sky-400"
+                      className="h-9 shrink-0 rounded-xl bg-white text-black hover:bg-zinc-100"
                       onClick={() => {
                         try {
                           localStorage.setItem(`builder_session_${s.solution_id}`, s.id);
