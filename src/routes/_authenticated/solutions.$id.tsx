@@ -76,7 +76,7 @@ function SolutionByIdDetail() {
         tools_required: string[];
         integrations: string[];
         video_url: string | null;
-        resources: { title: string; url: string; type?: string }[] | null;
+        resources: { title: string; url: string; type?: string; description?: string; domain?: string }[] | null;
       };
     },
   });
