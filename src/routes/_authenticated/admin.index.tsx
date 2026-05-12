@@ -719,8 +719,8 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
       n8n_template: form.n8n_template.trim() || null,
       checklist_items: linesToArray(form.checklist_items_text),
       builder_questions: builderQuestions as never,
-      resources: form.resources.map(({ client_id: _clientId, ...resource }) => ({
-        ...resource,
+      resources: form.resources.map((resource) => ({
+        type: resource.type ?? "link",
         title: resource.title.trim(),
         url: resource.url.trim(),
         description: resource.description?.trim() || undefined,
@@ -731,7 +731,7 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
 
     const { error } = await supabase
       .from("solutions")
-      .update(solutionPayload)
+      .update(solutionPayload as never)
       .eq("id", solution.id);
 
     if (error) {
