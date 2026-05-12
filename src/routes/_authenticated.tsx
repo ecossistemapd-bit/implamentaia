@@ -213,7 +213,7 @@ function NavList() {
                   />
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span className="ml-auto rounded-full border border-violet-500/40 bg-gradient-to-r from-violet-500/20 to-violet-500/20 px-2 py-0.5 text-[10px] font-semibold text-violet-400">
+                    <span className="ml-auto rounded-md border border-violet-500/30 bg-violet-500/10 px-1.5 py-0.5 text-[10px] font-medium text-violet-400">
                       {item.badge}
                     </span>
                   )}
