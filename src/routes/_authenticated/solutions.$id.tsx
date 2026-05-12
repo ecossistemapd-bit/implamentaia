@@ -21,6 +21,8 @@ import {
   ArrowRight,
   Sparkles,
   CheckCircle2,
+  Link as LinkIcon,
+  ExternalLink,
 } from "lucide-react";
 import { CATEGORIES, CATEGORY_LABEL, DIFFICULTY_LABEL, type CategoryKey, type Difficulty } from "@/lib/categories";
 import confetti from "canvas-confetti";
