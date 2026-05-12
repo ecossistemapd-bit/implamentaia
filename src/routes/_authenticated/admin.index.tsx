@@ -818,7 +818,7 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
     ]);
 
   return (
-    <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4">
+    <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 text-gray-900 [&_input]:text-gray-900 [&_textarea]:text-gray-900 [&_select]:text-gray-900 [&_input::placeholder]:text-gray-400 [&_textarea::placeholder]:text-gray-400">
       <div className="flex flex-wrap gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1 text-xs w-fit">
         {([
           ["general", "General"],
