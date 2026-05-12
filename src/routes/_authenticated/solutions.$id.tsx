@@ -36,6 +36,21 @@ export const Route = createFileRoute("/_authenticated/solutions/$id")({
 
 type StepKey = "herramientas" | "archivos" | "video" | "comentarios" | "conclusion";
 
+type SolutionToolItem = {
+  is_essential: boolean;
+  display_order: number | null;
+  tool: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    website: string | null;
+    logo_url: string | null;
+    monthly_cost_usd: number | null;
+    cost_label: string | null;
+  };
+};
+
 const STEPS: { key: StepKey; label: string; Icon: typeof Wrench }[] = [
   { key: "herramientas", label: "Herramientas", Icon: Wrench },
   { key: "archivos", label: "Archivos", Icon: FolderOpen },
