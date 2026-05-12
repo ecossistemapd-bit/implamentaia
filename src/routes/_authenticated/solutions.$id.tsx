@@ -731,18 +731,8 @@ function StepHerramientas({
                 )}
 
                 {/* Logo or initials */}
-                <div className="relative mx-auto mt-6 flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-zinc-900">
-                  {tool.logo_url ? (
-                    <img
-                      src={tool.logo_url}
-                      alt={tool.name}
-                      className="h-full w-full object-contain p-2"
-                    />
-                  ) : (
-                    <span className="text-lg font-bold tracking-tight text-white">
-                      {getToolInitials(tool.name)}
-                    </span>
-                  )}
+                <div className="relative mx-auto mt-6 flex items-center justify-center">
+                  <ToolLogo name={tool.name} logoUrl={tool.logo_url} />
                 </div>
 
                 <div className="relative mt-3 text-lg font-semibold text-white">{tool.name}</div>
