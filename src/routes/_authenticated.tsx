@@ -128,6 +128,7 @@ function AuthenticatedLayout() {
           <Outlet />
         </main>
       </div>
+      <ScrollToTop />
     </div>
   );
 }
