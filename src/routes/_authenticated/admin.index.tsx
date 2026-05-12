@@ -577,16 +577,14 @@ function SolutionsTab() {
     },
   });
 
-  const filtered = useMemo(() => {
-    const s = search.trim().toLowerCase();
-    const rows = data ?? [];
-    if (!s) return rows;
-    return rows.filter(
-      (r) =>
-        r.title.toLowerCase().includes(s) ||
-        (r.category ?? "").toLowerCase().includes(s),
-    );
-  }, [data, search]);
+  const solutionSearch = search.trim().toLowerCase();
+  const filtered = solutionSearch
+    ? (data ?? []).filter(
+        (r) =>
+          r.title.toLowerCase().includes(solutionSearch) ||
+          (r.category ?? "").toLowerCase().includes(solutionSearch),
+      )
+    : (data ?? []);
 
   return (
     <div className="mt-6">
