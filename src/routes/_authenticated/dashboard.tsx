@@ -130,29 +130,29 @@ function Dashboard() {
         {/* Hero */}
         <section className="grid gap-6 md:grid-cols-[1.4fr_1fr]">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/20 px-3 py-1 text-xs font-medium text-orange-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
               <Flame className="h-3.5 w-3.5" /> {streakDays} días consecutivos
             </span>
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-white">
-              {tod}, <span className="text-teal-400">{greetName}</span>! 👋
+              {tod}, <span className="text-white">{greetName}</span>! 👋
             </h1>
             <p className="mt-2 max-w-lg text-sm text-zinc-400">
               Seguí construyendo tu negocio con IA. Explorá soluciones, avanzá en tus cursos.
             </p>
             <Link
               to="/solutions"
-              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-sky-500 px-6 py-3 font-semibold text-white shadow-lg shadow-teal-500/25 transition hover:scale-[1.02] hover:shadow-teal-500/40"
+              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-black transition hover:bg-zinc-100"
             >
               Explorar Soluciones <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="rounded-2xl border border-teal-500/30 bg-zinc-900 p-5">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-semibold text-teal-400">
+              <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
                 <Calendar className="h-4 w-4" /> Próxima Sesión
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 px-2.5 py-0.5 text-[10px] font-bold uppercase text-red-400">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-950 px-2.5 py-0.5 text-[10px] font-bold uppercase text-zinc-400">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-400" /> Live
               </span>
             </div>
@@ -160,7 +160,7 @@ function Dashboard() {
               <Calendar className="h-10 w-10 text-zinc-700" strokeWidth={1.5} />
               <p className="mt-2 text-sm text-zinc-300">Sesiones en vivo próximamente</p>
             </div>
-            <div className="mt-3 rounded-xl bg-teal-500/10 p-3 text-sm text-zinc-400">
+            <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-500">
               Las sesiones se anuncian por email
             </div>
           </div>
@@ -169,9 +169,9 @@ function Dashboard() {
         {/* Stats */}
         <section className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
           {stats.map((s) => (
-            <div key={s.label} className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:scale-[1.02] hover:border-teal-500/50">
-              <s.icon className="h-5 w-5 text-teal-400" strokeWidth={1.75} />
-              <div className="mt-3 text-3xl font-bold text-teal-400">{s.value}</div>
+            <div key={s.label} className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-zinc-700">
+              <s.icon className="h-5 w-5 text-zinc-400" strokeWidth={1.75} />
+              <div className="mt-3 text-3xl font-bold text-white">{s.value}</div>
               <div className="mt-1 text-xs text-zinc-400">{s.label}</div>
               <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
                 <div className="h-full bg-teal-400 transition-all" style={{ width: `${Math.min(100, s.value * 20)}%` }} />
