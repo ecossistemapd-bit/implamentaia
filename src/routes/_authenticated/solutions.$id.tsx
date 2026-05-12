@@ -149,6 +149,7 @@ function SolutionByIdDetail() {
       setView("journey");
       toast.success("Continuando implementación", {
         description: "Redirigiendo a donde lo dejaste...",
+        duration: 4000,
       });
     }
   }, [progress, progressLoading, completedSet]);
