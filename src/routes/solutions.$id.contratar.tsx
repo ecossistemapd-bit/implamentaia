@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Check, ChevronDown, FileText, Lock, Loader2 } from "lucide-react";
@@ -12,8 +12,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { FEATURES } from "@/lib/features";
 
 export const Route = createFileRoute("/solutions/$id/contratar")({
+  beforeLoad: () => {
+    if (!FEATURES.MARKETPLACE) throw redirect({ to: "/dashboard" });
+  },
   component: ContratarPage,
 });
 
