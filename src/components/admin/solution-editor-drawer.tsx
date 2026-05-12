@@ -116,7 +116,7 @@ export function SolutionEditorDrawer({
   };
 
   const setTabDirty = (key: string, v: boolean) =>
-    setDirty((prev) => ({ ...prev, [key]: v }));
+    setDirty((prev) => (prev[key] === v ? prev : { ...prev, [key]: v }));
 
   useEffect(() => {
     if (!open) {
