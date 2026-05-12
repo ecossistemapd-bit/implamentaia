@@ -135,7 +135,7 @@ function AuthenticatedLayout() {
 
 function DesktopSidebar() {
   return (
-    <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 border-r border-zinc-800/50 bg-zinc-950 lg:flex lg:flex-col">
+    <aside className="sticky top-0 hidden h-screen w-[220px] shrink-0 border-r border-white/6 bg-[#0A0A0A] lg:flex lg:flex-col">
       <div className="px-5 py-5">
         <Logo />
       </div>
