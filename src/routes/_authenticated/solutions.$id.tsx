@@ -176,8 +176,8 @@ function SolutionByIdDetail() {
                 <div className="flex w-full items-center">
                   {i > 0 && (
                     <div
-                      className={`h-0.5 flex-1 transition ${
-                        prevCompleted ? "bg-violet-500" : "bg-zinc-800"
+                      className={`h-px flex-1 transition ${
+                        prevCompleted ? "bg-green-500" : "bg-white/8"
                       }`}
                     />
                   )}
