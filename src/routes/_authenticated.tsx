@@ -239,19 +239,19 @@ function UserMenu() {
   };
 
   return (
-    <div className="border-t border-sidebar-border px-3 py-3">
+    <div className="border-t border-zinc-800/50 px-3 py-3">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-white/5">
-            <Avatar className="h-8 w-8 ring-1 ring-primary/30">
+          <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-zinc-900">
+            <Avatar className="h-8 w-8">
               <AvatarImage src={(user?.user_metadata as { avatar_url?: string } | undefined)?.avatar_url} />
-              <AvatarFallback className="bg-primary/20 text-primary">{initial}</AvatarFallback>
+              <AvatarFallback className="bg-zinc-800 text-zinc-300">{initial}</AvatarFallback>
             </Avatar>
             <div className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate text-sm font-medium text-foreground">{email}</span>
-              <span className="text-xs text-muted-foreground">Mi cuenta</span>
+              <span className="truncate text-sm font-medium text-zinc-400">{email}</span>
+              <span className="text-xs text-zinc-600">Mi cuenta</span>
             </div>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            <ChevronRight className="h-4 w-4 text-zinc-600" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="top" className="w-56">
