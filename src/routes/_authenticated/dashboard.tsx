@@ -217,16 +217,16 @@ function Dashboard() {
 function EnProgreso({ inProgress }: { inProgress: Array<{ id: string; title: string; completed: number }> }) {
   const [tab, setTab] = useState<"sol" | "cur">("sol");
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
-      <div className="mb-4 flex items-center gap-2 border-b border-zinc-800/50">
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
+      <div className="mb-4 inline-flex items-center gap-1 rounded-full border border-zinc-800 bg-zinc-950 p-1">
         {([["sol", "Soluciones"], ["cur", "Cursos"]] as const).map(([k, l]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
-            className={`-mb-px border-b-2 px-3 pb-2 text-sm transition ${
+            className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${
               tab === k
-                ? "border-teal-400 text-teal-400"
-                : "border-transparent text-zinc-400 hover:text-zinc-200"
+                ? "bg-white text-black"
+                : "text-zinc-400 hover:text-zinc-100"
             }`}
           >
             {l}
