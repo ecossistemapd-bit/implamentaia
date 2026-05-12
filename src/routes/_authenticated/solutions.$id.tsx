@@ -859,93 +859,93 @@ function StepArchivos({
   saving: boolean;
   onComplete: () => void;
 }) {
+  const cards: { title: string; description: string; url: string; domain?: string }[] = [];
+  if (lovableRemixUrl) {
+    cards.push({
+      title: "Link de remix de Lovable",
+      description: "Link para remixear el proyecto en Lovable",
+      url: lovableRemixUrl,
+      domain: "LOVABLE.DEV",
+    });
+  }
+  for (const r of resources ?? []) {
+    if (!r?.url) continue;
+    let domain = (r.domain || "").trim();
+    if (!domain) {
+      try {
+        domain = new URL(r.url).hostname.replace(/^www\./, "");
+      } catch {
+        domain = r.url;
+      }
+    }
+    cards.push({
+      title: r.title || r.url,
+      description: r.description || "",
+      url: r.url,
+      domain: domain.toUpperCase(),
+    });
+  }
+
   return (
     <div>
       <SectionHeader
         text="Materiales y Recursos"
         action={
-          <CompleteButton onClick={onComplete} saving={saving} isCompleted={isCompleted} />
+          <CompleteButton
+            onClick={onComplete}
+            saving={saving}
+            isCompleted={isCompleted}
+            label="Marcar paso como completado →"
+          />
         }
       />
       <p className="mt-2 text-sm text-zinc-400">
         Descargá los materiales necesarios para implementar esta solución.
       </p>
 
-      <h3 className="mt-8 text-sm font-semibold uppercase tracking-wider text-zinc-400">Links útiles</h3>
-      {resources.length === 0 ? (
-        <div className="mt-3 flex flex-col items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 py-10 text-center">
-          <Clock className="h-6 w-6 text-zinc-600" />
-          <p className="text-sm text-zinc-400">Recursos disponibles próximamente</p>
-        </div>
-      ) : (
-        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-          {resources.map((r, i) => {
-            let domain = (r.domain || "").trim();
-            if (!domain) {
-              try {
-                domain = new URL(r.url).hostname.replace(/^www\./, "").toUpperCase();
-              } catch {
-                domain = r.url.toUpperCase();
-              }
-            }
-            return (
+      <div className="mt-8">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+          <LinkIcon className="h-4 w-4 text-zinc-400" />
+          Links Auxiliares
+        </h3>
+        {cards.length === 0 ? (
+          <div className="mt-4 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-10 text-center text-sm text-zinc-500">
+            Recursos disponibles próximamente
+          </div>
+        ) : (
+          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+            {cards.map((c) => (
               <div
-                key={i}
-                className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-4 transition hover:border-violet-500/50"
+                key={c.url}
+                className="flex items-center gap-4 rounded-xl border border-white/8 bg-secondary p-4 transition hover:border-white/20"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-lg">
-                  🔗
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800">
+                  <LinkIcon className="h-5 w-5 text-zinc-400" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-semibold text-white">{r.title}</div>
-                  {r.description && (
-                    <div className="mt-0.5 line-clamp-2 text-xs text-zinc-400">{r.description}</div>
+                  <div className="truncate text-sm font-semibold text-white">{c.title}</div>
+                  {c.description && (
+                    <div className="truncate text-xs text-zinc-400">{c.description}</div>
                   )}
-                  <span className="mt-1.5 inline-flex items-center rounded-md bg-zinc-800 px-2 py-0.5 text-[10px] font-medium tracking-wider text-zinc-400">
-                    {domain}
-                  </span>
+                  {c.domain && (
+                    <div className="mt-0.5 truncate text-[10px] font-medium uppercase tracking-wider text-zinc-500">
+                      {c.domain}
+                    </div>
+                  )}
                 </div>
                 <a
-                  href={r.url}
+                  href={c.url}
                   target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-violet-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-violet-600"
+                  rel="noopener noreferrer"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white transition hover:border-white/30 hover:bg-zinc-800"
                 >
-                  Acceder ↗
+                  Acceder
+                  <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Plantilla Lovable */}
-      <div className="mt-10">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-          Plantilla Lovable
-        </h3>
-        <div className="mt-3 rounded-xl border border-white/8 bg-secondary p-6">
-          {lovableRemixUrl ? (
-            <>
-              <p className="text-sm text-zinc-300">
-                Cloná esta plantilla en tu cuenta de Lovable y empezá a personalizarla.
-              </p>
-              <a
-                href={lovableRemixUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-500"
-              >
-                Remix con Lovable →
-              </a>
-            </>
-          ) : (
-            <div className="flex items-center gap-3 text-sm text-zinc-500">
-              <Clock className="h-4 w-4" />
-              Plantilla Lovable próximamente
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
