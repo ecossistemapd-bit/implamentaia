@@ -141,16 +141,27 @@ function SolutionsList() {
                   {...linkProps}
                   className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 transition duration-200 hover:border-zinc-700"
                 >
-                  {/* Card header with icon */}
-                  <div className="flex h-28 items-center justify-center bg-zinc-950">
+                  {/* Card header — hero image or icon fallback */}
+                  <div className="relative aspect-video w-full overflow-hidden bg-zinc-950">
                     {isDone && (
-                      <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-md border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-green-400">
+                      <span className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-md border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-green-400">
                         ✓ Completada
                       </span>
                     )}
-                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900">
-                      <Icon className="h-9 w-9 text-zinc-300" strokeWidth={1.5} />
-                    </div>
+                    {s.cover_image_url ? (
+                      <img
+                        src={s.cover_image_url}
+                        alt={s.title}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900">
+                          <Icon className="h-9 w-9 text-zinc-300" strokeWidth={1.5} />
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-1 flex-col p-5">
                     <h3 className="line-clamp-1 text-base font-semibold leading-tight text-white">
