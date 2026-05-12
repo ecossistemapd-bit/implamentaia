@@ -61,7 +61,11 @@ function SolutionByIdDetail() {
   const { data: s, isLoading, isError } = useQuery({
     queryKey: ["solution-by-id", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("solutions").select("*").eq("id", id).maybeSingle();
+      const { data, error } = await supabase
+        .from("solutions")
+        .select(`*, solution_tools (is_essential, display_order, tool:tools (id, name, slug, description, website, logo_url, monthly_cost_usd, cost_label))`)
+        .eq("id", id)
+        .maybeSingle();
       if (error) throw error;
       return data as unknown as {
         id: string;
@@ -79,6 +83,7 @@ function SolutionByIdDetail() {
         integrations: string[];
         video_url: string | null;
         resources: { title: string; url: string; type?: string; description?: string; domain?: string }[] | null;
+        solution_tools: SolutionToolItem[] | null;
       };
     },
   });
