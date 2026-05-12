@@ -112,7 +112,7 @@ function MiProgreso() {
 
       const projects = projectsRes.data ?? [];
       return {
-        solutionsStarted,
+        solutionsActive,
         solutionsCompleted,
         coursesStarted: startedCourseSet.size,
         coursesCompleted: completedCourseSet.size,
