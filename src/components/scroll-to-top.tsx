@@ -31,7 +31,7 @@ export function ScrollToTop() {
       onClick={handleClick}
       title={label}
       aria-label={label}
-      className="group fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-teal-500 text-white shadow-lg shadow-teal-500/25 transition-all duration-300 hover:scale-110 hover:bg-teal-400 animate-in fade-in"
+      className="group fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-violet-500 text-white shadow-lg shadow-violet-500/25 transition-all duration-300 hover:scale-110 hover:bg-violet-400 animate-in fade-in"
     >
       <Icon className="h-5 w-5" strokeWidth={2.25} />
     </button>

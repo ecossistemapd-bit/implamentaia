@@ -45,7 +45,7 @@ function TitleWithAccent({ text }: { text: string }) {
   const last = parts.pop()!;
   return (
     <>
-      {parts.join(" ")} <span className="text-teal-400">{last}</span>
+      {parts.join(" ")} <span className="text-violet-400">{last}</span>
     </>
   );
 }
@@ -149,15 +149,15 @@ function SolutionByIdDetail() {
           <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
             Progreso
           </div>
-          <div className="mt-1 text-4xl font-bold text-teal-400">{progressPct}%</div>
+          <div className="mt-1 text-4xl font-bold text-violet-400">{progressPct}%</div>
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
             <div
-              className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all"
+              className="h-full bg-gradient-to-r from-violet-500 to-green-500 transition-all"
               style={{ width: `${progressPct}%` }}
             />
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-400">
-            <Trophy className="h-3.5 w-3.5 text-teal-400" />
+            <Trophy className="h-3.5 w-3.5 text-violet-400" />
             {completedCount} de {STEPS.length} etapas completadas
           </div>
         </div>
@@ -177,7 +177,7 @@ function SolutionByIdDetail() {
                   {i > 0 && (
                     <div
                       className={`h-0.5 flex-1 transition ${
-                        prevCompleted ? "bg-teal-500" : "bg-zinc-800"
+                        prevCompleted ? "bg-violet-500" : "bg-zinc-800"
                       }`}
                     />
                   )}
@@ -187,7 +187,7 @@ function SolutionByIdDetail() {
                       isCompleted
                         ? "border-white bg-white text-black"
                         : isActive
-                        ? "border-white bg-white text-black shadow-lg shadow-teal-500/30"
+                        ? "border-white bg-white text-black shadow-lg shadow-violet-500/30"
                         : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600"
                     }`}
                     aria-label={step.label}
@@ -197,7 +197,7 @@ function SolutionByIdDetail() {
                   {i < STEPS.length - 1 && (
                     <div
                       className={`h-0.5 flex-1 transition ${
-                        isCompleted ? "bg-teal-500" : "bg-zinc-800"
+                        isCompleted ? "bg-violet-500" : "bg-zinc-800"
                       }`}
                     />
                   )}
@@ -205,7 +205,7 @@ function SolutionByIdDetail() {
                 <span
                   className={`mt-3 text-center text-xs transition ${
                     isActive
-                      ? "font-bold text-teal-400"
+                      ? "font-bold text-violet-400"
                       : isCompleted
                       ? "text-zinc-300"
                       : "text-zinc-600"
@@ -340,7 +340,7 @@ function StepHerramientas({ tools, onComplete }: { tools: string[]; onComplete: 
           <Button
             onClick={onComplete}
             disabled={!allDone && unique.length > 0}
-            className="rounded-lg bg-teal-500 px-6 py-2 text-white hover:bg-teal-600 disabled:opacity-40"
+            className="rounded-lg bg-violet-500 px-6 py-2 text-white hover:bg-violet-600 disabled:opacity-40"
           >
             Concluido →
           </Button>
@@ -364,15 +364,15 @@ function StepHerramientas({ tools, onComplete }: { tools: string[]; onComplete: 
                 onClick={() => toggle(t)}
                 className={`relative rounded-xl border p-6 text-center transition duration-200 ${
                   isOk
-                    ? "border-teal-500 bg-zinc-900 shadow-lg shadow-teal-500/10"
-                    : "border-zinc-800 bg-zinc-900 hover:scale-[1.02] hover:border-teal-500"
+                    ? "border-violet-500 bg-zinc-900 shadow-lg shadow-violet-500/10"
+                    : "border-zinc-800 bg-zinc-900 hover:scale-[1.02] hover:border-violet-500"
                 }`}
               >
                 <span className="absolute left-3 top-3 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                  <span className="text-teal-400">●</span> Esencial
+                  <span className="text-violet-400">●</span> Esencial
                 </span>
                 {isOk && (
-                  <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-teal-500 text-white">
+                  <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-violet-500 text-white">
                     <Check className="h-3 w-3" />
                   </span>
                 )}
@@ -432,7 +432,7 @@ function StepArchivos({
         action={
           <Button
             onClick={onComplete}
-            className="rounded-lg bg-teal-500 px-6 py-2 text-white hover:bg-teal-600"
+            className="rounded-lg bg-violet-500 px-6 py-2 text-white hover:bg-violet-600"
           >
             Concluido →
           </Button>
@@ -466,7 +466,7 @@ function StepArchivos({
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800">
-                    <Link2 className="h-4 w-4 text-teal-400" />
+                    <Link2 className="h-4 w-4 text-violet-400" />
                   </div>
                   <div className="min-w-0">
                     <div className="truncate text-sm font-medium text-white">{r.title}</div>
@@ -476,7 +476,7 @@ function StepArchivos({
                 <a href={r.url} target="_blank" rel="noreferrer">
                   <Button
                     size="sm"
-                    className="bg-teal-500 text-white hover:bg-teal-600"
+                    className="bg-violet-500 text-white hover:bg-violet-600"
                   >
                     <Download className="mr-1.5 h-3.5 w-3.5" /> Descargar
                   </Button>
@@ -498,7 +498,7 @@ function StepArchivos({
               variant="ghost"
               size="sm"
               onClick={copyPrompt}
-              className="text-teal-400 hover:bg-zinc-800 hover:text-teal-300"
+              className="text-violet-400 hover:bg-zinc-800 hover:text-violet-300"
             >
               <Copy className="mr-1 h-3.5 w-3.5" /> Copiar
             </Button>
@@ -515,7 +515,7 @@ function StepArchivos({
           <Button
             onClick={() => navigate({ to: "/builder/$solutionId", params: { solutionId } })}
             variant="outline"
-            className="mt-3 border-teal-500 bg-transparent text-teal-400 hover:bg-teal-500/10 hover:text-teal-300"
+            className="mt-3 border-violet-500 bg-transparent text-violet-400 hover:bg-violet-500/10 hover:text-violet-300"
           >
             Ir al Builder →
           </Button>
@@ -541,7 +541,7 @@ function StepVideo({
         action={
           <Button
             onClick={onComplete}
-            className="rounded-lg bg-teal-500 px-6 py-2 text-white hover:bg-teal-600"
+            className="rounded-lg bg-violet-500 px-6 py-2 text-white hover:bg-violet-600"
           >
             Marcar como visto →
           </Button>
@@ -562,8 +562,8 @@ function StepVideo({
           </>
         ) : (
           <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-900">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-teal-500/20 ring-2 ring-teal-500/30">
-              <Play className="h-9 w-9 fill-teal-400 text-teal-400" />
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-violet-500/20 ring-2 ring-violet-500/30">
+              <Play className="h-9 w-9 fill-violet-400 text-violet-400" />
             </div>
             <p className="text-sm font-medium text-zinc-300">Video disponible próximamente</p>
             <p className="text-xs text-zinc-600">Estamos preparando el tutorial de esta solución.</p>
@@ -647,8 +647,8 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
                 onClick={() => setRating(n)}
                 className={`h-11 w-11 rounded-lg text-sm font-medium transition ${
                   rating === n
-                    ? "scale-110 bg-teal-500 text-white shadow-md shadow-teal-500/30"
-                    : "bg-zinc-800 text-zinc-300 hover:bg-teal-500 hover:text-white"
+                    ? "scale-110 bg-violet-500 text-white shadow-md shadow-violet-500/30"
+                    : "bg-zinc-800 text-zinc-300 hover:bg-violet-500 hover:text-white"
                 }`}
               >
                 {n}
@@ -664,13 +664,13 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Comentario sobre tu implementación (opcional)..."
-            className="mt-5 min-h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-teal-500 focus:outline-none"
+            className="mt-5 min-h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
           />
 
           <Button
             onClick={submit}
             disabled={submitting}
-            className="mt-4 h-11 w-full rounded-lg bg-teal-500 text-white hover:bg-teal-600"
+            className="mt-4 h-11 w-full rounded-lg bg-violet-500 text-white hover:bg-violet-600"
           >
             Enviar evaluación
           </Button>
@@ -699,13 +699,13 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
                     className="rounded-xl border border-zinc-800 bg-zinc-900 p-4"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-500/20 text-xs font-bold text-teal-300">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/20 text-xs font-bold text-violet-300">
                         {initial}
                       </div>
                       <span className="text-sm font-medium text-white">Usuario</span>
                       <span className="text-xs text-zinc-600">{time}</span>
                       {c.rating !== null && (
-                        <span className="ml-auto rounded-md bg-teal-500/15 px-2 py-0.5 text-xs font-semibold text-teal-300">
+                        <span className="ml-auto rounded-md bg-violet-500/15 px-2 py-0.5 text-xs font-semibold text-violet-300">
                           {c.rating}/10
                         </span>
                       )}
@@ -736,9 +736,9 @@ function StepConclusion({
   return (
     <div className="mx-auto max-w-3xl">
       {/* Celebration card */}
-      <div className="rounded-2xl border border-teal-500/30 bg-gradient-to-br from-teal-900/30 to-zinc-900 p-10 text-center">
+      <div className="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-900/30 to-zinc-900 p-10 text-center">
         <div className="text-6xl">🏆</div>
-        <h2 className="mt-4 bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-3xl font-bold text-transparent">
+        <h2 className="mt-4 bg-gradient-to-r from-violet-400 to-violet-400 bg-clip-text text-3xl font-bold text-transparent">
           ¡Implementación Completada!
         </h2>
         <p className="mt-2 text-sm text-zinc-300">
@@ -752,12 +752,12 @@ function StepConclusion({
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold text-white">Tu Progreso</div>
-            <span className="rounded-full bg-teal-500/20 px-3 py-1 text-xs font-semibold text-teal-300">
+            <span className="rounded-full bg-violet-500/20 px-3 py-1 text-xs font-semibold text-violet-300">
               100% COMPLETADO
             </span>
           </div>
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-            <div className="h-full w-full bg-gradient-to-r from-teal-500 to-emerald-500" />
+            <div className="h-full w-full bg-gradient-to-r from-violet-500 to-green-500" />
           </div>
           <div className="mt-4 space-y-2">
             {allFour.map((k) => (
@@ -767,7 +767,7 @@ function StepConclusion({
               >
                 <Check
                   className={`h-3.5 w-3.5 ${
-                    completedSet.has(k) ? "text-teal-400" : "text-zinc-700"
+                    completedSet.has(k) ? "text-violet-400" : "text-zinc-700"
                   }`}
                 />
                 <span className="capitalize">{k}</span>
@@ -781,7 +781,7 @@ function StepConclusion({
           <div className="text-sm font-semibold text-white">Lo que recibís</div>
           <div className="mt-4 space-y-3">
             <div className="flex items-start gap-3">
-              <Award className="mt-0.5 h-5 w-5 shrink-0 text-teal-400" />
+              <Award className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
               <div>
                 <div className="text-sm font-medium text-white">Acceso permanente</div>
                 <div className="text-xs text-zinc-400">
@@ -790,7 +790,7 @@ function StepConclusion({
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <FileText className="mt-0.5 h-5 w-5 shrink-0 text-teal-400" />
+              <FileText className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
               <div>
                 <div className="text-sm font-medium text-white">Prompt personalizado</div>
                 <div className="text-xs text-zinc-400">
@@ -799,7 +799,7 @@ function StepConclusion({
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Lock className="mt-0.5 h-5 w-5 shrink-0 text-teal-400" />
+              <Lock className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
               <div>
                 <div className="text-sm font-medium text-white">Acceso a la comunidad</div>
                 <div className="text-xs text-zinc-400">

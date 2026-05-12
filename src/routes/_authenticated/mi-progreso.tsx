@@ -21,11 +21,11 @@ const STEP_LABELS: Record<string, string> = {
 
 const PROJECT_STATUS: Record<string, { label: string; cls: string }> = {
   pending: { label: "Pendiente", cls: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
-  assigned: { label: "Asignado", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
+  assigned: { label: "Asignado", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
   in_progress: { label: "En curso", cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
-  completed: { label: "Completado", cls: "bg-teal-500/20 text-teal-400 border-teal-500/30" },
+  completed: { label: "Completado", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
   generating: { label: "Generando", cls: "bg-zinc-600/20 text-zinc-400 border-zinc-600/30" },
-  ready: { label: "Listo", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
+  ready: { label: "Listo", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
   error: { label: "Error", cls: "bg-red-500/20 text-red-400 border-red-500/30" },
 };
 
@@ -136,7 +136,7 @@ function MiProgreso() {
     <div className="mx-auto max-w-5xl px-6 py-10">
       <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-white">
-          Mi <span className="text-teal-400">Progreso</span>
+          Mi <span className="text-violet-400">Progreso</span>
         </h1>
         <p className="mt-1 text-sm text-zinc-400">
           Un resumen de todo lo que estás aprendiendo e implementando.
@@ -147,10 +147,10 @@ function MiProgreso() {
         {cards.map((c) => (
           <div
             key={c.label}
-            className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition duration-200 hover:scale-[1.02] hover:border-teal-500/50"
+            className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition duration-200 hover:scale-[1.02] hover:border-violet-500/50"
           >
-            <c.icon className="h-5 w-5 text-teal-400" strokeWidth={1.75} />
-            <div className="mt-3 text-3xl font-bold tracking-tight text-teal-400">
+            <c.icon className="h-5 w-5 text-violet-400" strokeWidth={1.75} />
+            <div className="mt-3 text-3xl font-bold tracking-tight text-violet-400">
               {isLoading ? "—" : c.value}
             </div>
             <div className="mt-1 text-sm text-zinc-400">{c.label}</div>
@@ -174,19 +174,19 @@ function MiProgreso() {
               return (
                 <div
                   key={s.id}
-                  className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-teal-500/50"
+                  className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-violet-500/50"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-zinc-100">{s.title}</h3>
-                        <span className="rounded-full border border-teal-500/30 bg-teal-500/10 px-2 py-0.5 text-xs text-teal-400">
+                        <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-xs text-violet-400">
                           En: {s.currentStep}
                         </span>
                       </div>
                       <div className="mt-3 flex items-center gap-3">
                         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
-                          <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
+                          <div className="h-full bg-violet-400 transition-all" style={{ width: `${pct}%` }} />
                         </div>
                         <span className="shrink-0 text-xs text-zinc-400">{s.completed} de 5 pasos</span>
                       </div>
@@ -194,7 +194,7 @@ function MiProgreso() {
                     <Link
                       to="/solutions/$id"
                       params={{ id: s.id }}
-                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-teal-500 hover:text-teal-400"
+                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
                     >
                       Continuar <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
@@ -222,24 +222,24 @@ function MiProgreso() {
               return (
                 <div
                   key={c.id}
-                  className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-teal-500/50"
+                  className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-violet-500/50"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4 text-teal-400" />
+                        <BookOpen className="h-4 w-4 text-violet-400" />
                         <h3 className="font-semibold text-zinc-100">{c.title}</h3>
                       </div>
                       <div className="mt-3 flex items-center gap-3">
                         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
-                          <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
+                          <div className="h-full bg-violet-400 transition-all" style={{ width: `${pct}%` }} />
                         </div>
                         <span className="shrink-0 text-xs text-zinc-400">{c.done} de {c.total} módulos</span>
                       </div>
                     </div>
                     <Link
                       to="/cursos"
-                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-teal-500 hover:text-teal-400"
+                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
                     >
                       Continuar <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
@@ -270,7 +270,7 @@ function MiProgreso() {
               return (
                 <div
                   key={p.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-teal-500/50"
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-violet-500/50"
                 >
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold text-zinc-100">{p.title}</h3>
@@ -285,7 +285,7 @@ function MiProgreso() {
                   </span>
                   <Link
                     to="/projects"
-                    className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-teal-500 hover:text-teal-400"
+                    className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
                   >
                     Ver proyecto <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
@@ -317,7 +317,7 @@ function EmptyState({
       <p className="mt-3 text-sm text-zinc-400">{text}</p>
       <button
         onClick={onClick}
-        className="mt-4 inline-flex items-center gap-1 rounded-lg border border-teal-500/40 bg-teal-500/10 px-4 py-2 text-sm font-medium text-teal-400 transition hover:bg-teal-500/20"
+        className="mt-4 inline-flex items-center gap-1 rounded-lg border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-400 transition hover:bg-violet-500/20"
       >
         {cta} <ArrowRight className="h-3.5 w-3.5" />
       </button>

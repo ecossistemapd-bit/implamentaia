@@ -165,7 +165,7 @@ function SolutionsList() {
                       <div className="mt-3">
                         <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
                           <div
-                            className="h-full bg-gradient-to-r from-teal-500 to-emerald-500"
+                            className="h-full bg-gradient-to-r from-violet-500 to-green-500"
                             style={{ width: `${pct}%` }}
                           />
                         </div>

@@ -24,12 +24,12 @@ type Row = {
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
   pending: { label: "Pendiente", cls: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
-  assigned: { label: "Asignado", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
+  assigned: { label: "Asignado", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
   in_progress: { label: "En curso", cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
-  completed: { label: "Completado", cls: "bg-teal-500/20 text-teal-400 border-teal-500/30" },
+  completed: { label: "Completado", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
   cancelled: { label: "Cancelado", cls: "bg-zinc-600/20 text-zinc-400 border-zinc-600/30" },
   generating: { label: "Generando", cls: "bg-zinc-600/20 text-zinc-400 border-zinc-600/30" },
-  ready: { label: "Listo", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
+  ready: { label: "Listo", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
   error: { label: "Error", cls: "bg-red-500/20 text-red-400 border-red-500/30" },
 };
 
@@ -103,7 +103,7 @@ function ImplementerPanel() {
   return (
     <div className="mx-auto max-w-[1100px] px-6 py-10">
       <h1 className="text-3xl font-bold tracking-tight text-white">
-        Panel del <span className="text-teal-400">Implementador</span>
+        Panel del <span className="text-violet-400">Implementador</span>
       </h1>
       <p className="mt-1 text-sm text-zinc-400">Proyectos asignados a tu cuenta.</p>
 
@@ -111,10 +111,10 @@ function ImplementerPanel() {
         {stats.map((s) => (
           <div
             key={s.l}
-            className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:scale-[1.02] hover:border-teal-500/50"
+            className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:scale-[1.02] hover:border-violet-500/50"
           >
-            <s.icon className="h-4 w-4 text-teal-400" strokeWidth={1.75} />
-            <div className="mt-3 text-3xl font-bold text-teal-400">{s.n}</div>
+            <s.icon className="h-4 w-4 text-violet-400" strokeWidth={1.75} />
+            <div className="mt-3 text-3xl font-bold text-violet-400">{s.n}</div>
             <div className="mt-1 text-sm text-zinc-400">{s.l}</div>
           </div>
         ))}
@@ -133,7 +133,7 @@ function ImplementerPanel() {
               onClick={() => setTab(k)}
               className={`rounded-lg border px-3 py-1.5 transition ${
                 tab === k
-                  ? "border-teal-500/50 bg-teal-500/20 text-teal-400"
+                  ? "border-violet-500/50 bg-violet-500/20 text-violet-400"
                   : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200"
               }`}
             >
@@ -145,7 +145,7 @@ function ImplementerPanel() {
           placeholder="Buscar por cliente o empresa…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="h-9 w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-teal-500/50 focus:outline-none sm:max-w-xs"
+          className="h-9 w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-violet-500/50 focus:outline-none sm:max-w-xs"
         />
       </div>
 
@@ -193,7 +193,7 @@ function ImplementerPanel() {
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => navigate({ to: "/implementador/proyecto/$projectId", params: { projectId: r.id } })}
-                        className="rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-teal-500 hover:text-teal-400"
+                        className="rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
                       >
                         Ver detalle →
                       </button>

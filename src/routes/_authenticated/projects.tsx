@@ -61,7 +61,7 @@ function timeAgo(iso: string) {
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className="border-l-4 border-teal-500 pl-4">
+    <div className="border-l-4 border-violet-500 pl-4">
       <h2 className="text-xl font-semibold text-zinc-100">{title}</h2>
       {subtitle && <p className="mt-0.5 text-sm text-zinc-400">{subtitle}</p>}
     </div>
@@ -70,11 +70,11 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
 
 function statusInfo(s: string) {
   if (s === "ready" || s === "completed")
-    return { label: "Completado", cls: "bg-teal-500/15 text-teal-300 border-teal-500/30" };
+    return { label: "Completado", cls: "bg-violet-500/15 text-violet-300 border-violet-500/30" };
   if (s === "pending")
     return { label: "Pendiente", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
   if (s === "generating")
-    return { label: "En curso", cls: "bg-sky-500/15 text-sky-300 border-sky-500/30" };
+    return { label: "En curso", cls: "bg-violet-500/15 text-violet-300 border-violet-500/30" };
   return { label: s, cls: "bg-zinc-800/50 text-zinc-300 border-zinc-700/40" };
 }
 
@@ -168,9 +168,9 @@ function Projects() {
 
   return (
     <div className="mx-auto max-w-[960px] px-6 py-10">
-      <div className="border-l-4 border-teal-500 pl-4">
+      <div className="border-l-4 border-violet-500 pl-4">
         <h1 className="text-3xl font-bold tracking-tight text-white">
-          Mis <span className="text-teal-400">proyectos</span>
+          Mis <span className="text-violet-400">proyectos</span>
         </h1>
         <p className="mt-1 text-sm text-zinc-400">
           Tus implementaciones en curso y completadas.
@@ -191,7 +191,7 @@ function Projects() {
               return (
                 <div
                   key={s.id}
-                  className="group relative flex flex-col gap-3 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-teal-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
+                  className="group relative flex flex-col gap-3 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-violet-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
@@ -209,7 +209,7 @@ function Projects() {
                         Paso {s.current_step ?? 1} de 5
                       </div>
                       <div className="h-1.5 w-32 overflow-hidden rounded-full bg-zinc-800">
-                        <div className="h-full bg-teal-400" style={{ width: `${pct}%` }} />
+                        <div className="h-full bg-violet-400" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
                     <div className="mt-1.5 text-xs text-zinc-600">
@@ -266,7 +266,7 @@ function Projects() {
               return (
                 <div
                   key={p.id}
-                  className="group relative flex flex-col gap-2 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-teal-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
+                  className="group relative flex flex-col gap-2 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-violet-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-semibold text-zinc-100">
@@ -281,7 +281,7 @@ function Projects() {
                       <span
                         className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${
                           isImpl
-                            ? "bg-teal-500/15 text-teal-300 border border-teal-500/30"
+                            ? "bg-violet-500/15 text-violet-300 border border-violet-500/30"
                             : "bg-zinc-800/40 text-zinc-300 border border-zinc-700/40"
                         }`}
                       >
@@ -305,7 +305,7 @@ function Projects() {
                     {p.builder_session_id && (
                       <Button
                         variant="outline"
-                        className="h-8 shrink-0 rounded-xl border-zinc-700 bg-transparent text-xs text-zinc-300 hover:border-teal-500 hover:text-teal-400"
+                        className="h-8 shrink-0 rounded-xl border-zinc-700 bg-transparent text-xs text-zinc-300 hover:border-violet-500 hover:text-violet-400"
                         onClick={() => openPrompt(p.builder_session_id!)}
                       >
                         <Eye className="mr-1 h-3.5 w-3.5" /> Ver prompt generado
@@ -376,8 +376,8 @@ function Projects() {
 function EmptyState({ text }: { text: string }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800/60 bg-zinc-900/40 py-12 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-500/15">
-        <FolderKanban className="h-7 w-7 text-teal-400" />
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-violet-500/15">
+        <FolderKanban className="h-7 w-7 text-violet-400" />
       </div>
       <p className="mt-3 font-medium text-zinc-300">{text}</p>
       <p className="mt-1 text-sm text-zinc-600">
