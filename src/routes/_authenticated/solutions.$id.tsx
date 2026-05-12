@@ -36,6 +36,21 @@ export const Route = createFileRoute("/_authenticated/solutions/$id")({
 
 type StepKey = "herramientas" | "archivos" | "video" | "comentarios" | "conclusion";
 
+type SolutionToolItem = {
+  is_essential: boolean;
+  display_order: number | null;
+  tool: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    website: string | null;
+    logo_url: string | null;
+    monthly_cost_usd: number | null;
+    cost_label: string | null;
+  };
+};
+
 const STEPS: { key: StepKey; label: string; Icon: typeof Wrench }[] = [
   { key: "herramientas", label: "Herramientas", Icon: Wrench },
   { key: "archivos", label: "Archivos", Icon: FolderOpen },
@@ -61,7 +76,11 @@ function SolutionByIdDetail() {
   const { data: s, isLoading, isError } = useQuery({
     queryKey: ["solution-by-id", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("solutions").select("*").eq("id", id).maybeSingle();
+      const { data, error } = await supabase
+        .from("solutions")
+        .select(`*, solution_tools (is_essential, display_order, tool:tools (id, name, slug, description, website, logo_url, monthly_cost_usd, cost_label))`)
+        .eq("id", id)
+        .maybeSingle();
       if (error) throw error;
       return data as unknown as {
         id: string;
@@ -79,6 +98,7 @@ function SolutionByIdDetail() {
         integrations: string[];
         video_url: string | null;
         resources: { title: string; url: string; type?: string; description?: string; domain?: string }[] | null;
+        solution_tools: SolutionToolItem[] | null;
       };
     },
   });
@@ -424,7 +444,7 @@ function SolutionByIdDetail() {
           <StepHerramientas
             solutionId={id}
             userId={user?.id ?? ""}
-            tools={[...(s.tools_required ?? []), ...(s.integrations ?? [])]}
+            tools={s.solution_tools ?? []}
             isCompleted={completedSet.has("herramientas")}
             saving={savingStep === "herramientas"}
             onComplete={() => handleStepComplete("herramientas", "archivos")}
@@ -636,7 +656,14 @@ function ToolLogo({ name, logoUrl, website }: { name: string; logoUrl?: string |
   );
 }
 
-type ToolItem = { name: string; logo_url?: string | null; type?: "essential" | "optional" };
+type ToolDisplayItem = {
+  name: string;
+  description: string | null;
+  website: string | null;
+  logo_url: string | null;
+  cost_label: string | null;
+  type: "essential" | "optional";
+};
 
 function StepHerramientas({
   tools,
@@ -646,18 +673,24 @@ function StepHerramientas({
 }: {
   solutionId: string;
   userId: string;
-  tools: string[];
+  tools: SolutionToolItem[];
   isCompleted: boolean;
   saving: boolean;
   onComplete: () => void;
 }) {
-  const items: ToolItem[] = useMemo(
+  const items: ToolDisplayItem[] = useMemo(
     () =>
-      Array.from(new Set(tools.filter(Boolean))).map((name) => ({
-        name,
-        logo_url: null,
-        type: "essential" as const,
-      })),
+      (tools ?? [])
+        .slice()
+        .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+        .map((st) => ({
+          name: st.tool.name,
+          description: st.tool.description,
+          website: st.tool.website,
+          logo_url: st.tool.logo_url,
+          cost_label: st.tool.cost_label,
+          type: st.is_essential ? ("essential" as const) : ("optional" as const),
+        })),
     [tools],
   );
 
@@ -707,20 +740,22 @@ function StepHerramientas({
           {items.map((tool) => {
             const isOk = understood.has(tool.name);
             const isOptional = tool.type === "optional";
+            const officialUrl = tool.website
+              ? tool.website.startsWith("http")
+                ? tool.website
+                : `https://${tool.website}`
+              : null;
             return (
               <button
                 key={tool.name}
                 onClick={() => toggle(tool.name)}
-                className={`group relative overflow-hidden rounded-xl border p-6 text-center transition duration-200 ${
+                className={`group relative overflow-hidden rounded-xl border p-5 text-left transition duration-200 ${
                   isOk
                     ? "border-green-500 bg-secondary"
                     : "border-white/8 bg-secondary hover:border-white/20"
                 }`}
               >
-                {/* Green overlay when understood */}
-                {isOk && (
-                  <span className="pointer-events-none absolute inset-0 bg-green-500/10" />
-                )}
+                {isOk && <span className="pointer-events-none absolute inset-0 bg-green-500/10" />}
 
                 {/* Type badge */}
                 <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
@@ -732,26 +767,55 @@ function StepHerramientas({
                   {isOptional ? "Opcional" : "Esencial"}
                 </span>
 
-                {/* Check icon when understood */}
-                {isOk && (
-                  <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white">
-                    <Check className="h-3 w-3" />
-                  </span>
-                )}
-
-                {/* Logo or initials */}
-                <div className="relative mx-auto mt-6 flex items-center justify-center">
-                  <ToolLogo name={tool.name} logoUrl={tool.logo_url} />
+                {/* Top-right: cost badge + check */}
+                <div className="absolute right-3 top-3 flex items-center gap-2">
+                  {tool.cost_label && (
+                    <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-300">
+                      {tool.cost_label}
+                    </span>
+                  )}
+                  {isOk && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white">
+                      <Check className="h-3 w-3" />
+                    </span>
+                  )}
                 </div>
 
-                <div className="relative mt-3 text-lg font-semibold text-white">{tool.name}</div>
+                {/* Logo */}
+                <div className="relative mx-auto mt-8 flex items-center justify-center">
+                  <ToolLogo name={tool.name} logoUrl={tool.logo_url} website={tool.website} />
+                </div>
+
+                <div className="relative mt-3 text-center text-base font-semibold text-white">
+                  {tool.name}
+                </div>
+                {tool.description && (
+                  <p className="relative mt-1 text-center text-xs text-zinc-400 line-clamp-2">
+                    {tool.description}
+                  </p>
+                )}
+
                 <div
-                  className={`relative mt-1 text-sm ${
+                  className={`relative mt-2 text-center text-xs ${
                     isOk ? "font-medium text-green-500" : "text-zinc-500"
                   }`}
                 >
                   {isOk ? "Entendido ✓" : "Click para marcar como entendido"}
                 </div>
+
+                {officialUrl && (
+                  <div className="relative mt-3 text-center">
+                    <a
+                      href={officialUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs text-zinc-500 hover:text-white"
+                    >
+                      Sitio oficial →
+                    </a>
+                  </div>
+                )}
               </button>
             );
           })}
