@@ -27,8 +27,8 @@ const STATUS_META: Record<string, { label: string; cls: string }> = {
   assigned: { label: "Asignado", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
   in_progress: { label: "En curso", cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
   completed: { label: "Completado", cls: "bg-teal-500/20 text-teal-400 border-teal-500/30" },
-  cancelled: { label: "Cancelado", cls: "bg-slate-500/20 text-slate-400 border-slate-500/30" },
-  generating: { label: "Generando", cls: "bg-slate-500/20 text-slate-400 border-slate-500/30" },
+  cancelled: { label: "Cancelado", cls: "bg-zinc-600/20 text-zinc-400 border-zinc-600/30" },
+  generating: { label: "Generando", cls: "bg-zinc-600/20 text-zinc-400 border-zinc-600/30" },
   ready: { label: "Listo", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
   error: { label: "Error", cls: "bg-red-500/20 text-red-400 border-red-500/30" },
 };
@@ -90,7 +90,7 @@ function ImplementerPanel() {
   }, [data, tab, search]);
 
   if (roleLoading || !isImplementer) {
-    return <div className="p-10 text-sm text-slate-400">Cargando…</div>;
+    return <div className="p-10 text-sm text-zinc-400">Cargando…</div>;
   }
 
   const stats = [
@@ -105,23 +105,23 @@ function ImplementerPanel() {
       <h1 className="text-3xl font-bold tracking-tight text-white">
         Panel del <span className="text-teal-400">Implementador</span>
       </h1>
-      <p className="mt-1 text-sm text-slate-400">Proyectos asignados a tu cuenta.</p>
+      <p className="mt-1 text-sm text-zinc-400">Proyectos asignados a tu cuenta.</p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {stats.map((s) => (
           <div
             key={s.l}
-            className="rounded-xl border border-slate-700 bg-slate-800 p-5 transition hover:scale-[1.02] hover:border-teal-500/50"
+            className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:scale-[1.02] hover:border-teal-500/50"
           >
             <s.icon className="h-4 w-4 text-teal-400" strokeWidth={1.75} />
             <div className="mt-3 text-3xl font-bold text-teal-400">{s.n}</div>
-            <div className="mt-1 text-sm text-slate-400">{s.l}</div>
+            <div className="mt-1 text-sm text-zinc-400">{s.l}</div>
           </div>
         ))}
       </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-1 rounded-xl bg-slate-800/50 p-1 text-xs">
+        <div className="flex gap-1 rounded-xl bg-zinc-900/50 p-1 text-xs">
           {([
             ["all", "Todos"],
             ["pending", "Pendientes"],
@@ -134,7 +134,7 @@ function ImplementerPanel() {
               className={`rounded-lg border px-3 py-1.5 transition ${
                 tab === k
                   ? "border-teal-500/50 bg-teal-500/20 text-teal-400"
-                  : "border-slate-700 bg-slate-800 text-slate-400 hover:text-slate-200"
+                  : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200"
               }`}
             >
               {label}
@@ -145,13 +145,13 @@ function ImplementerPanel() {
           placeholder="Buscar por cliente o empresa…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="h-9 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 text-sm text-slate-200 placeholder:text-slate-500 focus:border-teal-500/50 focus:outline-none sm:max-w-xs"
+          className="h-9 w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-teal-500/50 focus:outline-none sm:max-w-xs"
         />
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-700 bg-slate-800/50">
+      <div className="mt-4 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
         <table className="w-full text-sm">
-          <thead className="bg-slate-900 text-left text-xs uppercase tracking-wide text-slate-400">
+          <thead className="bg-zinc-900 text-left text-xs uppercase tracking-wide text-zinc-400">
             <tr>
               <th className="px-4 py-3 font-medium">Cliente</th>
               <th className="px-4 py-3 font-medium">Solución</th>
@@ -162,38 +162,38 @@ function ImplementerPanel() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-slate-500">Cargando…</td></tr>
+              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-zinc-600">Cargando…</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-slate-500">Sin proyectos.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-zinc-600">Sin proyectos.</td></tr>
             ) : (
               filtered.map((r) => {
                 const meta = STATUS_META[r.status] ?? STATUS_META.pending;
                 const hasName = !!r.contact_name;
                 return (
-                  <tr key={r.id} className="border-b border-slate-700/50 bg-slate-800 transition hover:bg-slate-700/50">
+                  <tr key={r.id} className="border-b border-zinc-800/50 bg-zinc-900 transition hover:bg-zinc-800/50">
                     <td className="px-4 py-3">
                       {hasName ? (
                         <>
-                          <div className="font-medium text-slate-200">{r.contact_name}</div>
-                          <div className="text-xs text-slate-500">{r.company_name ?? ""}</div>
+                          <div className="font-medium text-zinc-200">{r.contact_name}</div>
+                          <div className="text-xs text-zinc-600">{r.company_name ?? ""}</div>
                         </>
                       ) : (
-                        <span className="italic text-slate-500">Sin asignar</span>
+                        <span className="italic text-zinc-600">Sin asignar</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-300">{r.solutions?.title ?? "—"}</td>
+                    <td className="px-4 py-3 text-zinc-300">{r.solutions?.title ?? "—"}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${meta.cls}`}>
                         {meta.label}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-slate-400">
+                    <td className="px-4 py-3 text-xs text-zinc-400">
                       {new Date(r.created_at).toLocaleDateString("es", { day: "2-digit", month: "2-digit", year: "numeric" })}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => navigate({ to: "/implementador/proyecto/$projectId", params: { projectId: r.id } })}
-                        className="rounded-lg border border-slate-600 px-4 py-1.5 text-sm text-slate-300 transition hover:border-teal-500 hover:text-teal-400"
+                        className="rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-teal-500 hover:text-teal-400"
                       >
                         Ver detalle →
                       </button>

@@ -24,7 +24,7 @@ const PROJECT_STATUS: Record<string, { label: string; cls: string }> = {
   assigned: { label: "Asignado", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
   in_progress: { label: "En curso", cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
   completed: { label: "Completado", cls: "bg-teal-500/20 text-teal-400 border-teal-500/30" },
-  generating: { label: "Generando", cls: "bg-slate-500/20 text-slate-400 border-slate-500/30" },
+  generating: { label: "Generando", cls: "bg-zinc-600/20 text-zinc-400 border-zinc-600/30" },
   ready: { label: "Listo", cls: "bg-sky-500/20 text-sky-400 border-sky-500/30" },
   error: { label: "Error", cls: "bg-red-500/20 text-red-400 border-red-500/30" },
 };
@@ -138,7 +138,7 @@ function MiProgreso() {
         <h1 className="text-3xl font-bold tracking-tight text-white">
           Mi <span className="text-teal-400">Progreso</span>
         </h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-zinc-400">
           Un resumen de todo lo que estás aprendiendo e implementando.
         </p>
       </header>
@@ -147,13 +147,13 @@ function MiProgreso() {
         {cards.map((c) => (
           <div
             key={c.label}
-            className="rounded-xl border border-slate-700 bg-slate-800 p-5 transition duration-200 hover:scale-[1.02] hover:border-teal-500/50"
+            className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition duration-200 hover:scale-[1.02] hover:border-teal-500/50"
           >
             <c.icon className="h-5 w-5 text-teal-400" strokeWidth={1.75} />
             <div className="mt-3 text-3xl font-bold tracking-tight text-teal-400">
               {isLoading ? "—" : c.value}
             </div>
-            <div className="mt-1 text-sm text-slate-400">{c.label}</div>
+            <div className="mt-1 text-sm text-zinc-400">{c.label}</div>
           </div>
         ))}
       </div>
@@ -174,27 +174,27 @@ function MiProgreso() {
               return (
                 <div
                   key={s.id}
-                  className="rounded-xl border border-slate-700 bg-slate-800 p-5 transition hover:border-teal-500/50"
+                  className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-teal-500/50"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-slate-100">{s.title}</h3>
+                        <h3 className="font-semibold text-zinc-100">{s.title}</h3>
                         <span className="rounded-full border border-teal-500/30 bg-teal-500/10 px-2 py-0.5 text-xs text-teal-400">
                           En: {s.currentStep}
                         </span>
                       </div>
                       <div className="mt-3 flex items-center gap-3">
-                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-700">
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
                           <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
                         </div>
-                        <span className="shrink-0 text-xs text-slate-400">{s.completed} de 5 pasos</span>
+                        <span className="shrink-0 text-xs text-zinc-400">{s.completed} de 5 pasos</span>
                       </div>
                     </div>
                     <Link
                       to="/solutions/$id"
                       params={{ id: s.id }}
-                      className="inline-flex items-center gap-1 rounded-lg border border-slate-600 px-4 py-1.5 text-sm text-slate-300 transition hover:border-teal-500 hover:text-teal-400"
+                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-teal-500 hover:text-teal-400"
                     >
                       Continuar <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
@@ -222,24 +222,24 @@ function MiProgreso() {
               return (
                 <div
                   key={c.id}
-                  className="rounded-xl border border-slate-700 bg-slate-800 p-5 transition hover:border-teal-500/50"
+                  className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-teal-500/50"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4 text-teal-400" />
-                        <h3 className="font-semibold text-slate-100">{c.title}</h3>
+                        <h3 className="font-semibold text-zinc-100">{c.title}</h3>
                       </div>
                       <div className="mt-3 flex items-center gap-3">
-                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-700">
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
                           <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
                         </div>
-                        <span className="shrink-0 text-xs text-slate-400">{c.done} de {c.total} módulos</span>
+                        <span className="shrink-0 text-xs text-zinc-400">{c.done} de {c.total} módulos</span>
                       </div>
                     </div>
                     <Link
                       to="/cursos"
-                      className="inline-flex items-center gap-1 rounded-lg border border-slate-600 px-4 py-1.5 text-sm text-slate-300 transition hover:border-teal-500 hover:text-teal-400"
+                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-teal-500 hover:text-teal-400"
                     >
                       Continuar <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
@@ -270,11 +270,11 @@ function MiProgreso() {
               return (
                 <div
                   key={p.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-700 bg-slate-800 p-5 transition hover:border-teal-500/50"
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-teal-500/50"
                 >
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-slate-100">{p.title}</h3>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                    <h3 className="font-semibold text-zinc-100">{p.title}</h3>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
                       <span>{p.solutions?.title ?? "Sin solución"}</span>
                       <span>·</span>
                       <span>{new Date(p.created_at).toLocaleDateString("es", { day: "2-digit", month: "2-digit", year: "numeric" })}</span>
@@ -285,7 +285,7 @@ function MiProgreso() {
                   </span>
                   <Link
                     to="/projects"
-                    className="inline-flex items-center gap-1 rounded-lg border border-slate-600 px-4 py-1.5 text-sm text-slate-300 transition hover:border-teal-500 hover:text-teal-400"
+                    className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-teal-500 hover:text-teal-400"
                   >
                     Ver proyecto <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
@@ -312,9 +312,9 @@ function EmptyState({
   icon: Icon, text, cta, onClick,
 }: { icon: typeof Rocket; text: string; cta: string; onClick: () => void }) {
   return (
-    <div className="rounded-xl border border-dashed border-slate-700 bg-slate-800/40 p-10 text-center">
-      <Icon className="mx-auto h-8 w-8 text-slate-500" strokeWidth={1.5} />
-      <p className="mt-3 text-sm text-slate-400">{text}</p>
+    <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-900/40 p-10 text-center">
+      <Icon className="mx-auto h-8 w-8 text-zinc-600" strokeWidth={1.5} />
+      <p className="mt-3 text-sm text-zinc-400">{text}</p>
       <button
         onClick={onClick}
         className="mt-4 inline-flex items-center gap-1 rounded-lg border border-teal-500/40 bg-teal-500/10 px-4 py-2 text-sm font-medium text-teal-400 transition hover:bg-teal-500/20"

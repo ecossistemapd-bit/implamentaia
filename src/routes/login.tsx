@@ -9,10 +9,6 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Logo } from "@/components/logo";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 const schema = z.object({
   email: z.string().email("Email inválido"),
@@ -36,6 +32,10 @@ function LoginPage() {
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
   });
+
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+  }, []);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/dashboard" });
@@ -72,12 +72,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <header className="flex items-center justify-between px-6 py-5">
-        <Logo />
-        <ThemeToggle />
-      </header>
-
+    <div className="dark flex min-h-screen flex-col bg-zinc-950 text-white">
       <main className="flex flex-1 items-center justify-center px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -85,45 +80,70 @@ function LoginPage() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="w-full max-w-sm"
         >
-          <h1 className="text-3xl font-semibold tracking-tight">
-            {mode === "signin" ? "Ingresar" : "Crear cuenta"}
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {mode === "signin"
-              ? "Bienvenido de vuelta a Implementa AI."
-              : "Plataforma por invitación. Tu email debe estar autorizado."}
-          </p>
+          <div className="flex justify-center">
+            <Logo />
+          </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" autoComplete="email" {...register("email")} />
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+          <div className="mt-10 text-center">
+            <h1 className="text-2xl font-semibold text-white">
+              {mode === "signin" ? "Ingresar" : "Crear cuenta"}
+            </h1>
+            <p className="mt-2 text-sm text-zinc-400">
+              {mode === "signin"
+                ? "Bienvenido de vuelta a Implementa AI"
+                : "Plataforma por invitación. Tu email debe estar autorizado."}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-3">
+            <div>
+              <input
+                id="email"
+                type="email"
+                placeholder="Email"
+                autoComplete="email"
+                className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 text-white placeholder-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-0"
+                {...register("email")}
+              />
+              {errors.email && <p className="mt-1.5 text-xs text-red-400">{errors.email.message}</p>}
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input id="password" type="password" autoComplete={mode === "signin" ? "current-password" : "new-password"} {...register("password")} />
-              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+            <div>
+              <input
+                id="password"
+                type="password"
+                placeholder="Contraseña"
+                autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 text-white placeholder-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-0"
+                {...register("password")}
+              />
+              {errors.password && <p className="mt-1.5 text-xs text-red-400">{errors.password.message}</p>}
             </div>
-            <Button type="submit" disabled={submitting} className="w-full rounded-full">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="h-12 w-full rounded-xl bg-white font-semibold text-black transition hover:bg-zinc-100 disabled:opacity-60"
+            >
               {submitting ? "Procesando..." : mode === "signin" ? "Ingresar" : "Crear cuenta"}
-            </Button>
+            </button>
           </form>
 
           <div className="mt-6 flex items-center justify-between text-sm">
             <button
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-              className="text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              className="text-zinc-500 hover:text-zinc-300"
             >
               {mode === "signin" ? "Crear cuenta" : "Ya tengo cuenta"}
             </button>
-            <Link to="/" className="text-muted-foreground hover:text-foreground">
+            <Link to="/" className="text-zinc-500 hover:text-zinc-300">
               Volver al inicio
             </Link>
           </div>
 
-          <p className="mt-10 text-center text-xs text-muted-foreground">
-            ¿No tenés invitación? <a className="underline underline-offset-4" href="mailto:hola@implementa.ai?subject=Solicitar%20acceso">Solicitar acceso</a>
+          <p className="mt-10 text-center text-xs text-zinc-600">
+            ¿No tenés invitación?{" "}
+            <a className="text-zinc-400 underline-offset-4 hover:underline" href="mailto:hola@implementa.ai?subject=Solicitar%20acceso">
+              Solicitar acceso
+            </a>
           </p>
         </motion.div>
       </main>
