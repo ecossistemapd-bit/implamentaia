@@ -234,7 +234,7 @@ function SolutionByIdDetail() {
         </Link>
 
         {/* Header — 2 columns */}
-        <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-[3fr_2fr] md:items-center">
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[3fr_2fr] md:items-center">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
@@ -272,7 +272,7 @@ function SolutionByIdDetail() {
         </div>
 
         {/* Stat cards — 2 rows of 3 */}
-        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <StatCard label="Categoría" value={categoryLabel} />
           <StatCard label="Nivel" value={difficultyLabel} />
           <StatCard label="Tiempo Estimado" value={s.estimated_time || "Variable"} />
@@ -296,7 +296,7 @@ function SolutionByIdDetail() {
         </div>
 
         {/* About + Experto */}
-        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[7fr_3fr]">
+        <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[7fr_3fr]">
           <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
             <h2 className="text-xl font-bold text-white">Sobre esta solución</h2>
             <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-300">
@@ -375,7 +375,7 @@ function SolutionByIdDetail() {
       </div>
 
       {/* Step navigator */}
-      <div className="mt-10">
+      <div className="mt-6">
         <div className="flex items-start">
           {STEPS.map((step, i) => {
             const isCompleted = completedSet.has(step.key);
@@ -419,7 +419,7 @@ function SolutionByIdDetail() {
       </div>
 
       {/* Step content */}
-      <div className="mt-10">
+      <div className="mt-6">
         {activeStep === "herramientas" && (
           <StepHerramientas
             solutionId={id}
