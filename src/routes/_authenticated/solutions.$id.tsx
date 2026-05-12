@@ -634,8 +634,23 @@ function getToolDomain(name: string): string | null {
 function ToolLogo({ name, logoUrl, website }: { name: string; logoUrl?: string | null; website?: string | null }) {
   const initials = getToolInitials(name);
   const domain = website || getToolDomain(name);
-  const initialSrc = logoUrl || (domain ? `https://logo.clearbit.com/${domain}` : null);
-  const [src, setSrc] = useState<string | null>(initialSrc);
+
+  const sources = useMemo(() => {
+    const list: string[] = [];
+    if (logoUrl) list.push(logoUrl);
+    if (domain) {
+      list.push(`https://icon.horse/icon/${domain}`);
+      list.push(`https://www.google.com/s2/favicons?domain=${domain}&sz=128`);
+    }
+    return list;
+  }, [logoUrl, domain]);
+
+  const [srcIndex, setSrcIndex] = useState(0);
+  const src = sources[srcIndex];
+
+  useEffect(() => {
+    setSrcIndex(0);
+  }, [sources]);
 
   if (!src) {
     return (
@@ -650,7 +665,7 @@ function ToolLogo({ name, logoUrl, website }: { name: string; logoUrl?: string |
         src={src}
         alt={name}
         className="h-full w-full object-contain"
-        onError={() => setSrc(null)}
+        onError={() => setSrcIndex((i) => i + 1)}
       />
     </div>
   );
