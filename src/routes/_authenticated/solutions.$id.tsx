@@ -190,7 +190,7 @@ function SolutionByIdDetail() {
       );
     setSavingStep(null);
     if (error) {
-      toast.error("No pudimos guardar tu progreso. Intentá de nuevo.");
+      toast.error("No pudimos guardar tu progreso. Intentá de nuevo.", { duration: 4000 });
       return false;
     }
     await qc.invalidateQueries({ queryKey: ["solution-step-progress", id, user.id] });
@@ -206,7 +206,7 @@ function SolutionByIdDetail() {
   const handleStepComplete = async (step: StepKey, next: StepKey) => {
     const ok = await markStepCompleted(step);
     if (!ok) return;
-    toast.success("¡Paso completado! Avanzando...");
+    toast.success("¡Paso completado! Avanzando...", { duration: 4000 });
     advanceTo(next);
   };
 
@@ -1043,7 +1043,7 @@ function StepComentarios({
 
   const submit = async () => {
     if (!user || rating === null) {
-      toast.error("Elegí una puntuación");
+      toast.error("Elegí una puntuación", { duration: 4000 });
       return;
     }
     setSubmitting(true);
@@ -1057,12 +1057,12 @@ function StepComentarios({
       } as never);
     setSubmitting(false);
     if (error) {
-      toast.error("Error al enviar evaluación");
+      toast.error("Error al enviar evaluación", { duration: 4000 });
       return;
     }
     setComment("");
     setRating(null);
-    toast.success("¡Gracias por tu evaluación!");
+    toast.success("¡Gracias por tu evaluación!", { duration: 4000 });
     qc.invalidateQueries({ queryKey: ["solution-comments", solutionId] });
   };
 
