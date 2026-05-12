@@ -286,50 +286,39 @@ function Empty({ text, cta, to }: { text: string; cta: string; to: "/solutions" 
   );
 }
 
-function Recomendacion({ sol }: { sol: { id: string; title: string; short_description: string } | null }) {
+function ProximosPasos({ next }: { next: { id: string; title: string; nextStepLabel: string; completed: number } }) {
   return (
     <div className="rounded-2xl border border-violet-500/20 bg-zinc-900 p-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-violet-400">
-          <Bot className="h-4 w-4" /> Recomendación de IA
-        </div>
-        <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-400">
-          ANÁLISIS INTELIGENTE
-        </span>
+      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-violet-400">
+        <Bot className="h-4 w-4" /> Próximo paso sugerido
       </div>
-      {sol ? (
-        <Link
-          to="/solutions/$id"
-          params={{ id: sol.id }}
-          className="mt-4 block rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 transition hover:border-violet-500/50"
-        >
-          <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-zinc-100">{sol.title}</h3>
-              <p className="mt-1 line-clamp-2 text-xs text-zinc-400">{sol.short_description}</p>
-            </div>
-            <ArrowRight className="h-5 w-5 shrink-0 text-violet-400" />
+      <Link
+        to="/solutions/$id"
+        params={{ id: next.id }}
+        className="mt-4 block rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 transition hover:border-violet-500/50"
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+            <Sparkles className="h-5 w-5" />
           </div>
-        </Link>
-      ) : (
-        <p className="mt-4 text-sm text-zinc-400">Cargando recomendación…</p>
-      )}
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate font-semibold text-zinc-100">{next.title}</h3>
+            <p className="mt-1 text-xs text-zinc-400">
+              Continuá en: <span className="text-violet-400">{next.nextStepLabel || "siguiente paso"}</span>
+            </p>
+            <p className="mt-1 text-[11px] text-zinc-600">{next.completed} de 5 pasos completados</p>
+          </div>
+          <ArrowRight className="h-5 w-5 shrink-0 text-violet-400" />
+        </div>
+      </Link>
     </div>
   );
 }
 
 function relativeTime(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return "ahora";
-  if (min < 60) return `hace ${min} min`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `hace ${hr} h`;
-  const d = Math.floor(hr / 24);
-  if (d < 30) return `hace ${d} d`;
-  const mo = Math.floor(d / 30);
-  return `hace ${mo} mes${mo > 1 ? "es" : ""}`;
+  try {
+    return formatDistanceToNow(new Date(iso), { addSuffix: true, locale: es });
+  } catch {
+    return "";
+  }
 }
