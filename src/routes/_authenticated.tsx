@@ -25,6 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useRole } from "@/hooks/use-role";
 import { Logo } from "@/components/logo";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -127,6 +128,7 @@ function AuthenticatedLayout() {
           <Outlet />
         </main>
       </div>
+      <ScrollToTop />
     </div>
   );
 }
