@@ -407,34 +407,38 @@ function SolutionByIdDetail() {
             const prevCompleted = i > 0 && completedSet.has(STEPS[i - 1].key);
             const Icon = step.Icon;
             return (
-              <div key={step.key} className="flex flex-1 flex-col items-center">
-                <div className="flex w-full items-center">
-                  {i > 0 && (
-                    <div className={`h-px flex-1 transition ${prevCompleted ? "bg-green-500" : "bg-white/8"}`} />
-                  )}
-                  <div
+              <div key={step.key} className="relative flex flex-1 flex-col items-center">
+                {/* Connector lines (behind, top half aligned with circle center) */}
+                {i > 0 && (
+                  <div className={`absolute left-0 top-[18px] h-px w-1/2 -translate-y-1/2 ${prevCompleted ? "bg-green-500" : "bg-white/8"}`} />
+                )}
+                {i < STEPS.length - 1 && (
+                  <div className={`absolute right-0 top-[18px] h-px w-1/2 -translate-y-1/2 ${isCompleted ? "bg-green-500" : "bg-white/8"}`} />
+                )}
+                <button
+                  type="button"
+                  onClick={() => setActiveStep(step.key)}
+                  aria-label={step.label}
+                  className="group relative z-10 flex flex-col items-center gap-2.5 rounded-lg px-2 py-1 transition"
+                >
+                  <span
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition ${
                       isCompleted
                         ? "border-green-500 bg-green-500 text-white"
                         : isActive
                         ? "border-violet-500 bg-violet-500 text-white"
-                        : "border-white/10 bg-transparent text-zinc-600"
+                        : "border-white/10 bg-background text-zinc-600 group-hover:border-white/20"
                     }`}
                   >
                     {isCompleted ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
-                  </div>
-                  {i < STEPS.length - 1 && (
-                    <div className={`h-px flex-1 transition ${isCompleted ? "bg-green-500" : "bg-white/8"}`} />
-                  )}
-                </div>
-                <button
-                  onClick={() => setActiveStep(step.key)}
-                  aria-label={step.label}
-                  className={`mt-2.5 w-full text-center text-xs transition hover:text-white ${
-                    isActive ? "text-white font-medium" : isCompleted ? "text-green-500" : "text-zinc-600"
-                  }`}
-                >
-                  {step.label}
+                  </span>
+                  <span
+                    className={`text-center text-xs transition group-hover:text-white ${
+                      isActive ? "text-white font-medium" : isCompleted ? "text-green-500" : "text-zinc-600"
+                    }`}
+                  >
+                    {step.label}
+                  </span>
                 </button>
               </div>
             );
