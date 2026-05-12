@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SolutionEditorDrawer } from "@/components/admin/solution-editor-drawer";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPanel,
