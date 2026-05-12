@@ -156,9 +156,6 @@ function Dashboard() {
               <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
                 <Calendar className="h-4 w-4" /> Próxima Sesión
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-950 px-2.5 py-0.5 text-[10px] font-bold uppercase text-zinc-400">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-400" /> Live
-              </span>
             </div>
             <div className="mt-4 flex flex-col items-center justify-center py-4 text-center">
               <Calendar className="h-10 w-10 text-zinc-700" strokeWidth={1.5} />
@@ -184,10 +181,10 @@ function Dashboard() {
           ))}
         </section>
 
-        {/* En Progreso + Recomendación */}
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        {/* En Progreso + Próximos pasos */}
+        <section className={`mt-8 grid gap-6 ${(data?.inProgress.length ?? 0) > 0 ? "lg:grid-cols-[1.4fr_1fr]" : ""}`}>
           <EnProgreso inProgress={data?.inProgress ?? []} />
-          <Recomendacion sol={data?.recommendation ?? null} />
+          {(data?.inProgress.length ?? 0) > 0 && <ProximosPasos next={data!.inProgress[0]} />}
         </section>
 
         {/* Actividad reciente */}
