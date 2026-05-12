@@ -1,16 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Play, Users, BookOpen, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/cursos/$courseId")({
   component: CourseDetailPage,
 });
 
-type Course = { id: string; title: string; description: string | null };
+type Course = { id: string; title: string; description: string | null; category: string | null; level: string | null };
 type Module = {
   id: string;
   title: string;
@@ -19,6 +18,21 @@ type Module = {
   duration_minutes: number | null;
   order_index: number;
 };
+
+function thumbGradient(title: string) {
+  const t = title.toLowerCase();
+  if (t.includes("lovable")) return { gradient: "from-purple-900 via-violet-800 to-slate-900", initial: "L" };
+  if (t.includes("claude")) return { gradient: "from-orange-900 via-amber-800 to-slate-900", initial: "C" };
+  if (t.includes("n8n")) return { gradient: "from-green-900 via-emerald-800 to-slate-900", initial: "n8n" };
+  return { gradient: "from-teal-900 via-sky-900 to-slate-900", initial: "AI" };
+}
+
+function levelClass(level: string | null) {
+  const l = (level ?? "").toLowerCase();
+  if (l.includes("avanz")) return "bg-rose-500/20 text-rose-300 border-rose-500/40";
+  if (l.includes("interm")) return "bg-amber-500/20 text-amber-300 border-amber-500/40";
+  return "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
+}
 
 function CourseDetailPage() {
   const { courseId } = Route.useParams();
@@ -36,7 +50,7 @@ function CourseDetailPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("courses" as never)
-        .select("id, title, description")
+        .select("id, title, description, category, level")
         .eq("id", courseId)
         .maybeSingle();
       if (error) throw error;
@@ -84,6 +98,9 @@ function CourseDetailPage() {
   const total = modules?.length ?? 0;
   const done = Object.values(progress ?? {}).filter(Boolean).length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const selectedIdx = modules?.findIndex((m) => m.id === selectedId) ?? -1;
+  const nextModule = selectedIdx >= 0 && modules ? modules[selectedIdx + 1] : null;
+  const style = useMemo(() => thumbGradient(course?.title ?? ""), [course?.title]);
 
   const toggleComplete = async () => {
     if (!selected || !user) return;
@@ -104,99 +121,194 @@ function CourseDetailPage() {
 
   if (!user) return null;
 
+  const inProgress = done > 0;
+
   return (
-    <div className="min-h-screen bg-[#f9f9f9]">
-      <header className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
-        <Link to="/cursos" className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
-          <ArrowLeft className="h-4 w-4" /> Volver
-        </Link>
-        <h1 className="truncate text-xl font-bold text-gray-900">{course?.title}</h1>
-        <span className="text-sm text-gray-500">
-          {done} / {total} completados
-        </span>
+    <div className="min-h-screen bg-slate-950">
+      <header className="border-b border-slate-800 bg-slate-900/70 px-6 py-3 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <Link to="/cursos" className="flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-teal-400">
+            <ArrowLeft className="h-4 w-4" /> Cursos
+          </Link>
+          <span className="text-sm text-slate-400">
+            {done} / {total} completados
+          </span>
+        </div>
       </header>
+
+      {/* Hero */}
+      <section className="mx-auto mt-6 max-w-6xl px-6">
+        <div className={`relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br ${style.gradient} shadow-2xl shadow-black/40`}>
+          <div className="relative aspect-[16/6] w-full">
+            <div className="absolute inset-0 opacity-20" style={{
+              backgroundImage:
+                "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15) 0, transparent 40%), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0, transparent 40%)",
+            }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-8">
+              <div className="flex flex-wrap items-center gap-2">
+                {course?.category && (
+                  <span className="rounded-md border border-teal-500/40 bg-teal-500/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-teal-300">
+                    {course.category}
+                  </span>
+                )}
+                <span className={`rounded-md border px-2 py-0.5 text-[11px] font-medium ${levelClass(course?.level ?? null)}`}>
+                  {course?.level ?? "Principiante"}
+                </span>
+              </div>
+              <h1 className="mt-3 text-3xl font-bold text-white md:text-4xl">{course?.title}</h1>
+              {course?.description && (
+                <p className="mt-2 max-w-3xl text-sm text-slate-300">{course.description}</p>
+              )}
+              <div className="mt-4 flex flex-wrap items-center gap-5 text-sm text-slate-300">
+                <span className="flex items-center gap-1.5">
+                  <Users className="h-4 w-4" /> Sé el primero
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <BookOpen className="h-4 w-4" /> {total > 0 ? `${total} módulos` : "Próximamente"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <main className="mx-auto max-w-6xl px-6 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[65%_35%]">
+          {/* Player */}
           <div>
-            {selected?.video_url ? (
-              <iframe
-                src={selected.video_url}
-                allow="autoplay; fullscreen"
-                className="aspect-video w-full rounded-xl bg-gray-900"
-              />
-            ) : (
-              <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-gray-900">
-                <span className="text-sm text-white/60">
-                  {selected ? "Este módulo no tiene video todavía" : "Seleccioná un módulo para comenzar"}
-                </span>
-              </div>
-            )}
-            {selected && (
-              <>
-                <h2 className="mt-4 text-lg font-semibold text-gray-900">{selected.title}</h2>
-                {selected.description && (
-                  <p className="mt-1 text-sm text-gray-500">{selected.description}</p>
-                )}
-                <Button
-                  onClick={toggleComplete}
-                  variant={progress?.[selected.id] ? "outline" : "default"}
-                  className="mt-4 w-full"
-                >
-                  {progress?.[selected.id] ? "✓ Completado" : "Marcar como completado ✓"}
-                </Button>
-              </>
-            )}
-          </div>
-
-          <div>
-            <div className="mb-3 text-xs font-semibold tracking-widest text-gray-400">MÓDULOS</div>
-            <div className="space-y-1">
-              {(modules ?? []).map((m) => {
-                const isDone = !!progress?.[m.id];
-                const isActive = m.id === selectedId;
-                return (
-                  <div
-                    key={m.id}
-                    onClick={() => setSelectedId(m.id)}
-                    className={`flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors hover:bg-gray-50 ${
-                      isActive ? "bg-gray-50" : ""
-                    }`}
-                  >
-                    <div
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                        isDone
-                          ? "bg-black text-white"
-                          : isActive
-                            ? "border-2 border-black"
-                            : "border-2 border-gray-300"
-                      }`}
-                    >
-                      {isDone && <Check className="h-3 w-3" strokeWidth={3} />}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium text-gray-900">{m.title}</div>
-                      {m.duration_minutes != null && (
-                        <div className="text-xs text-gray-400">{m.duration_minutes} min</div>
-                      )}
-                    </div>
+            <div className="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-900 shadow-xl shadow-black/30">
+              {selected?.video_url ? (
+                <iframe
+                  src={selected.video_url}
+                  allow="autoplay; fullscreen"
+                  className="aspect-video w-full bg-black"
+                />
+              ) : (
+                <div className={`relative flex aspect-video w-full items-center justify-center bg-gradient-to-br ${style.gradient}`}>
+                  <div className="absolute inset-0 bg-slate-950/60" />
+                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                    <Play className="h-8 w-8 fill-white text-white" />
                   </div>
-                );
-              })}
-              {modules && modules.length === 0 && (
-                <p className="px-3 py-6 text-sm text-gray-400">Próximamente. Estamos preparando los módulos.</p>
+                  <span className="absolute bottom-4 text-sm text-white/70">
+                    {selected ? "Video próximamente" : "Próximamente"}
+                  </span>
+                </div>
               )}
             </div>
 
-            <div className="mt-6">
-              <div className="text-xs text-gray-400">
-                {done} de {total} módulos completados
+            {selected && (
+              <div className="mt-5 rounded-xl border border-slate-700/50 bg-slate-800/80 p-6 shadow-xl shadow-black/20">
+                <h2 className="text-xl font-semibold text-slate-100">{selected.title}</h2>
+                {selected.description && (
+                  <p className="mt-2 text-sm text-slate-300">{selected.description}</p>
+                )}
+
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={toggleComplete}
+                    className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
+                      progress?.[selected.id]
+                        ? "border border-teal-500/40 bg-teal-500/10 text-teal-300 hover:bg-teal-500/20"
+                        : "bg-gradient-to-r from-teal-500 to-sky-500 text-white shadow-lg shadow-teal-500/20 hover:scale-[1.02]"
+                    }`}
+                  >
+                    <Check className="h-4 w-4" />
+                    {progress?.[selected.id] ? "Completado" : "Marcar como completado"}
+                  </button>
+
+                  {nextModule && (
+                    <button
+                      onClick={() => setSelectedId(nextModule.id)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-600 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:border-teal-500/50 hover:text-teal-300"
+                    >
+                      Siguiente módulo <ChevronRight className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="mt-6">
+                  <div className="flex items-center justify-between text-xs text-slate-400">
+                    <span>Progreso del curso</span>
+                    <span>{done} de {total} completados</span>
+                  </div>
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+                    <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
               </div>
-              <div className="mt-1 h-1 w-full overflow-hidden rounded bg-gray-100">
-                <div className="h-full bg-black" style={{ width: `${pct}%` }} />
-              </div>
-            </div>
+            )}
           </div>
+
+          {/* Modules sidebar */}
+          <aside>
+            <div className="rounded-xl border border-slate-700/50 bg-slate-800/80 p-4 shadow-xl shadow-black/20">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">Módulos</div>
+                <button
+                  onClick={() => modules && modules[0] && setSelectedId(modules[0].id)}
+                  className="text-xs font-semibold text-teal-400 hover:text-teal-300"
+                  disabled={!modules || modules.length === 0}
+                >
+                  {inProgress ? "Continuar donde lo dejé" : "Comenzar curso"}
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                {(modules ?? []).map((m, idx) => {
+                  const isDone = !!progress?.[m.id];
+                  const isActive = m.id === selectedId;
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => setSelectedId(m.id)}
+                      className={`flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors ${
+                        isActive
+                          ? "border border-teal-500/40 bg-teal-500/10"
+                          : "border border-transparent hover:bg-slate-700/40"
+                      }`}
+                    >
+                      <div
+                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                          isDone
+                            ? "bg-teal-500 text-white"
+                            : isActive
+                              ? "border-2 border-teal-400 text-teal-300"
+                              : "border-2 border-slate-600 text-slate-400"
+                        }`}
+                      >
+                        {isDone ? <Check className="h-3 w-3" strokeWidth={3} /> : idx + 1}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className={`truncate text-sm font-medium ${isActive ? "text-teal-200" : "text-slate-100"}`}>
+                          {m.title}
+                        </div>
+                        {m.duration_minutes != null && (
+                          <div className="text-xs text-slate-500">{m.duration_minutes} min</div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+                {modules && modules.length === 0 && (
+                  <p className="px-3 py-8 text-center text-sm text-slate-500">
+                    Estamos preparando los módulos. Volvé pronto.
+                  </p>
+                )}
+              </div>
+
+              {total > 0 && (
+                <div className="mt-5 border-t border-slate-700/50 pt-4">
+                  <div className="text-xs text-slate-400">
+                    {done} de {total} módulos completados
+                  </div>
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+                    <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          </aside>
         </div>
       </main>
     </div>
