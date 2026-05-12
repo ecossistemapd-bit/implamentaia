@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   Wrench,
@@ -17,7 +17,9 @@ import {
   Award,
   FileText,
   Lock,
+  Loader2,
 } from "lucide-react";
+import confetti from "canvas-confetti";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -38,17 +40,17 @@ const STEPS: { key: StepKey; label: string; Icon: typeof Wrench }[] = [
   { key: "conclusion", label: "Conclusión", Icon: Trophy },
 ];
 
-// Title without color accent (Linear style: white only)
-function TitleWithAccent({ text }: { text: string }) {
-  return <>{text}</>;
-}
+const PRIOR_STEPS: StepKey[] = ["herramientas", "archivos", "video", "comentarios"];
 
 function SolutionByIdDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [activeStep, setActiveStep] = useState<StepKey>("herramientas");
+  const [activeStep, setActiveStep] = useState<StepKey | null>(null);
+  const [savingStep, setSavingStep] = useState<StepKey | null>(null);
+  const initializedRef = useRef(false);
+  const confettiFiredRef = useRef(false);
 
   const { data: s, isLoading, isError } = useQuery({
     queryKey: ["solution-by-id", id],
@@ -67,7 +69,12 @@ function SolutionByIdDetail() {
     },
   });
 
-  const { data: progress } = useQuery({
+  const {
+    data: progress,
+    isLoading: progressLoading,
+    isError: progressError,
+    refetch: refetchProgress,
+  } = useQuery({
     queryKey: ["solution-step-progress", id, user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
@@ -87,67 +94,115 @@ function SolutionByIdDetail() {
   );
   const completedCount = completedSet.size;
   const progressPct = Math.round((completedCount / STEPS.length) * 100);
+  const allPriorDone = PRIOR_STEPS.every((k) => completedSet.has(k));
 
-  const markStepCompleted = async (step: StepKey) => {
-    if (!user) return;
+  // Initialize active step from DB once
+  useEffect(() => {
+    if (initializedRef.current || progressLoading || !progress) return;
+    initializedRef.current = true;
+    const firstIncomplete = STEPS.find((s) => !completedSet.has(s.key));
+    setActiveStep(firstIncomplete ? firstIncomplete.key : "conclusion");
+  }, [progress, progressLoading, completedSet]);
+
+  // Confetti when reaching conclusion with all prior done
+  useEffect(() => {
+    if (
+      activeStep === "conclusion" &&
+      allPriorDone &&
+      !confettiFiredRef.current
+    ) {
+      confettiFiredRef.current = true;
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.3 },
+        colors: ["#22c55e", "#8b5cf6", "#ffffff"],
+      });
+    }
+  }, [activeStep, allPriorDone]);
+
+  // Redirect from conclusion to first incomplete if user lands there without completing
+  useEffect(() => {
+    if (activeStep === "conclusion" && !allPriorDone && !progressLoading) {
+      const firstIncomplete = PRIOR_STEPS.find((k) => !completedSet.has(k));
+      if (firstIncomplete) setActiveStep(firstIncomplete);
+    }
+  }, [activeStep, allPriorDone, completedSet, progressLoading]);
+
+  const markStepCompleted = async (step: StepKey): Promise<boolean> => {
+    if (!user) return false;
+    setSavingStep(step);
     const { error } = await (supabase as never as typeof supabase)
       .from("solution_steps_progress" as never)
       .upsert(
         { user_id: user.id, solution_id: id, step, completed: true, completed_at: new Date().toISOString() } as never,
         { onConflict: "user_id,solution_id,step" } as never,
       );
+    setSavingStep(null);
     if (error) {
-      toast.error("Error al guardar progreso");
-      return;
+      toast.error("No pudimos guardar tu progreso. Intentá de nuevo.");
+      return false;
     }
-    qc.invalidateQueries({ queryKey: ["solution-step-progress", id, user.id] });
+    await qc.invalidateQueries({ queryKey: ["solution-step-progress", id, user.id] });
     qc.invalidateQueries({ queryKey: ["solutions-progress-all", user.id] });
+    return true;
   };
 
-  const advance = (next: StepKey) => setActiveStep(next);
+  const advanceTo = (next: StepKey) => {
+    setActiveStep(next);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleStepComplete = async (step: StepKey, next: StepKey) => {
+    const ok = await markStepCompleted(step);
+    if (!ok) return;
+    toast.success("¡Paso completado! Avanzando...");
+    advanceTo(next);
+  };
 
   useEffect(() => {
     if (!isLoading && (isError || !s)) navigate({ to: "/solutions" });
   }, [isLoading, isError, s, navigate]);
 
-  if (isLoading || !s) {
+  if (isLoading || !s || activeStep === null) {
     return (
       <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="h-8 w-64 animate-pulse rounded bg-zinc-900" />
+        <div className="mt-6 h-24 w-full animate-pulse rounded bg-zinc-900" />
+      </div>
+    );
+  }
+
+  if (progressError) {
+    return (
+      <div className="mx-auto max-w-3xl px-6 py-16 text-center">
+        <p className="text-sm text-zinc-300">No pudimos cargar tu progreso.</p>
+        <Button onClick={() => refetchProgress()} className="mt-4 bg-white text-black hover:bg-zinc-100">
+          Reintentar
+        </Button>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-[1100px] px-6 py-8">
-      {/* Header — two columns */}
+      {/* Header */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_auto] md:items-start">
         <div>
-          <Link
-            to="/solutions"
-            className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white"
-          >
+          <Link to="/solutions" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white">
             <ArrowLeft className="h-4 w-4" /> Soluciones
           </Link>
-          <h1 className="mt-3 text-3xl font-bold leading-tight text-white md:text-4xl">
-            <TitleWithAccent text={s.title} />
-          </h1>
+          <h1 className="mt-3 text-3xl font-bold leading-tight text-white md:text-4xl">{s.title}</h1>
           {s.short_description && (
             <p className="mt-2 max-w-xl text-sm text-zinc-400">{s.short_description}</p>
           )}
         </div>
 
-        {/* Progress card */}
         <div className="rounded-xl border border-white/8 bg-[#111111] p-4 md:w-[240px]">
-          <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-500">
-            Progreso
-          </div>
+          <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-500">Progreso</div>
           <div className="mt-1 text-2xl font-semibold text-white">{progressPct}%</div>
           <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-white/8">
-            <div
-              className="h-full bg-green-500 transition-all"
-              style={{ width: `${progressPct}%` }}
-            />
+            <div className="h-full bg-green-500 transition-all" style={{ width: `${progressPct}%` }} />
           </div>
           <div className="mt-3 text-xs text-zinc-500">
             {completedCount} de {STEPS.length} etapas completadas
@@ -167,11 +222,7 @@ function SolutionByIdDetail() {
               <div key={step.key} className="flex flex-1 flex-col items-center">
                 <div className="flex w-full items-center">
                   {i > 0 && (
-                    <div
-                      className={`h-px flex-1 transition ${
-                        prevCompleted ? "bg-green-500" : "bg-white/8"
-                      }`}
-                    />
+                    <div className={`h-px flex-1 transition ${prevCompleted ? "bg-green-500" : "bg-white/8"}`} />
                   )}
                   <button
                     onClick={() => setActiveStep(step.key)}
@@ -187,20 +238,12 @@ function SolutionByIdDetail() {
                     {isCompleted ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
                   </button>
                   {i < STEPS.length - 1 && (
-                    <div
-                      className={`h-px flex-1 transition ${
-                        isCompleted ? "bg-green-500" : "bg-white/8"
-                      }`}
-                    />
+                    <div className={`h-px flex-1 transition ${isCompleted ? "bg-green-500" : "bg-white/8"}`} />
                   )}
                 </div>
                 <span
                   className={`mt-2.5 text-center text-xs transition ${
-                    isActive
-                      ? "text-white font-medium"
-                      : isCompleted
-                      ? "text-green-500"
-                      : "text-zinc-600"
+                    isActive ? "text-white font-medium" : isCompleted ? "text-green-500" : "text-zinc-600"
                   }`}
                 >
                   {step.label}
@@ -215,59 +258,49 @@ function SolutionByIdDetail() {
       <div className="mt-10">
         {activeStep === "herramientas" && (
           <StepHerramientas
+            solutionId={id}
+            userId={user?.id ?? ""}
             tools={[...(s.tools_required ?? []), ...(s.integrations ?? [])]}
-            onComplete={async () => {
-              await markStepCompleted("herramientas");
-              advance("archivos");
-            }}
+            isCompleted={completedSet.has("herramientas")}
+            saving={savingStep === "herramientas"}
+            onComplete={() => handleStepComplete("herramientas", "archivos")}
           />
         )}
         {activeStep === "archivos" && (
           <StepArchivos
             solutionId={id}
             resources={s.resources ?? []}
-            onComplete={async () => {
-              await markStepCompleted("archivos");
-              advance("video");
-            }}
+            isCompleted={completedSet.has("archivos")}
+            saving={savingStep === "archivos"}
+            onComplete={() => handleStepComplete("archivos", "video")}
           />
         )}
         {activeStep === "video" && (
           <StepVideo
             videoUrl={s.video_url}
             title={s.title}
-            onComplete={async () => {
-              await markStepCompleted("video");
-              advance("comentarios");
-            }}
+            isCompleted={completedSet.has("video")}
+            saving={savingStep === "video"}
+            onComplete={() => handleStepComplete("video", "comentarios")}
           />
         )}
         {activeStep === "comentarios" && (
           <StepComentarios
             solutionId={id}
-            onComplete={async () => {
-              await markStepCompleted("comentarios");
-              advance("conclusion");
-            }}
+            isCompleted={completedSet.has("comentarios")}
+            saving={savingStep === "comentarios"}
+            onComplete={() => handleStepComplete("comentarios", "conclusion")}
           />
         )}
-        {activeStep === "conclusion" && (
+        {activeStep === "conclusion" && allPriorDone && (
           <StepConclusion
             solutionId={id}
+            solutionTitle={s.title}
             completedSet={completedSet}
+            saving={savingStep === "conclusion"}
             onFinalize={async () => {
-              await markStepCompleted("conclusion");
-              if (user) {
-                await (supabase as never as typeof supabase)
-                  .from("builder_projects")
-                  .insert({
-                    user_id: user.id,
-                    source_solution_id: id,
-                    type: "diy",
-                    status: "completed",
-                    title: s.title,
-                  } as never);
-              }
+              const ok = await markStepCompleted("conclusion");
+              if (!ok) return;
               navigate({ to: "/projects" });
             }}
           />
@@ -295,47 +328,111 @@ function renderToolIcon(name: string) {
   return <span className="text-2xl">🔧</span>;
 }
 
-function SectionHeader({
-  text,
-  action,
+function CompleteButton({
+  onClick,
+  saving,
+  disabled,
+  isCompleted,
+  disabledLabel,
+  label = "Marcar paso como completado",
 }: {
-  text: string;
-  action?: React.ReactNode;
+  onClick: () => void;
+  saving: boolean;
+  disabled?: boolean;
+  isCompleted: boolean;
+  disabledLabel?: string;
+  label?: string;
 }) {
+  if (isCompleted) {
+    return (
+      <Button disabled className="rounded-lg bg-zinc-800 px-6 py-2 text-zinc-400">
+        <Check className="mr-1.5 h-4 w-4" /> Paso completado
+      </Button>
+    );
+  }
+  return (
+    <Button
+      onClick={onClick}
+      disabled={disabled || saving}
+      className="rounded-lg bg-violet-500 px-6 py-2 text-white hover:bg-violet-600 disabled:opacity-40"
+    >
+      {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+      {disabled && !saving ? disabledLabel ?? label : label}
+    </Button>
+  );
+}
+
+function SectionHeader({ text, action }: { text: string; action?: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <h2 className="text-2xl font-bold text-white">
-        <TitleWithAccent text={text} />
-      </h2>
+      <h2 className="text-2xl font-bold text-white">{text}</h2>
       {action}
     </div>
   );
 }
 
-function StepHerramientas({ tools, onComplete }: { tools: string[]; onComplete: () => void }) {
+function StepHerramientas({
+  solutionId,
+  userId,
+  tools,
+  isCompleted,
+  saving,
+  onComplete,
+}: {
+  solutionId: string;
+  userId: string;
+  tools: string[];
+  isCompleted: boolean;
+  saving: boolean;
+  onComplete: () => void;
+}) {
+  const unique = useMemo(() => Array.from(new Set(tools.filter(Boolean))), [tools]);
+  const storageKey = `tools_${solutionId}_${userId}`;
   const [understood, setUnderstood] = useState<Set<string>>(new Set());
-  const unique = Array.from(new Set(tools.filter(Boolean)));
-  const allDone = unique.length > 0 && understood.size === unique.length;
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !userId) return;
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) setUnderstood(new Set(JSON.parse(raw)));
+    } catch {
+      /* ignore */
+    }
+  }, [storageKey, userId]);
+
+  // If step is already completed, treat all tools as understood
+  useEffect(() => {
+    if (isCompleted && unique.length > 0) setUnderstood(new Set(unique));
+  }, [isCompleted, unique]);
+
   const toggle = (t: string) => {
     setUnderstood((prev) => {
       const next = new Set(prev);
       if (next.has(t)) next.delete(t);
       else next.add(t);
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(Array.from(next)));
+      } catch {
+        /* ignore */
+      }
       return next;
     });
   };
+
+  const allDone = unique.length === 0 || understood.size >= unique.length;
+
   return (
     <div>
       <SectionHeader
         text="Herramientas de la Solución"
         action={
-          <Button
+          <CompleteButton
             onClick={onComplete}
-            disabled={!allDone && unique.length > 0}
-            className="rounded-lg bg-violet-500 px-6 py-2 text-white hover:bg-violet-600 disabled:opacity-40"
-          >
-            Concluido →
-          </Button>
+            saving={saving}
+            disabled={!allDone}
+            disabledLabel="Marcá todas las herramientas primero"
+            isCompleted={isCompleted}
+          />
         }
       />
       <p className="mt-2 text-sm text-zinc-400">
@@ -356,7 +453,7 @@ function StepHerramientas({ tools, onComplete }: { tools: string[]; onComplete: 
                 onClick={() => toggle(t)}
                 className={`relative rounded-xl border p-6 text-center transition duration-200 ${
                   isOk
-                    ? "border-violet-500 bg-zinc-900 shadow-lg shadow-violet-500/10"
+                    ? "border-green-500 bg-zinc-900 shadow-lg shadow-green-500/10"
                     : "border-zinc-800 bg-zinc-900 hover:scale-[1.02] hover:border-violet-500"
                 }`}
               >
@@ -364,7 +461,7 @@ function StepHerramientas({ tools, onComplete }: { tools: string[]; onComplete: 
                   <span className="text-violet-400">●</span> Esencial
                 </span>
                 {isOk && (
-                  <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-violet-500 text-white">
+                  <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white">
                     <Check className="h-3 w-3" />
                   </span>
                 )}
@@ -387,10 +484,14 @@ function StepHerramientas({ tools, onComplete }: { tools: string[]; onComplete: 
 function StepArchivos({
   solutionId,
   resources,
+  isCompleted,
+  saving,
   onComplete,
 }: {
   solutionId: string;
   resources: { title: string; url: string; type?: string }[];
+  isCompleted: boolean;
+  saving: boolean;
   onComplete: () => void;
 }) {
   const { user } = useAuth();
@@ -422,25 +523,18 @@ function StepArchivos({
       <SectionHeader
         text="Materiales y Recursos"
         action={
-          <Button
-            onClick={onComplete}
-            className="rounded-lg bg-violet-500 px-6 py-2 text-white hover:bg-violet-600"
-          >
-            Concluido →
-          </Button>
+          <CompleteButton onClick={onComplete} saving={saving} isCompleted={isCompleted} />
         }
       />
       <p className="mt-2 text-sm text-zinc-400">
         Descargá los materiales necesarios para implementar esta solución.
       </p>
 
-      <h3 className="mt-8 text-sm font-semibold uppercase tracking-wider text-zinc-400">
-        Links útiles
-      </h3>
+      <h3 className="mt-8 text-sm font-semibold uppercase tracking-wider text-zinc-400">Links útiles</h3>
       {resources.length === 0 ? (
         <div className="mt-3 flex flex-col items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 py-10 text-center">
           <Clock className="h-6 w-6 text-zinc-600" />
-          <p className="text-sm text-zinc-400">Los recursos estarán disponibles próximamente</p>
+          <p className="text-sm text-zinc-400">Recursos disponibles próximamente</p>
         </div>
       ) : (
         <div className="mt-3 space-y-2">
@@ -452,9 +546,12 @@ function StepArchivos({
               domain = r.url;
             }
             return (
-              <div
+              <a
                 key={i}
-                className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 p-4"
+                href={r.url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900 p-4 transition hover:border-violet-500/50"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800">
@@ -465,35 +562,37 @@ function StepArchivos({
                     <div className="truncate text-xs text-zinc-400">{domain}</div>
                   </div>
                 </div>
-                <a href={r.url} target="_blank" rel="noreferrer">
-                  <Button
-                    size="sm"
-                    className="bg-violet-500 text-white hover:bg-violet-600"
-                  >
-                    <Download className="mr-1.5 h-3.5 w-3.5" /> Descargar
-                  </Button>
-                </a>
-              </div>
+                <Button size="sm" className="bg-violet-500 text-white hover:bg-violet-600">
+                  <Download className="mr-1.5 h-3.5 w-3.5" /> Abrir
+                </Button>
+              </a>
             );
           })}
         </div>
       )}
 
-      <h3 className="mt-10 text-sm font-semibold uppercase tracking-wider text-zinc-400">
-        Tu prompt personalizado
-      </h3>
+      <h3 className="mt-10 text-sm font-semibold uppercase tracking-wider text-zinc-400">Tu prompt personalizado</h3>
       {session?.generated_prompt ? (
         <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900">
           <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
             <span className="text-xs text-zinc-400">Generado por el Builder</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={copyPrompt}
-              className="text-violet-400 hover:bg-zinc-800 hover:text-violet-300"
-            >
-              <Copy className="mr-1 h-3.5 w-3.5" /> Copiar
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={copyPrompt}
+                className="text-violet-400 hover:bg-zinc-800 hover:text-violet-300"
+              >
+                <Copy className="mr-1 h-3.5 w-3.5" /> Copiar
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => navigate({ to: "/builder/$solutionId", params: { solutionId } })}
+                className="bg-violet-500 text-white hover:bg-violet-600"
+              >
+                Ir al Builder →
+              </Button>
+            </div>
           </div>
           <pre className="max-h-72 overflow-auto whitespace-pre-wrap bg-zinc-900 p-4 font-mono text-xs text-zinc-300">
             {session.generated_prompt}
@@ -501,15 +600,12 @@ function StepArchivos({
         </div>
       ) : (
         <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900 p-6 text-center">
-          <p className="text-sm text-zinc-400">
-            Generá tu prompt personalizado con el Builder.
-          </p>
+          <p className="text-sm text-zinc-400">Generá tu prompt personalizado con el Builder.</p>
           <Button
             onClick={() => navigate({ to: "/builder/$solutionId", params: { solutionId } })}
-            variant="outline"
-            className="mt-3 border-violet-500 bg-transparent text-violet-400 hover:bg-violet-500/10 hover:text-violet-300"
+            className="mt-3 bg-violet-500 text-white hover:bg-violet-600"
           >
-            Ir al Builder →
+            Generar mi prompt con el Builder →
           </Button>
         </div>
       )}
@@ -520,10 +616,14 @@ function StepArchivos({
 function StepVideo({
   videoUrl,
   title,
+  isCompleted,
+  saving,
   onComplete,
 }: {
   videoUrl: string | null;
   title: string;
+  isCompleted: boolean;
+  saving: boolean;
   onComplete: () => void;
 }) {
   return (
@@ -531,12 +631,7 @@ function StepVideo({
       <SectionHeader
         text="Video de Implementación"
         action={
-          <Button
-            onClick={onComplete}
-            className="rounded-lg bg-violet-500 px-6 py-2 text-white hover:bg-violet-600"
-          >
-            Marcar como visto →
-          </Button>
+          <CompleteButton onClick={onComplete} saving={saving} isCompleted={isCompleted} label="Marcar como visto" />
         }
       />
       <p className="mt-2 text-sm text-zinc-400">Seguí el tutorial paso a paso.</p>
@@ -557,7 +652,7 @@ function StepVideo({
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-violet-500/20 ring-2 ring-violet-500/30">
               <Play className="h-9 w-9 fill-violet-400 text-violet-400" />
             </div>
-            <p className="text-sm font-medium text-zinc-300">Video disponible próximamente</p>
+            <p className="text-sm font-medium text-zinc-300">Video de implementación próximamente</p>
             <p className="text-xs text-zinc-600">Estamos preparando el tutorial de esta solución.</p>
           </div>
         )}
@@ -566,7 +661,17 @@ function StepVideo({
   );
 }
 
-function StepComentarios({ solutionId, onComplete }: { solutionId: string; onComplete: () => void }) {
+function StepComentarios({
+  solutionId,
+  isCompleted,
+  saving,
+  onComplete,
+}: {
+  solutionId: string;
+  isCompleted: boolean;
+  saving: boolean;
+  onComplete: () => void;
+}) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [rating, setRating] = useState<number | null>(null);
@@ -592,6 +697,11 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
     },
   });
 
+  const myComment = useMemo(
+    () => (comments ?? []).find((c) => c.user_id === user?.id) ?? null,
+    [comments, user?.id],
+  );
+
   const submit = async () => {
     if (!user || rating === null) {
       toast.error("Elegí una puntuación");
@@ -608,67 +718,89 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
       } as never);
     setSubmitting(false);
     if (error) {
-      toast.error("Error al enviar");
+      toast.error("Error al enviar evaluación");
       return;
     }
     setComment("");
     setRating(null);
+    toast.success("¡Gracias por tu evaluación!");
     qc.invalidateQueries({ queryKey: ["solution-comments", solutionId] });
-    onComplete();
   };
+
+  const canComplete = isCompleted || !!myComment;
 
   return (
     <div>
-      <SectionHeader text="Comentarios de la Solución" />
-      <p className="mt-2 text-sm text-zinc-400">
-        Dejá tu evaluación y mirá qué piensan otros.
-      </p>
+      <SectionHeader
+        text="Comentarios de la Solución"
+        action={
+          <CompleteButton
+            onClick={onComplete}
+            saving={saving}
+            isCompleted={isCompleted}
+            disabled={!canComplete}
+            disabledLabel="Enviá tu evaluación primero"
+          />
+        }
+      />
+      <p className="mt-2 text-sm text-zinc-400">Dejá tu evaluación y mirá qué piensan otros.</p>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[3fr_2fr]">
-        {/* Tu evaluación */}
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
           <div className="text-sm font-semibold text-white">Tu evaluación</div>
-          <p className="mt-1 text-xs text-zinc-400">
-            ¿Qué tan probable es que recomiendes esta solución?
-          </p>
 
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {Array.from({ length: 11 }).map((_, n) => (
-              <button
-                key={n}
-                onClick={() => setRating(n)}
-                className={`h-11 w-11 rounded-lg text-sm font-medium transition ${
-                  rating === n
-                    ? "scale-110 bg-violet-500 text-white shadow-md shadow-violet-500/30"
-                    : "bg-zinc-800 text-zinc-300 hover:bg-violet-500 hover:text-white"
-                }`}
+          {myComment ? (
+            <div className="mt-4 rounded-lg border border-green-500/30 bg-green-500/5 p-4">
+              <div className="flex items-center gap-2 text-sm text-green-400">
+                <Check className="h-4 w-4" /> Ya enviaste tu evaluación
+              </div>
+              <div className="mt-3 text-2xl font-bold text-white">{myComment.rating}/10</div>
+              {myComment.comment && (
+                <p className="mt-2 text-sm text-zinc-300">{myComment.comment}</p>
+              )}
+            </div>
+          ) : (
+            <>
+              <p className="mt-1 text-xs text-zinc-400">
+                ¿Qué tan probable es que recomiendes esta solución?
+              </p>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {Array.from({ length: 11 }).map((_, n) => (
+                  <button
+                    key={n}
+                    onClick={() => setRating(n)}
+                    className={`h-11 w-11 rounded-lg text-sm font-medium transition ${
+                      rating === n
+                        ? "scale-110 bg-violet-500 text-white shadow-md shadow-violet-500/30"
+                        : "bg-zinc-800 text-zinc-300 hover:bg-violet-500 hover:text-white"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 flex justify-between text-xs text-zinc-600">
+                <span>Nada probable</span>
+                <span>Muy probable</span>
+              </div>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Comentario sobre tu implementación (opcional)..."
+                className="mt-5 min-h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
+              />
+              <Button
+                onClick={submit}
+                disabled={submitting}
+                className="mt-4 h-11 w-full rounded-lg bg-violet-500 text-white hover:bg-violet-600"
               >
-                {n}
-              </button>
-            ))}
-          </div>
-          <div className="mt-2 flex justify-between text-xs text-zinc-600">
-            <span>Nada probable</span>
-            <span>Muy probable</span>
-          </div>
-
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Comentario sobre tu implementación (opcional)..."
-            className="mt-5 min-h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
-          />
-
-          <Button
-            onClick={submit}
-            disabled={submitting}
-            className="mt-4 h-11 w-full rounded-lg bg-violet-500 text-white hover:bg-violet-600"
-          >
-            Enviar evaluación
-          </Button>
+                {submitting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                Enviar evaluación
+              </Button>
+            </>
+          )}
         </div>
 
-        {/* Comentarios */}
         <div>
           <div className="flex items-center text-sm font-semibold text-white">
             Comentarios de la comunidad
@@ -682,17 +814,13 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
                 Sé el primero en comentar.
               </p>
             ) : (
-              comments.map((c) => {
-                const initial = "U";
+              comments.slice(0, 5).map((c) => {
                 const time = relativeTime(c.created_at);
                 return (
-                  <div
-                    key={c.id}
-                    className="rounded-xl border border-zinc-800 bg-zinc-900 p-4"
-                  >
+                  <div key={c.id} className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
                     <div className="flex items-center gap-2">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/20 text-xs font-bold text-violet-300">
-                        {initial}
+                        U
                       </div>
                       <span className="text-sm font-medium text-white">Usuario</span>
                       <span className="text-xs text-zinc-600">{time}</span>
@@ -702,9 +830,7 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
                         </span>
                       )}
                     </div>
-                    {c.comment && (
-                      <p className="mt-2 text-sm text-zinc-300">{c.comment}</p>
-                    )}
+                    {c.comment && <p className="mt-2 text-sm text-zinc-300">{c.comment}</p>}
                   </div>
                 );
               })
@@ -717,95 +843,120 @@ function StepComentarios({ solutionId, onComplete }: { solutionId: string; onCom
 }
 
 function StepConclusion({
+  solutionId,
+  solutionTitle,
   completedSet,
+  saving,
   onFinalize,
 }: {
   solutionId: string;
+  solutionTitle: string;
   completedSet: Set<StepKey>;
+  saving: boolean;
   onFinalize: () => void;
 }) {
-  const allFour = ["herramientas", "archivos", "video", "comentarios"] as StepKey[];
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { data: existingProject } = useQuery({
+    queryKey: ["project-for-solution", solutionId, user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("builder_projects")
+        .select("id")
+        .eq("user_id", user!.id)
+        .eq("source_solution_id", solutionId)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   return (
     <div className="mx-auto max-w-3xl">
-      {/* Celebration card */}
       <div className="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-900/30 to-zinc-900 p-10 text-center">
         <div className="text-6xl">🏆</div>
-        <h2 className="mt-4 bg-gradient-to-r from-violet-400 to-violet-400 bg-clip-text text-3xl font-bold text-transparent">
-          ¡Implementación Completada!
-        </h2>
+        <h2 className="mt-4 text-3xl font-bold text-white">¡Implementación Completada!</h2>
         <p className="mt-2 text-sm text-zinc-300">
-          Felicitaciones. Completaste todas las etapas de esta solución.
+          Completaste los 5 pasos de <span className="font-semibold text-white">{solutionTitle}</span>.
         </p>
       </div>
 
-      {/* Bottom grid */}
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-        {/* Tu Progreso */}
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold text-white">Tu Progreso</div>
-            <span className="rounded-full bg-violet-500/20 px-3 py-1 text-xs font-semibold text-violet-300">
+            <div className="text-sm font-semibold text-white">Tu progreso</div>
+            <span className="rounded-full bg-green-500/15 px-3 py-1 text-xs font-semibold text-green-400">
               100% COMPLETADO
             </span>
           </div>
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-            <div className="h-full w-full bg-gradient-to-r from-violet-500 to-green-500" />
+            <div className="h-full w-full bg-green-500" />
           </div>
           <div className="mt-4 space-y-2">
-            {allFour.map((k) => (
+            {STEPS.map((s) => (
               <div
-                key={k}
+                key={s.key}
                 className="flex items-center gap-2 rounded-lg bg-zinc-900/60 px-3 py-2 text-xs text-zinc-300"
               >
                 <Check
-                  className={`h-3.5 w-3.5 ${
-                    completedSet.has(k) ? "text-violet-400" : "text-zinc-700"
-                  }`}
+                  className={`h-3.5 w-3.5 ${completedSet.has(s.key) ? "text-green-500" : "text-zinc-700"}`}
                 />
-                <span className="capitalize">{k}</span>
+                <span>{s.label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Lo que recibís */}
         <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-          <div className="text-sm font-semibold text-white">Lo que recibís</div>
+          <div className="text-sm font-semibold text-white">Próximos pasos</div>
           <div className="mt-4 space-y-3">
             <div className="flex items-start gap-3">
               <Award className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
-              <div>
-                <div className="text-sm font-medium text-white">Acceso permanente</div>
-                <div className="text-xs text-zinc-400">
-                  Volvé a los materiales cuando quieras.
-                </div>
+              <div className="text-xs text-zinc-400">
+                Revisá otras soluciones del catálogo para seguir avanzando.
               </div>
             </div>
             <div className="flex items-start gap-3">
               <FileText className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
-              <div>
-                <div className="text-sm font-medium text-white">Prompt personalizado</div>
-                <div className="text-xs text-zinc-400">
-                  Tu configuración guardada en Mis Proyectos.
-                </div>
+              <div className="text-xs text-zinc-400">
+                Tu prompt personalizado está guardado en Mis Proyectos.
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Lock className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
-              <div>
-                <div className="text-sm font-medium text-white">Acceso a la comunidad</div>
-                <div className="text-xs text-zinc-400">
-                  Compartí tu experiencia y aprendé de otros.
-                </div>
+              <div className="text-xs text-zinc-400">
+                Compartí tu experiencia con la comunidad.
               </div>
             </div>
           </div>
-          <Button
-            onClick={onFinalize}
-            className="mt-6 h-12 w-full rounded-xl bg-white text-black hover:bg-zinc-100"
-          >
-            Finalizar implementación
-          </Button>
+          <div className="mt-6 space-y-2">
+            <Button
+              onClick={() => navigate({ to: "/solutions" })}
+              className="h-11 w-full rounded-xl bg-white text-black hover:bg-zinc-100"
+            >
+              Ver todas las soluciones →
+            </Button>
+            {existingProject && (
+              <Button
+                onClick={() => navigate({ to: "/projects" })}
+                variant="outline"
+                className="h-11 w-full rounded-xl border-zinc-700 bg-transparent text-zinc-200 hover:bg-zinc-800"
+              >
+                Ver mi proyecto →
+              </Button>
+            )}
+            <Button
+              onClick={onFinalize}
+              disabled={saving || completedSet.has("conclusion")}
+              variant="ghost"
+              className="h-10 w-full text-xs text-zinc-500 hover:bg-zinc-800/50"
+            >
+              {saving && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+              {completedSet.has("conclusion") ? "Finalizado" : "Marcar como finalizado"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
