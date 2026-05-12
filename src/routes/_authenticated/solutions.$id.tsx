@@ -38,16 +38,9 @@ const STEPS: { key: StepKey; label: string; Icon: typeof Wrench }[] = [
   { key: "conclusion", label: "Conclusión", Icon: Trophy },
 ];
 
-// Highlight last word of title in teal
+// Title without color accent (Linear style: white only)
 function TitleWithAccent({ text }: { text: string }) {
-  const parts = text.trim().split(" ");
-  if (parts.length < 2) return <>{text}</>;
-  const last = parts.pop()!;
-  return (
-    <>
-      {parts.join(" ")} <span className="text-violet-400">{last}</span>
-    </>
-  );
+  return <>{text}</>;
 }
 
 function SolutionByIdDetail() {
