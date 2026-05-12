@@ -1,0 +1,2 @@
+alter table public.solutions add column if not exists lovable_remix_url text;
+comment on column public.solutions.lovable_remix_url is 'URL del template oficial de Lovable para remix. Ej: https://lovable.dev/projects/<id>';
