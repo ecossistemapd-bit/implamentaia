@@ -455,6 +455,7 @@ function SolutionByIdDetail() {
           <StepArchivos
             solutionId={id}
             resources={s.resources ?? []}
+            lovableRemixUrl={s.lovable_remix_url}
             isCompleted={completedSet.has("archivos")}
             saving={savingStep === "archivos"}
             onComplete={() => handleStepComplete("archivos", "video")}
