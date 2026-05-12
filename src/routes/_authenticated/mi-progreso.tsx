@@ -79,8 +79,8 @@ function MiProgreso() {
         .filter((x): x is NonNullable<typeof x> => !!x)
         .sort((a, b) => b.completed - a.completed);
 
-      const solutionsStarted = solutionsInProgress.length;
       const solutionsCompleted = solutionsInProgress.filter((s) => s.completed >= 5).length;
+      const solutionsActive = solutionsInProgress.filter((s) => s.completed < 5).length;
 
       const modProg = ((modulesProgRes.data ?? []) as Array<{ module_id: string; completed: boolean; modules: { course_id: string } | null }>);
       const allMods = ((modulesAllRes.data ?? []) as Array<{ id: string; course_id: string }>);
