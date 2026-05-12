@@ -180,9 +180,9 @@ function SolutionsList() {
                     </div>
                     {!isDone && (
                       <div className="mt-3">
-                        <div className="h-0.5 w-full overflow-hidden rounded-full bg-white/8">
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
                           <div
-                            className="h-full bg-green-500"
+                            className="h-full bg-green-500 transition-all"
                             style={{ width: `${pct}%` }}
                           />
                         </div>
