@@ -226,124 +226,140 @@ function SolutionByIdDetail() {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  if (view === "overview") {
+    return (
+      <div className="mx-auto max-w-[1100px] px-6 py-8">
+        <Link to="/solutions" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white">
+          <ArrowLeft className="h-4 w-4" /> Soluciones
+        </Link>
+
+        {/* Header — 2 columns */}
+        <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-[3fr_2fr] md:items-center">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
+                <CategoryIcon className="h-3.5 w-3.5" /> {categoryLabel}
+              </span>
+              <span className="inline-flex items-center rounded-full border border-white/10 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
+                {difficultyLabel}
+              </span>
+            </div>
+            <h1 className="mt-4 text-3xl font-bold leading-tight text-white md:text-5xl">{s.title}</h1>
+            {s.short_description && (
+              <p className="mt-3 max-w-xl text-base text-zinc-400">{s.short_description}</p>
+            )}
+            <Button
+              onClick={goToJourney}
+              className="mt-6 rounded-lg bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-violet-600"
+            >
+              Continuar Solución <ArrowRight className="ml-1.5 h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
+            {s.cover_image_url ? (
+              <img
+                src={s.cover_image_url}
+                alt={s.title}
+                className="h-full max-h-[260px] w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-[220px] w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
+                <CategoryIcon className="h-20 w-20 text-zinc-700" strokeWidth={1.2} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Stat cards — 2 rows of 3 */}
+        <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <StatCard label="Categoría" value={categoryLabel} />
+          <StatCard label="Nivel" value={difficultyLabel} />
+          <StatCard label="Tiempo Estimado" value={s.estimated_time || "Variable"} />
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <StatCard
+            label="Inversión de la Plataforma"
+            value={s.platform_investment || "—"}
+            hint="Valor que la plataforma invirtió para que tengas esta solución."
+          />
+          <StatCard
+            label="Tiempo de Desarrollo"
+            value={s.development_time_minutes ? `${s.development_time_minutes} min` : "—"}
+            hint="Tiempo dedicado a elaborar y estructurar esta solución."
+          />
+          <StatCard
+            label="Tokens por Ejecución"
+            value={s.tokens_per_execution ? s.tokens_per_execution.toLocaleString() : "—"}
+            hint="Promedio de tokens usados en cada ejecución."
+          />
+        </div>
+
+        {/* About + Experto */}
+        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[7fr_3fr]">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
+            <h2 className="text-xl font-bold text-white">Sobre esta solución</h2>
+            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-300">
+              {longDesc || "Sin descripción disponible."}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
+            <div className="flex items-center -space-x-2">
+              {["bg-violet-500", "bg-emerald-500", "bg-amber-500"].map((c, i) => (
+                <div
+                  key={i}
+                  className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-zinc-900 ${c} text-xs font-bold text-white`}
+                >
+                  {String.fromCharCode(65 + i)}
+                </div>
+              ))}
+            </div>
+            <span className="mt-4 inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
+              <CheckCircle2 className="h-3 w-3" /> Verificados
+            </span>
+            <h3 className="mt-3 text-lg font-bold text-white">Implementador Partner</h3>
+            <p className="mt-2 text-sm text-zinc-400">
+              Conectá con un especialista dedicado para implementar esta solución en tu negocio.
+            </p>
+            <ul className="mt-4 space-y-2 text-sm text-zinc-300">
+              {[
+                "Implementador dedicado a tu proyecto",
+                "Acompañamiento completo del proceso",
+                "Soporte durante la implementación",
+              ].map((t) => (
+                <li key={t} className="flex items-start gap-2">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
+            <Button
+              onClick={() => navigate({ to: "/contratar-experto" })}
+              className="mt-5 w-full rounded-lg bg-teal-500 py-2.5 text-sm font-semibold text-white hover:bg-teal-600"
+            >
+              Contratar Implementador <ArrowRight className="ml-1.5 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // VIEW 2 — Journey
   return (
     <div className="mx-auto max-w-[1100px] px-6 py-8">
-      <Link to="/solutions" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white">
+      {/* Minimal header */}
+      <button
+        onClick={goToOverview}
+        className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white"
+      >
         <ArrowLeft className="h-4 w-4" /> Soluciones
-      </Link>
-
-      {/* Header — 2 columns */}
-      <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-[3fr_2fr] md:items-center">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
-              <CategoryIcon className="h-3.5 w-3.5" /> {categoryLabel}
-            </span>
-            <span className="inline-flex items-center rounded-full border border-white/10 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
-              {difficultyLabel}
-            </span>
-          </div>
-          <h1 className="mt-4 text-3xl font-bold leading-tight text-white md:text-5xl">{s.title}</h1>
-          {s.short_description && (
-            <p className="mt-3 max-w-xl text-base text-zinc-400">{s.short_description}</p>
-          )}
-          <Button
-            onClick={scrollToSteps}
-            className="mt-6 rounded-lg bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-violet-600"
-          >
-            Continuar Solución <ArrowRight className="ml-1.5 h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
-          {s.cover_image_url ? (
-            <img
-              src={s.cover_image_url}
-              alt={s.title}
-              className="h-full max-h-[260px] w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-[220px] w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
-              <CategoryIcon className="h-20 w-20 text-zinc-700" strokeWidth={1.2} />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Stat cards — 2 rows of 3 */}
-      <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <StatCard label="Categoría" value={categoryLabel} />
-        <StatCard label="Nivel" value={difficultyLabel} />
-        <StatCard label="Tiempo Estimado" value={s.estimated_time || "Variable"} />
-      </div>
-      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <StatCard
-          label="Inversión de la Plataforma"
-          value={s.platform_investment || "—"}
-          hint="Valor que la plataforma invirtió para que tengas esta solución."
-        />
-        <StatCard
-          label="Tiempo de Desarrollo"
-          value={s.development_time_minutes ? `${s.development_time_minutes} min` : "—"}
-          hint="Tiempo dedicado a elaborar y estructurar esta solución."
-        />
-        <StatCard
-          label="Tokens por Ejecución"
-          value={s.tokens_per_execution ? s.tokens_per_execution.toLocaleString() : "—"}
-          hint="Promedio de tokens usados en cada ejecución."
-        />
-      </div>
-
-      {/* About + Experto */}
-      <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[7fr_3fr]">
-        <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
-          <h2 className="text-xl font-bold text-white">Sobre esta solución</h2>
-          <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-300">
-            {longDesc || "Sin descripción disponible."}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-6">
-          <div className="flex items-center -space-x-2">
-            {["bg-violet-500", "bg-emerald-500", "bg-amber-500"].map((c, i) => (
-              <div
-                key={i}
-                className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-zinc-900 ${c} text-xs font-bold text-white`}
-              >
-                {String.fromCharCode(65 + i)}
-              </div>
-            ))}
-          </div>
-          <span className="mt-4 inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
-            <CheckCircle2 className="h-3 w-3" /> Verificados
-          </span>
-          <h3 className="mt-3 text-lg font-bold text-white">Implementador Partner</h3>
-          <p className="mt-2 text-sm text-zinc-400">
-            Conectá con un especialista dedicado para implementar esta solución en tu negocio.
-          </p>
-          <ul className="mt-4 space-y-2 text-sm text-zinc-300">
-            {[
-              "Implementador dedicado a tu proyecto",
-              "Acompañamiento completo del proceso",
-              "Soporte durante la implementación",
-            ].map((t) => (
-              <li key={t} className="flex items-start gap-2">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
-                <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-          <Button
-            onClick={() => navigate({ to: "/contratar-experto" })}
-            className="mt-5 w-full rounded-lg bg-teal-500 py-2.5 text-sm font-semibold text-white hover:bg-teal-600"
-          >
-            Contratar Implementador <ArrowRight className="ml-1.5 h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      </button>
+      <h1 className="mt-4 text-2xl font-bold text-white md:text-3xl">{s.title}</h1>
 
       {/* Progress summary */}
-      <div id="solution-steps" className="mt-12 rounded-xl border border-white/8 bg-[#111111] p-4">
+      <div className="mt-6 rounded-xl border border-white/8 bg-[#111111] p-4">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-500">Tu progreso</div>
