@@ -86,7 +86,7 @@ function SolutionsList() {
   return (
     <div className="mx-auto max-w-[1100px] px-6 py-10">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Soluciones de <span className="text-teal-400">IA</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Soluciones de <span className="text-white">IA</span></h1>
         <p className="mt-1 text-sm text-zinc-400">
           Implementaciones reales y listas para tu empresa.
         </p>
@@ -138,15 +138,12 @@ function SolutionsList() {
                 <Link
                   key={s.id}
                   {...linkProps}
-                  className="group flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 transition duration-200 hover:scale-[1.01] hover:border-teal-500"
+                  className="group flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 transition duration-200 hover:border-zinc-700"
                 >
                   {/* Card header with icon */}
-                  <div className="flex h-28 items-center justify-center bg-zinc-800/30">
-                    <div
-                      className="flex h-20 w-20 items-center justify-center rounded-2xl border border-zinc-700/50 bg-zinc-800/50"
-                      style={{ boxShadow: "0 0 24px rgba(20, 184, 166, 0.10)" }}
-                    >
-                      <Icon className="h-9 w-9 text-teal-400" strokeWidth={1.5} />
+                  <div className="flex h-28 items-center justify-center bg-zinc-950">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900">
+                      <Icon className="h-9 w-9 text-zinc-300" strokeWidth={1.5} />
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col p-5">
@@ -217,19 +214,19 @@ function SolutionsList() {
 }
 
 const CATEGORY_COLOR: Record<string, string> = {
-  ventas: "border-sky-500/30 bg-sky-500/10 text-sky-300",
-  marketing: "border-purple-500/30 bg-purple-500/10 text-purple-300",
-  atencion: "border-teal-500/30 bg-teal-500/10 text-teal-300",
-  finanzas: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-  operaciones: "border-amber-500/30 bg-amber-500/10 text-amber-300",
-  rrhh: "border-pink-500/30 bg-pink-500/10 text-pink-300",
-  default: "border-zinc-700 bg-zinc-800/50 text-zinc-300",
+  ventas: "border-zinc-700 bg-zinc-800 text-zinc-300",
+  marketing: "border-zinc-700 bg-zinc-800 text-zinc-300",
+  atencion: "border-zinc-700 bg-zinc-800 text-zinc-300",
+  finanzas: "border-zinc-700 bg-zinc-800 text-zinc-300",
+  operaciones: "border-zinc-700 bg-zinc-800 text-zinc-300",
+  rrhh: "border-zinc-700 bg-zinc-800 text-zinc-300",
+  default: "border-zinc-700 bg-zinc-800 text-zinc-300",
 };
 
 const DIFFICULTY_COLOR: Record<Difficulty, string> = {
-  principiante: "border-green-500/30 bg-green-500/10 text-green-300",
-  intermedio: "border-yellow-500/30 bg-yellow-500/10 text-yellow-300",
-  avanzado: "border-red-500/30 bg-red-500/10 text-red-300",
+  principiante: "border-zinc-700 bg-zinc-800 text-zinc-300",
+  intermedio: "border-zinc-700 bg-zinc-800 text-zinc-300",
+  avanzado: "border-zinc-700 bg-zinc-800 text-zinc-300",
 };
 
 function FilterChip({
@@ -247,8 +244,8 @@ function FilterChip({
       onClick={onClick}
       className={`h-8 rounded-full border px-3.5 text-xs font-medium transition ${
         active
-          ? "border-teal-500 bg-teal-500 text-white"
-          : "border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-zinc-700 hover:text-white"
+          ? "border-white bg-white text-black"
+          : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:text-white"
       }`}
     >
       {children}
