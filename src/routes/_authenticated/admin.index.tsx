@@ -392,3 +392,263 @@ function ProjectsTab({ filterUserId, onClearFilter }: { filterUserId: string | n
     </div>
   );
 }
+
+// ===================== SolutionsTab =====================
+
+type ResourceLink = {
+  type?: string;
+  title: string;
+  description?: string;
+  url: string;
+  domain?: string;
+};
+
+type SolutionRow = {
+  id: string;
+  title: string;
+  category: string;
+  resources: ResourceLink[] | null;
+};
+
+function extractDomain(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "").toUpperCase();
+  } catch {
+    return "";
+  }
+}
+
+function SolutionsTab() {
+  const qc = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-solutions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("solutions")
+        .select("id, title, category, resources")
+        .order("title");
+      if (error) throw error;
+      return (data ?? []) as unknown as SolutionRow[];
+    },
+  });
+
+  const filtered = useMemo(() => {
+    const s = search.trim().toLowerCase();
+    const rows = data ?? [];
+    if (!s) return rows;
+    return rows.filter(
+      (r) =>
+        r.title.toLowerCase().includes(s) ||
+        (r.category ?? "").toLowerCase().includes(s),
+    );
+  }, [data, search]);
+
+  const saveResources = async (id: string, resources: ResourceLink[]) => {
+    const { error } = await supabase
+      .from("solutions")
+      .update({ resources: resources as never })
+      .eq("id", id);
+    if (error) {
+      toast.error("Error: " + error.message);
+      return false;
+    }
+    toast.success("✓ Links actualizados");
+    qc.invalidateQueries({ queryKey: ["admin-solutions"] });
+    return true;
+  };
+
+  return (
+    <div className="mt-6">
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="text-sm text-gray-500">
+          {(data ?? []).length} soluciones · gestioná los links útiles de cada una
+        </div>
+        <Input
+          placeholder="Buscar solución…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="h-9 w-full sm:max-w-xs text-sm"
+        />
+      </div>
+
+      <div className="space-y-2">
+        {isLoading ? (
+          <div className="rounded-xl border border-gray-200 bg-white px-4 py-10 text-center text-xs text-gray-400">
+            Cargando…
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-gray-200 bg-white px-4 py-10 text-center text-xs text-gray-400">
+            Sin resultados.
+          </div>
+        ) : (
+          filtered.map((sol) => (
+            <div
+              key={sol.id}
+              className="overflow-hidden rounded-xl border border-gray-200 bg-white"
+            >
+              <button
+                onClick={() => setOpenId((cur) => (cur === sol.id ? null : sol.id))}
+                className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50"
+              >
+                <div>
+                  <div className="text-sm font-semibold text-gray-900">{sol.title}</div>
+                  <div className="text-xs text-gray-500">
+                    {sol.category} · {sol.resources?.length ?? 0} links
+                  </div>
+                </div>
+                <span className="text-xs text-gray-400">
+                  {openId === sol.id ? "Cerrar" : "Editar links"}
+                </span>
+              </button>
+
+              {openId === sol.id && (
+                <ResourcesEditor
+                  initial={sol.resources ?? []}
+                  onSave={(next) => saveResources(sol.id, next)}
+                />
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ResourcesEditor({
+  initial,
+  onSave,
+}: {
+  initial: ResourceLink[];
+  onSave: (next: ResourceLink[]) => Promise<boolean>;
+}) {
+  const [items, setItems] = useState<ResourceLink[]>(initial);
+  const [adding, setAdding] = useState(false);
+  const [draft, setDraft] = useState<ResourceLink>({
+    type: "link",
+    title: "",
+    description: "",
+    url: "",
+  });
+  const [saving, setSaving] = useState(false);
+
+  const removeAt = (i: number) => {
+    setItems((prev) => prev.filter((_, idx) => idx !== i));
+  };
+
+  const addDraft = () => {
+    if (!draft.title.trim() || !draft.url.trim()) {
+      toast.error("Título y URL son obligatorios");
+      return;
+    }
+    const next: ResourceLink = {
+      type: "link",
+      title: draft.title.trim(),
+      description: draft.description?.trim() || undefined,
+      url: draft.url.trim(),
+      domain: extractDomain(draft.url.trim()),
+    };
+    setItems((prev) => [...prev, next]);
+    setDraft({ type: "link", title: "", description: "", url: "" });
+    setAdding(false);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const ok = await onSave(items);
+    setSaving(false);
+    if (!ok) return;
+  };
+
+  return (
+    <div className="border-t border-gray-200 bg-gray-50 p-4">
+      <div className="space-y-2">
+        {items.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-gray-300 bg-white px-4 py-6 text-center text-xs text-gray-400">
+            No hay links todavía.
+          </div>
+        ) : (
+          items.map((it, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2"
+            >
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium text-gray-900">
+                  {it.title}
+                </div>
+                <div className="truncate text-xs text-gray-500">{it.url}</div>
+              </div>
+              <span className="rounded bg-gray-100 px-2 py-0.5 text-[10px] font-medium tracking-wider text-gray-600">
+                {it.domain || extractDomain(it.url)}
+              </span>
+              <button
+                onClick={() => removeAt(i)}
+                className="text-xs text-red-600 hover:underline"
+              >
+                Eliminar
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+
+      {adding ? (
+        <div className="mt-3 space-y-2 rounded-lg border border-gray-200 bg-white p-3">
+          <Input
+            placeholder="Título"
+            value={draft.title}
+            onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+            className="h-9 text-sm"
+          />
+          <Input
+            placeholder="Descripción (opcional)"
+            value={draft.description ?? ""}
+            onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+            className="h-9 text-sm"
+          />
+          <Input
+            placeholder="https://…"
+            value={draft.url}
+            onChange={(e) => setDraft({ ...draft, url: e.target.value })}
+            className="h-9 text-sm"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={addDraft}
+              className="rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background"
+            >
+              Agregar
+            </button>
+            <button
+              onClick={() => setAdding(false)}
+              className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => setAdding(true)}
+          className="mt-3 rounded-md border border-dashed border-gray-300 bg-white px-3 py-2 text-xs text-gray-600 hover:bg-gray-100"
+        >
+          + Agregar Link
+        </button>
+      )}
+
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="rounded-md bg-foreground px-4 py-2 text-xs font-medium text-background disabled:opacity-50"
+        >
+          {saving ? "Guardando…" : "Guardar cambios"}
+        </button>
+      </div>
+    </div>
+  );
+}
