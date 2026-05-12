@@ -24,6 +24,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useRole } from "@/hooks/use-role";
+import { FEATURES } from "@/lib/features";
 import { Logo } from "@/components/logo";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { Button } from "@/components/ui/button";
@@ -192,6 +193,7 @@ function NavList() {
       SECTIONS.map((sec) => ({
         ...sec,
         items: sec.items
+          .filter((it) => FEATURES.MARKETPLACE || (it.to !== "/contratar-experto" && it.to !== "/implementador"))
           .filter((it) => (!it.implOnly || isImplementer) && (!it.adminOnly || isAdmin))
           .map((it) => (it.to === "/cursos" && cursosVisited ? { ...it, badge: undefined } : it)),
       })).filter((sec) => sec.items.length > 0),

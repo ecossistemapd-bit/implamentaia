@@ -1,7 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { HeartHandshake, CheckCircle2, ArrowRight } from "lucide-react";
+import { FEATURES } from "@/lib/features";
 
 export const Route = createFileRoute("/_authenticated/contratar-experto")({
+  beforeLoad: () => {
+    if (!FEATURES.MARKETPLACE) throw redirect({ to: "/dashboard" });
+  },
   component: ContratarExperto,
 });
 

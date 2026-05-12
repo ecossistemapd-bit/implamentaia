@@ -25,6 +25,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { CATEGORIES, CATEGORY_LABEL, DIFFICULTY_LABEL, type CategoryKey, type Difficulty } from "@/lib/categories";
+import { FEATURES } from "@/lib/features";
 import confetti from "canvas-confetti";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -320,7 +321,7 @@ function SolutionByIdDetail() {
         </div>
 
         {/* About + Experto */}
-        <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[7fr_3fr]">
+        <div className={`mt-6 grid grid-cols-1 gap-4 ${FEATURES.MARKETPLACE ? "lg:grid-cols-[7fr_3fr]" : ""}`}>
           <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
             <h2 className="text-xl font-bold text-white">Sobre esta solución</h2>
             <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-300">
@@ -328,6 +329,7 @@ function SolutionByIdDetail() {
             </p>
           </div>
 
+          {FEATURES.MARKETPLACE && (
           <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
             <div className="flex items-center -space-x-2">
               {["bg-violet-500", "bg-emerald-500", "bg-amber-500"].map((c, i) => (
@@ -365,6 +367,7 @@ function SolutionByIdDetail() {
               Contratar Implementador <ArrowRight className="ml-1.5 h-4 w-4" />
             </Button>
           </div>
+          )}
         </div>
       </div>
     );

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Check, Copy, ExternalLink, LifeBuoy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { FEATURES } from "@/lib/features";
 import type { Database } from "@/integrations/supabase/types";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -470,6 +471,7 @@ function BuilderWizard() {
             subtitle="Los workflows que necesitás crear en n8n para esta solución."
           >
             <N8nTemplate template={solution.n8n_template ?? ""} />
+            {FEATURES.MARKETPLACE && (
             <div className="mt-6 rounded-[10px] bg-muted/60 p-4">
               <h4 className="text-[13px] font-semibold">¿Necesitás ayuda con n8n?</h4>
               <p className="mt-1 text-[12px] text-muted-foreground">
@@ -487,6 +489,7 @@ function BuilderWizard() {
                 Contratar implementador →
               </Button>
             </div>
+            )}
           </Step>
         )}
 
