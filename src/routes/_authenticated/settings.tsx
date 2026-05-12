@@ -43,7 +43,7 @@ function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-12 lg:py-16">
-      <h1 className="border-l-4 border-teal-500 pl-4 text-2xl font-bold text-white">Configuración</h1>
+      <h1 className="border-l-4 border-violet-500 pl-4 text-2xl font-bold text-white">Configuración</h1>
 
       <div className="mt-10 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
         <h2 className="text-base font-medium text-white">Perfil</h2>

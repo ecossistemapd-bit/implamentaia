@@ -691,7 +691,7 @@ function Checklist({
       </div>
       <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-muted">
         <div
-          className="h-full bg-emerald-500 transition-all"
+          className="h-full bg-green-500 transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -718,7 +718,7 @@ function Checklist({
               </span>
               <span
                 className={`text-[13px] ${
-                  checks[i] ? "line-through text-emerald-700 dark:text-emerald-400" : "text-foreground"
+                  checks[i] ? "line-through text-emerald-700 dark:text-green-400" : "text-foreground"
                 }`}
               >
                 {item}

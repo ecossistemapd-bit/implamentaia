@@ -33,7 +33,7 @@ function ContratarExperto() {
               key={b}
               className="flex items-start gap-2 rounded-lg border border-zinc-700 bg-zinc-800/50 p-3 text-sm text-zinc-200"
             >
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-teal-400" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-violet-400" />
               <span>{b}</span>
             </li>
           ))}

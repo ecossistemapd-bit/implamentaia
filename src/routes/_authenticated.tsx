@@ -135,7 +135,7 @@ function AuthenticatedLayout() {
 
 function DesktopSidebar() {
   return (
-    <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 border-r border-zinc-800/50 bg-zinc-950 lg:flex lg:flex-col">
+    <aside className="sticky top-0 hidden h-screen w-[220px] shrink-0 border-r border-white/6 bg-[#0A0A0A] lg:flex lg:flex-col">
       <div className="px-5 py-5">
         <Logo />
       </div>
@@ -213,7 +213,7 @@ function NavList() {
                   />
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span className="ml-auto rounded-full border border-teal-500/40 bg-gradient-to-r from-teal-500/20 to-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-teal-400">
+                    <span className="ml-auto rounded-md border border-violet-500/30 bg-violet-500/10 px-1.5 py-0.5 text-[10px] font-medium text-violet-400">
                       {item.badge}
                     </span>
                   )}

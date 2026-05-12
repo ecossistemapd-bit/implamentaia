@@ -24,14 +24,14 @@ function thumbGradient(title: string) {
   if (t.includes("lovable")) return { gradient: "from-purple-900 via-violet-800 to-zinc-900", initial: "L" };
   if (t.includes("claude")) return { gradient: "from-orange-900 via-amber-800 to-zinc-900", initial: "C" };
   if (t.includes("n8n")) return { gradient: "from-green-900 via-emerald-800 to-zinc-900", initial: "n8n" };
-  return { gradient: "from-teal-900 via-sky-900 to-zinc-900", initial: "AI" };
+  return { gradient: "from-violet-900 via-sky-900 to-zinc-900", initial: "AI" };
 }
 
 function levelClass(level: string | null) {
   const l = (level ?? "").toLowerCase();
   if (l.includes("avanz")) return "bg-rose-500/20 text-rose-300 border-rose-500/40";
   if (l.includes("interm")) return "bg-amber-500/20 text-amber-300 border-amber-500/40";
-  return "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
+  return "bg-green-500/20 text-emerald-300 border-green-500/40";
 }
 
 function CourseDetailPage() {
@@ -127,7 +127,7 @@ function CourseDetailPage() {
     <div className="min-h-screen bg-zinc-950">
       <header className="border-b border-zinc-900 bg-zinc-900/70 px-6 py-3 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <Link to="/cursos" className="flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-teal-400">
+          <Link to="/cursos" className="flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-violet-400">
             <ArrowLeft className="h-4 w-4" /> Cursos
           </Link>
           <span className="text-sm text-zinc-400">
@@ -148,7 +148,7 @@ function CourseDetailPage() {
             <div className="absolute bottom-0 left-0 right-0 p-8">
               <div className="flex flex-wrap items-center gap-2">
                 {course?.category && (
-                  <span className="rounded-md border border-teal-500/40 bg-teal-500/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-teal-300">
+                  <span className="rounded-md border border-violet-500/40 bg-violet-500/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-violet-300">
                     {course.category}
                   </span>
                 )}
@@ -209,8 +209,8 @@ function CourseDetailPage() {
                     onClick={toggleComplete}
                     className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
                       progress?.[selected.id]
-                        ? "border border-teal-500/40 bg-teal-500/10 text-teal-300 hover:bg-teal-500/20"
-                        : "bg-gradient-to-r from-teal-500 to-sky-500 text-white shadow-lg shadow-teal-500/20 hover:scale-[1.02]"
+                        ? "border border-violet-500/40 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20"
+                        : "bg-gradient-to-r from-violet-500 to-violet-500 text-white shadow-lg shadow-violet-500/20 hover:scale-[1.02]"
                     }`}
                   >
                     <Check className="h-4 w-4" />
@@ -220,7 +220,7 @@ function CourseDetailPage() {
                   {nextModule && (
                     <button
                       onClick={() => setSelectedId(nextModule.id)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:border-teal-500/50 hover:text-teal-300"
+                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:border-violet-500/50 hover:text-violet-300"
                     >
                       Siguiente módulo <ChevronRight className="h-4 w-4" />
                     </button>
@@ -233,7 +233,7 @@ function CourseDetailPage() {
                     <span>{done} de {total} completados</span>
                   </div>
                   <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-                    <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
+                    <div className="h-full bg-violet-400 transition-all" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               </div>
@@ -247,7 +247,7 @@ function CourseDetailPage() {
                 <div className="text-xs font-semibold uppercase tracking-widest text-zinc-400">Módulos</div>
                 <button
                   onClick={() => modules && modules[0] && setSelectedId(modules[0].id)}
-                  className="text-xs font-semibold text-teal-400 hover:text-teal-300"
+                  className="text-xs font-semibold text-violet-400 hover:text-violet-300"
                   disabled={!modules || modules.length === 0}
                 >
                   {inProgress ? "Continuar donde lo dejé" : "Comenzar curso"}
@@ -264,16 +264,16 @@ function CourseDetailPage() {
                       onClick={() => setSelectedId(m.id)}
                       className={`flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors ${
                         isActive
-                          ? "border border-teal-500/40 bg-teal-500/10"
+                          ? "border border-violet-500/40 bg-violet-500/10"
                           : "border border-transparent hover:bg-zinc-800/40"
                       }`}
                     >
                       <div
                         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
                           isDone
-                            ? "bg-teal-500 text-white"
+                            ? "bg-violet-500 text-white"
                             : isActive
-                              ? "border-2 border-teal-400 text-teal-300"
+                              ? "border-2 border-violet-400 text-violet-300"
                               : "border-2 border-zinc-700 text-zinc-400"
                         }`}
                       >
@@ -303,7 +303,7 @@ function CourseDetailPage() {
                     {done} de {total} módulos completados
                   </div>
                   <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-                    <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
+                    <div className="h-full bg-violet-400 transition-all" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               )}

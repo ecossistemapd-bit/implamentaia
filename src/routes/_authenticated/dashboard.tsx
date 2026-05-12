@@ -134,7 +134,7 @@ function Dashboard() {
               <Flame className="h-3.5 w-3.5" /> {streakDays} días consecutivos
             </span>
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-white">
-              {tod}, <span className="text-white">{greetName}</span>! 👋
+              {tod}, <span className="text-white">{greetName}</span>
             </h1>
             <p className="mt-2 max-w-lg text-sm text-zinc-400">
               Seguí construyendo tu negocio con IA. Explorá soluciones, avanzá en tus cursos.
@@ -174,7 +174,7 @@ function Dashboard() {
               <div className="mt-3 text-3xl font-bold text-white">{s.value}</div>
               <div className="mt-1 text-xs text-zinc-400">{s.label}</div>
               <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
-                <div className="h-full bg-teal-400 transition-all" style={{ width: `${Math.min(100, s.value * 20)}%` }} />
+                <div className="h-full bg-violet-400 transition-all" style={{ width: `${Math.min(100, s.value * 20)}%` }} />
               </div>
             </div>
           ))}
@@ -198,7 +198,7 @@ function Dashboard() {
               <ul className="divide-y divide-zinc-800/40">
                 {(data?.recent ?? []).map((a, i) => (
                   <li key={i} className="flex items-center gap-3 py-3 text-sm">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-500/10 text-teal-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/10 text-violet-400">
                       <Activity className="h-4 w-4" />
                     </div>
                     <span className="flex-1 text-zinc-200">{a.label}</span>
@@ -245,15 +245,15 @@ function EnProgreso({ inProgress }: { inProgress: Array<{ id: string; title: str
                   key={s.id}
                   to="/solutions/$id"
                   params={{ id: s.id }}
-                  className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-3 transition hover:border-teal-500/50"
+                  className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-3 transition hover:border-violet-500/50"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-500/10 text-teal-400">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10 text-violet-400">
                     <Sparkles className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-medium text-zinc-100">{s.title}</div>
                     <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
-                      <div className="h-full bg-teal-400" style={{ width: `${pct}%` }} />
+                      <div className="h-full bg-violet-400" style={{ width: `${pct}%` }} />
                     </div>
                     <div className="mt-1 text-[11px] text-zinc-600">{s.completed} de 5 pasos</div>
                   </div>
@@ -277,7 +277,7 @@ function Empty({ text, cta, to }: { text: string; cta: string; to: "/solutions" 
       <p className="mt-2 text-sm text-zinc-400">{text}</p>
       <Link
         to={to}
-        className="mt-3 inline-flex items-center gap-1 rounded-lg border border-teal-500/40 bg-teal-500/10 px-4 py-2 text-sm font-medium text-teal-400 hover:bg-teal-500/20"
+        className="mt-3 inline-flex items-center gap-1 rounded-lg border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-400 hover:bg-violet-500/20"
       >
         {cta} <ArrowRight className="h-3.5 w-3.5" />
       </Link>
@@ -287,12 +287,12 @@ function Empty({ text, cta, to }: { text: string; cta: string; to: "/solutions" 
 
 function Recomendacion({ sol }: { sol: { id: string; title: string; short_description: string } | null }) {
   return (
-    <div className="rounded-2xl border border-teal-500/20 bg-zinc-900 p-6">
+    <div className="rounded-2xl border border-violet-500/20 bg-zinc-900 p-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-teal-400">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-violet-400">
           <Bot className="h-4 w-4" /> Recomendación de IA
         </div>
-        <span className="rounded-full border border-teal-500/30 bg-teal-500/10 px-2 py-0.5 text-[10px] font-semibold text-teal-400">
+        <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-400">
           ANÁLISIS INTELIGENTE
         </span>
       </div>
@@ -300,17 +300,17 @@ function Recomendacion({ sol }: { sol: { id: string; title: string; short_descri
         <Link
           to="/solutions/$id"
           params={{ id: sol.id }}
-          className="mt-4 block rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 transition hover:border-teal-500/50"
+          className="mt-4 block rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 transition hover:border-violet-500/50"
         >
           <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
               <Sparkles className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="font-semibold text-zinc-100">{sol.title}</h3>
               <p className="mt-1 line-clamp-2 text-xs text-zinc-400">{sol.short_description}</p>
             </div>
-            <ArrowRight className="h-5 w-5 shrink-0 text-teal-400" />
+            <ArrowRight className="h-5 w-5 shrink-0 text-violet-400" />
           </div>
         </Link>
       ) : (

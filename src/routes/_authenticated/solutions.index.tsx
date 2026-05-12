@@ -86,8 +86,8 @@ function SolutionsList() {
   return (
     <div className="mx-auto max-w-[1100px] px-6 py-10">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Soluciones de <span className="text-white">IA</span></h1>
-        <p className="mt-1 text-sm text-zinc-400">
+        <h1 className="text-xl font-semibold tracking-tight text-white">Soluciones</h1>
+        <p className="mt-1 text-sm text-zinc-500">
           Implementaciones reales y listas para tu empresa.
         </p>
       </header>
@@ -163,13 +163,13 @@ function SolutionsList() {
                     </div>
                     {completed > 0 && (
                       <div className="mt-3">
-                        <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
+                        <div className="h-0.5 w-full overflow-hidden rounded-full bg-white/8">
                           <div
-                            className="h-full bg-gradient-to-r from-teal-500 to-emerald-500"
+                            className="h-full bg-green-500"
                             style={{ width: `${pct}%` }}
                           />
                         </div>
-                        <div className="mt-1.5 text-[11px] text-zinc-400">
+                        <div className="mt-1.5 text-[11px] text-zinc-500">
                           {completed} de 5 pasos
                         </div>
                       </div>

@@ -4,9 +4,9 @@ export function Logo({ className = "" }: { className?: string }) {
   return (
     <Link
       to="/"
-      className={`inline-flex items-center gap-2 text-lg tracking-tight ${className}`}
+      className={`inline-flex items-center gap-2.5 text-base tracking-tight ${className}`}
     >
-      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-teal-500 text-white font-bold text-sm">
+      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-violet-600 to-violet-400 text-white font-bold text-[12px]">
         I
       </span>
       <span className="font-semibold text-white">Implementa AI</span>

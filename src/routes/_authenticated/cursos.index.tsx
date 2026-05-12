@@ -39,13 +39,13 @@ const THUMB_BY_KEY: Record<string, ThumbStyle> = {
   },
   n8n: {
     gradient: "from-green-900 via-emerald-800 to-zinc-900",
-    badge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+    badge: "bg-green-500/20 text-emerald-300 border-green-500/40",
     initial: "n8n",
     tagline: "Formación n8n",
   },
   default: {
-    gradient: "from-teal-900 via-sky-900 to-zinc-900",
-    badge: "bg-teal-500/20 text-teal-300 border-teal-500/40",
+    gradient: "from-violet-900 via-sky-900 to-zinc-900",
+    badge: "bg-violet-500/20 text-violet-300 border-violet-500/40",
     initial: "AI",
     tagline: "Formación IA",
   },
@@ -63,7 +63,7 @@ const FILTERS = ["Todos", "No-Code", "IA", "Automatización"] as const;
 type Filter = (typeof FILTERS)[number];
 
 const COMING_SOON = [
-  { title: "ChatGPT para Negocios", category: "IA", gradient: "from-emerald-900 via-teal-800 to-zinc-900" },
+  { title: "ChatGPT para Negocios", category: "IA", gradient: "from-green-900 via-teal-800 to-zinc-900" },
   { title: "Make (Integromat)", category: "Automatización", gradient: "from-fuchsia-900 via-purple-800 to-zinc-900" },
   { title: "WhatsApp Business API", category: "Automatización", gradient: "from-green-900 via-lime-800 to-zinc-900" },
   { title: "Meta Ads con IA", category: "Marketing", gradient: "from-blue-900 via-indigo-800 to-zinc-900" },
@@ -173,7 +173,7 @@ function CursosPage() {
       {/* Header */}
       <div>
         <h1 className="text-4xl font-bold text-zinc-100">
-          Cursos de <span className="text-teal-400">IA</span>
+          Cursos de <span className="text-violet-400">IA</span>
         </h1>
         <p className="mt-2 text-zinc-400">
           Capacitación práctica en las herramientas que usan los mejores implementadores.
@@ -185,7 +185,7 @@ function CursosPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar cursos..."
-            className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 py-3 pl-11 pr-4 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-teal-500/60 focus:ring-2 focus:ring-teal-500/20"
+            className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 py-3 pl-11 pr-4 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/20"
           />
         </div>
 
@@ -212,7 +212,7 @@ function CursosPage() {
       {/* Featured */}
       {featured && (
         <section className="mt-10">
-          <div className="mb-3 flex items-center gap-3 border-l-4 border-teal-500 pl-3">
+          <div className="mb-3 flex items-center gap-3 border-l-4 border-violet-500 pl-3">
             <h2 className="text-xl font-semibold text-zinc-100">Destacado</h2>
           </div>
           <FeaturedCard
@@ -226,7 +226,7 @@ function CursosPage() {
       {/* Tools grid */}
       {rest.length > 0 && (
         <section className="mt-12">
-          <div className="mb-4 flex items-center gap-3 border-l-4 border-teal-500 pl-3">
+          <div className="mb-4 flex items-center gap-3 border-l-4 border-violet-500 pl-3">
             <h2 className="text-xl font-semibold text-zinc-100">Herramientas de IA</h2>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -250,7 +250,7 @@ function CursosPage() {
 
       {/* Coming soon */}
       <section className="mt-14">
-        <div className="mb-4 flex items-center gap-3 border-l-4 border-teal-500 pl-3">
+        <div className="mb-4 flex items-center gap-3 border-l-4 border-violet-500 pl-3">
           <h2 className="text-xl font-semibold text-zinc-100">Próximamente</h2>
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -287,7 +287,7 @@ function levelBadgeClass(level: string | null) {
   const l = (level ?? "").toLowerCase();
   if (l.includes("avanz")) return "bg-rose-500/20 text-rose-300 border-rose-500/40";
   if (l.includes("interm")) return "bg-amber-500/20 text-amber-300 border-amber-500/40";
-  return "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
+  return "bg-green-500/20 text-emerald-300 border-green-500/40";
 }
 
 function CourseCard({
@@ -307,7 +307,7 @@ function CourseCard({
   return (
     <button
       onClick={onClick}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900/80 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-teal-500/50 hover:shadow-2xl hover:shadow-black/50"
+      className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900/80 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-500/50 hover:shadow-2xl hover:shadow-black/50"
     >
       <div className="relative overflow-hidden">
         <div className="transition-transform duration-200 group-hover:scale-[1.03]">
@@ -317,7 +317,7 @@ function CourseCard({
           {course.level ?? "Principiante"}
         </span>
         {inProgress && (
-          <span className="absolute right-3 top-3 rounded-md border border-teal-500/50 bg-teal-500/30 px-2 py-0.5 text-[11px] font-semibold tracking-wide text-teal-200 backdrop-blur-sm">
+          <span className="absolute right-3 top-3 rounded-md border border-violet-500/50 bg-violet-500/30 px-2 py-0.5 text-[11px] font-semibold tracking-wide text-teal-200 backdrop-blur-sm">
             EN PROGRESO
           </span>
         )}
@@ -343,7 +343,7 @@ function CourseCard({
               {progress.done} de {progress.total} módulos completados
             </div>
             <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-              <div className="h-full bg-teal-400 transition-all" style={{ width: `${pct}%` }} />
+              <div className="h-full bg-violet-400 transition-all" style={{ width: `${pct}%` }} />
             </div>
           </div>
         ) : (
@@ -352,11 +352,11 @@ function CourseCard({
 
         <div className="mt-4">
           {inProgress ? (
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-teal-400">
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-violet-400">
               Continuar →
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-md border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-200 transition-colors group-hover:border-teal-500/50 group-hover:text-teal-300">
+            <span className="inline-flex items-center gap-1 rounded-md border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-200 transition-colors group-hover:border-violet-500/50 group-hover:text-violet-300">
               Ver curso →
             </span>
           )}
@@ -389,7 +389,7 @@ function FeaturedCard({
         <div className="flex flex-col justify-center bg-zinc-900/70 p-8 backdrop-blur-sm lg:col-span-2">
           <div className="flex items-center gap-2">
             {course.category && (
-              <span className="rounded-md border border-teal-500/40 bg-teal-500/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-teal-300">
+              <span className="rounded-md border border-violet-500/40 bg-violet-500/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-violet-300">
                 {course.category}
               </span>
             )}
@@ -417,7 +417,7 @@ function FeaturedCard({
                 {progress.done} de {progress.total} completados
               </div>
               <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-                <div className="h-full bg-teal-400" style={{ width: `${pct}%` }} />
+                <div className="h-full bg-violet-400" style={{ width: `${pct}%` }} />
               </div>
             </div>
           )}
