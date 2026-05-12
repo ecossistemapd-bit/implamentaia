@@ -444,7 +444,7 @@ function SolutionByIdDetail() {
           <StepHerramientas
             solutionId={id}
             userId={user?.id ?? ""}
-            tools={[...(s.tools_required ?? []), ...(s.integrations ?? [])]}
+            tools={s.solution_tools ?? []}
             isCompleted={completedSet.has("herramientas")}
             saving={savingStep === "herramientas"}
             onComplete={() => handleStepComplete("herramientas", "archivos")}
