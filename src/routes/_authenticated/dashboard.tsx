@@ -36,7 +36,7 @@ function Dashboard() {
     enabled: !!user,
     queryFn: async () => {
       const [steps, projects, modProg, allMods, allSolutions, solComments] = await Promise.all([
-        supabase.from("solution_steps_progress" as never).select("solution_id, step, completed").eq("user_id", user!.id),
+        supabase.from("solution_steps_progress" as never).select("solution_id, step, completed, completed_at").eq("user_id", user!.id),
         supabase.from("builder_projects").select("id, status").eq("user_id", user!.id),
         supabase.from("user_progress" as never).select("module_id, completed, modules:module_id(course_id)").eq("user_id", user!.id),
         supabase.from("modules" as never).select("id, course_id"),
@@ -44,7 +44,7 @@ function Dashboard() {
         supabase.from("solution_comments").select("solution_id, created_at").eq("user_id", user!.id).order("created_at", { ascending: false }).limit(5),
       ]);
 
-      type Step = { solution_id: string; step: string; completed: boolean };
+      type Step = { solution_id: string; step: string; completed: boolean; completed_at: string | null };
       const stepRows = ((steps as { data: Step[] | null }).data) ?? [];
       const stepsBySol: Record<string, Set<string>> = {};
       stepRows.forEach((s) => {
@@ -52,11 +52,18 @@ function Dashboard() {
         (stepsBySol[s.solution_id] ??= new Set()).add(s.step);
       });
       const solsList = (allSolutions.data ?? []) as Array<{ id: string; title: string; slug: string; short_description: string; icon_name: string }>;
+      const STEP_ORDER = ["herramientas", "archivos", "video", "comentarios", "conclusion"] as const;
+      const STEP_LABELS: Record<string, string> = {
+        herramientas: "Herramientas", archivos: "Archivos", video: "Video",
+        comentarios: "Comentarios", conclusion: "Conclusión",
+      };
       const inProgress = Object.entries(stepsBySol)
         .filter(([, set]) => set.size > 0 && set.size < 5)
         .map(([sid, set]) => {
           const sol = solsList.find((s) => s.id === sid);
-          return sol ? { ...sol, completed: set.size } : null;
+          if (!sol) return null;
+          const nextKey = STEP_ORDER.find((k) => !set.has(k));
+          return { ...sol, completed: set.size, nextStepLabel: nextKey ? STEP_LABELS[nextKey] : "" };
         })
         .filter((x): x is NonNullable<typeof x> => !!x);
       const completed = Object.values(stepsBySol).filter((s) => s.size >= 5).length;
@@ -77,17 +84,15 @@ function Dashboard() {
       const projectRows = projects.data ?? [];
       const activeProjects = projectRows.filter((p) => p.status !== "completed").length;
 
-      const startedSolIds = new Set(Object.keys(stepsBySol));
-      const recommendation = solsList.find((s) => !startedSolIds.has(s.id)) ?? solsList[0] ?? null;
-
       // Recent activity: last completed steps + comments
       type Activity = { type: "step" | "comment"; label: string; date: string; solId?: string };
       const recentSteps: Activity[] = stepRows
-        .filter((s) => s.completed)
-        .slice(-5)
+        .filter((s) => s.completed && s.completed_at)
+        .sort((a, b) => (b.completed_at ?? "").localeCompare(a.completed_at ?? ""))
+        .slice(0, 5)
         .map((s) => {
           const sol = solsList.find((x) => x.id === s.solution_id);
-          return { type: "step", label: `Completaste "${s.step}" en ${sol?.title ?? "una solución"}`, date: new Date().toISOString(), solId: s.solution_id };
+          return { type: "step", label: `Completaste "${s.step}" en ${sol?.title ?? "una solución"}`, date: s.completed_at as string, solId: s.solution_id };
         });
       const commentRows = (solComments.data ?? []) as Array<{ solution_id: string; created_at: string }>;
       const recentComments: Activity[] = commentRows.map((c) => {
@@ -103,7 +108,6 @@ function Dashboard() {
         inProgress,
         coursesStarted: startedCourses.size,
         activeProjects,
-        recommendation,
         recent,
       };
     },
