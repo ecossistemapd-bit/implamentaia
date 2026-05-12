@@ -172,16 +172,30 @@ function MobileTopBar() {
 function NavList() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { isImplementer, isAdmin } = useRole();
+  const [cursosVisited, setCursosVisited] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("cursos_visited") === "true") setCursosVisited(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (pathname.startsWith("/cursos") && !cursosVisited) {
+      localStorage.setItem("cursos_visited", "true");
+      setCursosVisited(true);
+    }
+  }, [pathname, cursosVisited]);
 
   const sections = useMemo(
     () =>
       SECTIONS.map((sec) => ({
         ...sec,
-        items: sec.items.filter(
-          (it) => (!it.implOnly || isImplementer) && (!it.adminOnly || isAdmin),
-        ),
+        items: sec.items
+          .filter((it) => (!it.implOnly || isImplementer) && (!it.adminOnly || isAdmin))
+          .map((it) => (it.to === "/cursos" && cursosVisited ? { ...it, badge: undefined } : it)),
       })).filter((sec) => sec.items.length > 0),
-    [isImplementer, isAdmin],
+    [isImplementer, isAdmin, cursosVisited],
   );
 
   return (

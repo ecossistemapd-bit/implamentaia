@@ -149,6 +149,7 @@ function SolutionByIdDetail() {
       setView("journey");
       toast.success("Continuando implementación", {
         description: "Redirigiendo a donde lo dejaste...",
+        duration: 4000,
       });
     }
   }, [progress, progressLoading, completedSet]);
@@ -189,7 +190,7 @@ function SolutionByIdDetail() {
       );
     setSavingStep(null);
     if (error) {
-      toast.error("No pudimos guardar tu progreso. Intentá de nuevo.");
+      toast.error("No pudimos guardar tu progreso. Intentá de nuevo.", { duration: 4000 });
       return false;
     }
     await qc.invalidateQueries({ queryKey: ["solution-step-progress", id, user.id] });
@@ -205,7 +206,7 @@ function SolutionByIdDetail() {
   const handleStepComplete = async (step: StepKey, next: StepKey) => {
     const ok = await markStepCompleted(step);
     if (!ok) return;
-    toast.success("¡Paso completado! Avanzando...");
+    toast.success("¡Paso completado! Avanzando...", { duration: 4000 });
     advanceTo(next);
   };
 
@@ -406,35 +407,39 @@ function SolutionByIdDetail() {
             const prevCompleted = i > 0 && completedSet.has(STEPS[i - 1].key);
             const Icon = step.Icon;
             return (
-              <div key={step.key} className="flex flex-1 flex-col items-center">
-                <div className="flex w-full items-center">
-                  {i > 0 && (
-                    <div className={`h-px flex-1 transition ${prevCompleted ? "bg-green-500" : "bg-white/8"}`} />
-                  )}
-                  <button
-                    onClick={() => setActiveStep(step.key)}
+              <div key={step.key} className="relative flex flex-1 flex-col items-center">
+                {/* Connector lines (behind, top half aligned with circle center) */}
+                {i > 0 && (
+                  <div className={`absolute left-0 top-[18px] h-px w-1/2 -translate-y-1/2 ${prevCompleted ? "bg-green-500" : "bg-white/8"}`} />
+                )}
+                {i < STEPS.length - 1 && (
+                  <div className={`absolute right-0 top-[18px] h-px w-1/2 -translate-y-1/2 ${isCompleted ? "bg-green-500" : "bg-white/8"}`} />
+                )}
+                <button
+                  type="button"
+                  onClick={() => setActiveStep(step.key)}
+                  aria-label={step.label}
+                  className="group relative z-10 flex flex-col items-center gap-2.5 rounded-lg px-2 py-1 transition"
+                >
+                  <span
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition ${
                       isCompleted
                         ? "border-green-500 bg-green-500 text-white"
                         : isActive
                         ? "border-violet-500 bg-violet-500 text-white"
-                        : "border-white/10 bg-transparent text-zinc-600 hover:border-white/20"
+                        : "border-white/10 bg-background text-zinc-600 group-hover:border-white/20"
                     }`}
-                    aria-label={step.label}
                   >
                     {isCompleted ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
-                  </button>
-                  {i < STEPS.length - 1 && (
-                    <div className={`h-px flex-1 transition ${isCompleted ? "bg-green-500" : "bg-white/8"}`} />
-                  )}
-                </div>
-                <span
-                  className={`mt-2.5 text-center text-xs transition ${
-                    isActive ? "text-white font-medium" : isCompleted ? "text-green-500" : "text-zinc-600"
-                  }`}
-                >
-                  {step.label}
-                </span>
+                  </span>
+                  <span
+                    className={`text-center text-xs transition group-hover:text-white ${
+                      isActive ? "text-white font-medium" : isCompleted ? "text-green-500" : "text-zinc-600"
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+                </button>
               </div>
             );
           })}
@@ -1042,7 +1047,7 @@ function StepComentarios({
 
   const submit = async () => {
     if (!user || rating === null) {
-      toast.error("Elegí una puntuación");
+      toast.error("Elegí una puntuación", { duration: 4000 });
       return;
     }
     setSubmitting(true);
@@ -1056,12 +1061,12 @@ function StepComentarios({
       } as never);
     setSubmitting(false);
     if (error) {
-      toast.error("Error al enviar evaluación");
+      toast.error("Error al enviar evaluación", { duration: 4000 });
       return;
     }
     setComment("");
     setRating(null);
-    toast.success("¡Gracias por tu evaluación!");
+    toast.success("¡Gracias por tu evaluación!", { duration: 4000 });
     qc.invalidateQueries({ queryKey: ["solution-comments", solutionId] });
   };
 

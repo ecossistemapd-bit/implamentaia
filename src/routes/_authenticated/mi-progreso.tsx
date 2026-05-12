@@ -79,8 +79,8 @@ function MiProgreso() {
         .filter((x): x is NonNullable<typeof x> => !!x)
         .sort((a, b) => b.completed - a.completed);
 
-      const solutionsStarted = solutionsInProgress.length;
       const solutionsCompleted = solutionsInProgress.filter((s) => s.completed >= 5).length;
+      const solutionsActive = solutionsInProgress.filter((s) => s.completed < 5).length;
 
       const modProg = ((modulesProgRes.data ?? []) as Array<{ module_id: string; completed: boolean; modules: { course_id: string } | null }>);
       const allMods = ((modulesAllRes.data ?? []) as Array<{ id: string; course_id: string }>);
@@ -112,7 +112,7 @@ function MiProgreso() {
 
       const projects = projectsRes.data ?? [];
       return {
-        solutionsStarted,
+        solutionsActive,
         solutionsCompleted,
         coursesStarted: startedCourseSet.size,
         coursesCompleted: completedCourseSet.size,
@@ -126,7 +126,7 @@ function MiProgreso() {
   });
 
   const cards = [
-    { icon: Sparkles, label: "Soluciones iniciadas", value: data?.solutionsStarted ?? 0 },
+    { icon: Sparkles, label: "Soluciones en progreso", value: data?.solutionsActive ?? 0 },
     { icon: Trophy, label: "Soluciones completadas", value: data?.solutionsCompleted ?? 0 },
     { icon: BookOpen, label: "Cursos en progreso", value: data?.coursesStarted ?? 0 },
     { icon: TrendingUp, label: "Proyectos activos", value: data?.projectsActive ?? 0 },

@@ -8,6 +8,8 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { OnboardingModal } from "@/components/onboarding-modal";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -36,7 +38,7 @@ function Dashboard() {
     enabled: !!user,
     queryFn: async () => {
       const [steps, projects, modProg, allMods, allSolutions, solComments] = await Promise.all([
-        supabase.from("solution_steps_progress" as never).select("solution_id, step, completed").eq("user_id", user!.id),
+        supabase.from("solution_steps_progress" as never).select("solution_id, step, completed, completed_at").eq("user_id", user!.id),
         supabase.from("builder_projects").select("id, status").eq("user_id", user!.id),
         supabase.from("user_progress" as never).select("module_id, completed, modules:module_id(course_id)").eq("user_id", user!.id),
         supabase.from("modules" as never).select("id, course_id"),
@@ -44,7 +46,7 @@ function Dashboard() {
         supabase.from("solution_comments").select("solution_id, created_at").eq("user_id", user!.id).order("created_at", { ascending: false }).limit(5),
       ]);
 
-      type Step = { solution_id: string; step: string; completed: boolean };
+      type Step = { solution_id: string; step: string; completed: boolean; completed_at: string | null };
       const stepRows = ((steps as { data: Step[] | null }).data) ?? [];
       const stepsBySol: Record<string, Set<string>> = {};
       stepRows.forEach((s) => {
@@ -52,11 +54,18 @@ function Dashboard() {
         (stepsBySol[s.solution_id] ??= new Set()).add(s.step);
       });
       const solsList = (allSolutions.data ?? []) as Array<{ id: string; title: string; slug: string; short_description: string; icon_name: string }>;
+      const STEP_ORDER = ["herramientas", "archivos", "video", "comentarios", "conclusion"] as const;
+      const STEP_LABELS: Record<string, string> = {
+        herramientas: "Herramientas", archivos: "Archivos", video: "Video",
+        comentarios: "Comentarios", conclusion: "Conclusión",
+      };
       const inProgress = Object.entries(stepsBySol)
         .filter(([, set]) => set.size > 0 && set.size < 5)
         .map(([sid, set]) => {
           const sol = solsList.find((s) => s.id === sid);
-          return sol ? { ...sol, completed: set.size } : null;
+          if (!sol) return null;
+          const nextKey = STEP_ORDER.find((k) => !set.has(k));
+          return { ...sol, completed: set.size, nextStepLabel: nextKey ? STEP_LABELS[nextKey] : "" };
         })
         .filter((x): x is NonNullable<typeof x> => !!x);
       const completed = Object.values(stepsBySol).filter((s) => s.size >= 5).length;
@@ -77,17 +86,15 @@ function Dashboard() {
       const projectRows = projects.data ?? [];
       const activeProjects = projectRows.filter((p) => p.status !== "completed").length;
 
-      const startedSolIds = new Set(Object.keys(stepsBySol));
-      const recommendation = solsList.find((s) => !startedSolIds.has(s.id)) ?? solsList[0] ?? null;
-
       // Recent activity: last completed steps + comments
       type Activity = { type: "step" | "comment"; label: string; date: string; solId?: string };
       const recentSteps: Activity[] = stepRows
-        .filter((s) => s.completed)
-        .slice(-5)
+        .filter((s) => s.completed && s.completed_at)
+        .sort((a, b) => (b.completed_at ?? "").localeCompare(a.completed_at ?? ""))
+        .slice(0, 5)
         .map((s) => {
           const sol = solsList.find((x) => x.id === s.solution_id);
-          return { type: "step", label: `Completaste "${s.step}" en ${sol?.title ?? "una solución"}`, date: new Date().toISOString(), solId: s.solution_id };
+          return { type: "step", label: `Completaste "${s.step}" en ${sol?.title ?? "una solución"}`, date: s.completed_at as string, solId: s.solution_id };
         });
       const commentRows = (solComments.data ?? []) as Array<{ solution_id: string; created_at: string }>;
       const recentComments: Activity[] = commentRows.map((c) => {
@@ -103,7 +110,6 @@ function Dashboard() {
         inProgress,
         coursesStarted: startedCourses.size,
         activeProjects,
-        recommendation,
         recent,
       };
     },
@@ -152,9 +158,6 @@ function Dashboard() {
               <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
                 <Calendar className="h-4 w-4" /> Próxima Sesión
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-950 px-2.5 py-0.5 text-[10px] font-bold uppercase text-zinc-400">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-400" /> Live
-              </span>
             </div>
             <div className="mt-4 flex flex-col items-center justify-center py-4 text-center">
               <Calendar className="h-10 w-10 text-zinc-700" strokeWidth={1.5} />
@@ -180,10 +183,10 @@ function Dashboard() {
           ))}
         </section>
 
-        {/* En Progreso + Recomendación */}
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        {/* En Progreso + Próximos pasos */}
+        <section className={`mt-8 grid gap-6 ${(data?.inProgress.length ?? 0) > 0 ? "lg:grid-cols-[1.4fr_1fr]" : ""}`}>
           <EnProgreso inProgress={data?.inProgress ?? []} />
-          <Recomendacion sol={data?.recommendation ?? null} />
+          {(data?.inProgress.length ?? 0) > 0 && <ProximosPasos next={data!.inProgress[0]} />}
         </section>
 
         {/* Actividad reciente */}
@@ -285,50 +288,39 @@ function Empty({ text, cta, to }: { text: string; cta: string; to: "/solutions" 
   );
 }
 
-function Recomendacion({ sol }: { sol: { id: string; title: string; short_description: string } | null }) {
+function ProximosPasos({ next }: { next: { id: string; title: string; nextStepLabel: string; completed: number } }) {
   return (
     <div className="rounded-2xl border border-violet-500/20 bg-zinc-900 p-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-violet-400">
-          <Bot className="h-4 w-4" /> Recomendación de IA
-        </div>
-        <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-400">
-          ANÁLISIS INTELIGENTE
-        </span>
+      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-violet-400">
+        <Bot className="h-4 w-4" /> Próximo paso sugerido
       </div>
-      {sol ? (
-        <Link
-          to="/solutions/$id"
-          params={{ id: sol.id }}
-          className="mt-4 block rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 transition hover:border-violet-500/50"
-        >
-          <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-zinc-100">{sol.title}</h3>
-              <p className="mt-1 line-clamp-2 text-xs text-zinc-400">{sol.short_description}</p>
-            </div>
-            <ArrowRight className="h-5 w-5 shrink-0 text-violet-400" />
+      <Link
+        to="/solutions/$id"
+        params={{ id: next.id }}
+        className="mt-4 block rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 transition hover:border-violet-500/50"
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+            <Sparkles className="h-5 w-5" />
           </div>
-        </Link>
-      ) : (
-        <p className="mt-4 text-sm text-zinc-400">Cargando recomendación…</p>
-      )}
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate font-semibold text-zinc-100">{next.title}</h3>
+            <p className="mt-1 text-xs text-zinc-400">
+              Continuá en: <span className="text-violet-400">{next.nextStepLabel || "siguiente paso"}</span>
+            </p>
+            <p className="mt-1 text-[11px] text-zinc-600">{next.completed} de 5 pasos completados</p>
+          </div>
+          <ArrowRight className="h-5 w-5 shrink-0 text-violet-400" />
+        </div>
+      </Link>
     </div>
   );
 }
 
 function relativeTime(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return "ahora";
-  if (min < 60) return `hace ${min} min`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `hace ${hr} h`;
-  const d = Math.floor(hr / 24);
-  if (d < 30) return `hace ${d} d`;
-  const mo = Math.floor(d / 30);
-  return `hace ${mo} mes${mo > 1 ? "es" : ""}`;
+  try {
+    return formatDistanceToNow(new Date(iso), { addSuffix: true, locale: es });
+  } catch {
+    return "";
+  }
 }

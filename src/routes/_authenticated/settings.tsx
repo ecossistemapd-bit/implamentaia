@@ -32,8 +32,8 @@ function SettingsPage() {
     setSaving(true);
     const { error } = await supabase.from("profiles").upsert({ id: user.id, ...profile });
     setSaving(false);
-    if (error) toast.error(error.message);
-    else toast.success("Guardado");
+    if (error) toast.error(error.message, { duration: 4000 });
+    else toast.success("Guardado", { duration: 4000 });
   };
 
   const logout = async () => {

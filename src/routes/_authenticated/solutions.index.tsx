@@ -167,7 +167,7 @@ function SolutionsList() {
                         {DIFFICULTY_LABEL[s.difficulty as Difficulty]}
                       </span>
                     </div>
-                    {completed > 0 && (
+                    {!isDone && (
                       <div className="mt-3">
                         <div className="h-0.5 w-full overflow-hidden rounded-full bg-white/8">
                           <div
@@ -175,8 +175,11 @@ function SolutionsList() {
                             style={{ width: `${pct}%` }}
                           />
                         </div>
-                        <div className="mt-1.5 text-[11px] text-zinc-500">
-                          {completed} de 5 pasos
+                        <div className="mt-1.5 flex items-center justify-between text-[11px] text-zinc-500">
+                          <span>{completed} de 5 pasos</span>
+                          <span className="font-medium text-violet-400">
+                            {completed > 0 ? "Continuar →" : "Comenzar →"}
+                          </span>
                         </div>
                       </div>
                     )}
