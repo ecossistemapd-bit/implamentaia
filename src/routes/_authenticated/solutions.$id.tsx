@@ -53,7 +53,9 @@ function SolutionByIdDetail() {
   const qc = useQueryClient();
   const [activeStep, setActiveStep] = useState<StepKey | null>(null);
   const [savingStep, setSavingStep] = useState<StepKey | null>(null);
+  const [view, setView] = useState<"overview" | "journey">("overview");
   const initializedRef = useRef(false);
+  const viewInitializedRef = useRef(false);
   const confettiFiredRef = useRef(false);
 
   const { data: s, isLoading, isError } = useQuery({
