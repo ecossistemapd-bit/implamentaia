@@ -25,6 +25,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { CATEGORIES, CATEGORY_LABEL, DIFFICULTY_LABEL, type CategoryKey, type Difficulty } from "@/lib/categories";
+import { FEATURES } from "@/lib/features";
 import confetti from "canvas-confetti";
 
 import { supabase } from "@/integrations/supabase/client";
