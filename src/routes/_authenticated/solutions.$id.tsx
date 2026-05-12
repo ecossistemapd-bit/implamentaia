@@ -145,19 +145,18 @@ function SolutionByIdDetail() {
         </div>
 
         {/* Progress card */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 md:w-[240px]">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-400">
+        <div className="rounded-xl border border-white/8 bg-[#111111] p-4 md:w-[240px]">
+          <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-500">
             Progreso
           </div>
-          <div className="mt-1 text-4xl font-bold text-violet-400">{progressPct}%</div>
-          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+          <div className="mt-1 text-2xl font-semibold text-white">{progressPct}%</div>
+          <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-white/8">
             <div
-              className="h-full bg-gradient-to-r from-violet-500 to-green-500 transition-all"
+              className="h-full bg-green-500 transition-all"
               style={{ width: `${progressPct}%` }}
             />
           </div>
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-zinc-400">
-            <Trophy className="h-3.5 w-3.5 text-violet-400" />
+          <div className="mt-3 text-xs text-zinc-500">
             {completedCount} de {STEPS.length} etapas completadas
           </div>
         </div>
