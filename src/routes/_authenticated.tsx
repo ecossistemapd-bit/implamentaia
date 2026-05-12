@@ -172,18 +172,18 @@ function MobileTopBar() {
 function NavList() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { isImplementer, isAdmin } = useRole();
-  const [cursosVisited, setCursosVisited] = useState(false);
+  const [cursosVisited, setCursosVisited] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("cursos_visited") === "true";
+  });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (localStorage.getItem("cursos_visited") === "true") setCursosVisited(true);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (pathname.startsWith("/cursos") && !cursosVisited) {
-      localStorage.setItem("cursos_visited", "true");
-      setCursosVisited(true);
+    if (pathname.startsWith("/cursos")) {
+      if (localStorage.getItem("cursos_visited") !== "true") {
+        localStorage.setItem("cursos_visited", "true");
+      }
+      if (!cursosVisited) setCursosVisited(true);
     }
   }, [pathname, cursosVisited]);
 
