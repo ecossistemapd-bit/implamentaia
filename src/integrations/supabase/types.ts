@@ -424,6 +424,7 @@ export type Database = {
           integrations: string[]
           is_featured: boolean
           long_description: string
+          lovable_remix_url: string | null
           n8n_template: string | null
           platform_investment: string | null
           prompt_template: string | null
@@ -451,6 +452,7 @@ export type Database = {
           integrations?: string[]
           is_featured?: boolean
           long_description: string
+          lovable_remix_url?: string | null
           n8n_template?: string | null
           platform_investment?: string | null
           prompt_template?: string | null
@@ -478,6 +480,7 @@ export type Database = {
           integrations?: string[]
           is_featured?: boolean
           long_description?: string
+          lovable_remix_url?: string | null
           n8n_template?: string | null
           platform_investment?: string | null
           prompt_template?: string | null

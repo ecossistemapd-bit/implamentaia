@@ -99,6 +99,7 @@ function SolutionByIdDetail() {
         video_url: string | null;
         resources: { title: string; url: string; type?: string; description?: string; domain?: string }[] | null;
         solution_tools: SolutionToolItem[] | null;
+        lovable_remix_url: string | null;
       };
     },
   });
@@ -454,6 +455,7 @@ function SolutionByIdDetail() {
           <StepArchivos
             solutionId={id}
             resources={s.resources ?? []}
+            lovableRemixUrl={s.lovable_remix_url}
             isCompleted={completedSet.has("archivos")}
             saving={savingStep === "archivos"}
             onComplete={() => handleStepComplete("archivos", "video")}
@@ -841,42 +843,20 @@ function StepHerramientas({
 }
 
 function StepArchivos({
-  solutionId,
+  solutionId: _solutionId,
   resources,
+  lovableRemixUrl,
   isCompleted,
   saving,
   onComplete,
 }: {
   solutionId: string;
   resources: { title: string; url: string; type?: string; description?: string; domain?: string }[];
+  lovableRemixUrl?: string | null;
   isCompleted: boolean;
   saving: boolean;
   onComplete: () => void;
 }) {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const { data: session } = useQuery({
-    queryKey: ["builder-session", solutionId, user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("builder_sessions")
-        .select("generated_prompt")
-        .eq("solution_id", solutionId)
-        .eq("user_id", user!.id)
-        .order("updated_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return data;
-    },
-  });
-
-  const copyPrompt = () => {
-    if (!session?.generated_prompt) return;
-    navigator.clipboard.writeText(session.generated_prompt);
-    toast.success("Prompt copiado");
-  };
-
   return (
     <div>
       <SectionHeader
@@ -937,44 +917,34 @@ function StepArchivos({
         </div>
       )}
 
-      <h3 className="mt-10 text-sm font-semibold uppercase tracking-wider text-zinc-400">Tu prompt personalizado</h3>
-      {session?.generated_prompt ? (
-        <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900">
-          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
-            <span className="text-xs text-zinc-400">Generado por el Builder</span>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={copyPrompt}
-                className="text-violet-400 hover:bg-zinc-800 hover:text-violet-300"
+      {/* Plantilla Lovable */}
+      <div className="mt-10">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+          Plantilla Lovable
+        </h3>
+        <div className="mt-3 rounded-xl border border-white/8 bg-secondary p-6">
+          {lovableRemixUrl ? (
+            <>
+              <p className="text-sm text-zinc-300">
+                Cloná esta plantilla en tu cuenta de Lovable y empezá a personalizarla.
+              </p>
+              <a
+                href={lovableRemixUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-500"
               >
-                <Copy className="mr-1 h-3.5 w-3.5" /> Copiar
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => navigate({ to: "/builder/$solutionId", params: { solutionId } })}
-                className="bg-violet-500 text-white hover:bg-violet-600"
-              >
-                Ir al Builder →
-              </Button>
+                Remix con Lovable →
+              </a>
+            </>
+          ) : (
+            <div className="flex items-center gap-3 text-sm text-zinc-500">
+              <Clock className="h-4 w-4" />
+              Plantilla Lovable próximamente
             </div>
-          </div>
-          <pre className="max-h-72 overflow-auto whitespace-pre-wrap bg-zinc-900 p-4 font-mono text-xs text-zinc-300">
-            {session.generated_prompt}
-          </pre>
+          )}
         </div>
-      ) : (
-        <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900 p-6 text-center">
-          <p className="text-sm text-zinc-400">Generá tu prompt personalizado con el Builder.</p>
-          <Button
-            onClick={() => navigate({ to: "/builder/$solutionId", params: { solutionId } })}
-            className="mt-3 bg-violet-500 text-white hover:bg-violet-600"
-          >
-            Generar mi prompt con el Builder →
-          </Button>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
