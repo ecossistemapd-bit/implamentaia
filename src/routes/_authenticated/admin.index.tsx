@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole } from "@/hooks/use-role";
@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SolutionEditorDrawer } from "@/components/admin/solution-editor-drawer";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPanel,
@@ -395,24 +394,183 @@ function ProjectsTab({ filterUserId, onClearFilter }: { filterUserId: string | n
 }
 
 
+type ResourceLink = {
+  type?: string;
+  title: string;
+  description?: string;
+  url: string;
+  domain?: string;
+};
+
+type ResourceFormItem = ResourceLink & { client_id: string };
+
+type ToolRow = {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string | null;
+  website: string | null;
+  description: string | null;
+};
+
+type SolutionToolInlineRow = {
+  tool_id: string;
+  is_essential: boolean;
+  display_order: number | null;
+  tool?: ToolRow | null;
+};
+
 type SolutionRow = {
   id: string;
   title: string;
+  slug: string;
   category: string;
-  resources: unknown[] | null;
+  difficulty: string;
+  short_description: string;
+  long_description: string;
+  estimated_time: string;
+  roi_estimate: string;
+  platform_investment: string | null;
+  development_time_minutes: number | null;
+  tokens_per_execution: number | null;
   cover_image_url: string | null;
+  icon_name: string;
+  tools_required: string[] | null;
+  integrations: string[] | null;
+  features: string[] | null;
+  video_url: string | null;
+  lovable_remix_url: string | null;
+  prompt_template: string | null;
+  n8n_template: string | null;
+  checklist_items: string[] | null;
+  builder_questions: unknown | null;
+  resources: ResourceLink[] | null;
+  is_featured: boolean;
+  solution_tools?: SolutionToolInlineRow[] | null;
 };
+
+type SolutionForm = {
+  title: string;
+  slug: string;
+  category: string;
+  difficulty: string;
+  short_description: string;
+  long_description: string;
+  estimated_time: string;
+  roi_estimate: string;
+  platform_investment: string;
+  development_time_minutes: number;
+  tokens_per_execution: number;
+  cover_image_url: string;
+  icon_name: string;
+  tools_required_text: string;
+  integrations_text: string;
+  features_text: string;
+  video_url: string;
+  lovable_remix_url: string;
+  prompt_template: string;
+  n8n_template: string;
+  checklist_items_text: string;
+  builder_questions_text: string;
+  resources: ResourceFormItem[];
+  is_featured: boolean;
+};
+
+const CATEGORY_OPTIONS = [
+  { value: "ventas", label: "Ventas" },
+  { value: "marketing", label: "Marketing" },
+  { value: "atencion", label: "Servicio al Cliente" },
+  { value: "finanzas", label: "Finanzas" },
+  { value: "rrhh", label: "Recursos Humanos" },
+  { value: "operaciones", label: "Operaciones" },
+];
+
+const DIFFICULTY_OPTIONS = [
+  { value: "principiante", label: "Principiante" },
+  { value: "intermedio", label: "Intermedio" },
+  { value: "avanzado", label: "Avanzado" },
+];
+
+function makeClientId(prefix: string) {
+  try {
+    return `${prefix}-${globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`}`;
+  } catch {
+    return `${prefix}-${Date.now()}-${Math.random()}`;
+  }
+}
+
+function extractDomain(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "").toUpperCase();
+  } catch {
+    return "";
+  }
+}
+
+function linesToArray(value: string) {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function initialFormFromSolution(solution: SolutionRow): SolutionForm {
+  return {
+    title: solution.title ?? "",
+    slug: solution.slug ?? "",
+    category: solution.category ?? "ventas",
+    difficulty: solution.difficulty ?? "principiante",
+    short_description: solution.short_description ?? "",
+    long_description: solution.long_description ?? "",
+    estimated_time: solution.estimated_time ?? "",
+    roi_estimate: solution.roi_estimate ?? "",
+    platform_investment: solution.platform_investment ?? "",
+    development_time_minutes: solution.development_time_minutes ?? 0,
+    tokens_per_execution: solution.tokens_per_execution ?? 0,
+    cover_image_url: solution.cover_image_url ?? "",
+    icon_name: solution.icon_name ?? "Sparkles",
+    tools_required_text: (solution.tools_required ?? []).join("\n"),
+    integrations_text: (solution.integrations ?? []).join("\n"),
+    features_text: (solution.features ?? []).join("\n"),
+    video_url: solution.video_url ?? "",
+    lovable_remix_url: solution.lovable_remix_url ?? "",
+    prompt_template: solution.prompt_template ?? "",
+    n8n_template: solution.n8n_template ?? "",
+    checklist_items_text: (solution.checklist_items ?? []).join("\n"),
+    builder_questions_text: solution.builder_questions ? JSON.stringify(solution.builder_questions, null, 2) : "",
+    resources: (solution.resources ?? []).map((resource) => ({
+      client_id: makeClientId("resource"),
+      type: resource.type ?? "link",
+      title: resource.title ?? "",
+      description: resource.description ?? "",
+      url: resource.url ?? "",
+      domain: resource.domain ?? extractDomain(resource.url ?? ""),
+    })),
+    is_featured: Boolean(solution.is_featured),
+  };
+}
+
+function initialToolsFromSolution(solution: SolutionRow): SolutionToolInlineRow[] {
+  return (solution.solution_tools ?? []).map((row, position) => ({
+    tool_id: row.tool_id,
+    is_essential: row.is_essential ?? true,
+    display_order: row.display_order ?? position,
+    tool: row.tool ?? null,
+  }));
+}
 
 function SolutionsTab() {
   const [search, setSearch] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-solutions"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("solutions")
-        .select("id, title, category, resources, cover_image_url")
+        .select(
+          "id, title, slug, category, difficulty, short_description, long_description, estimated_time, roi_estimate, platform_investment, development_time_minutes, tokens_per_execution, cover_image_url, icon_name, tools_required, integrations, features, video_url, lovable_remix_url, prompt_template, n8n_template, checklist_items, builder_questions, resources, is_featured, solution_tools(tool_id, is_essential, display_order, tool:tools(id, name, slug, logo_url, website, description))",
+        )
         .order("title");
       if (error) throw error;
       return (data ?? []) as unknown as SolutionRow[];
@@ -454,42 +612,472 @@ function SolutionsTab() {
             Sin resultados.
           </div>
         ) : (
-          filtered.map((sol) => (
-            <div
-              key={sol.id}
-              className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3"
-            >
-              <div className="flex min-w-0 items-center gap-3">
-                <div className="h-10 w-16 shrink-0 overflow-hidden rounded bg-zinc-100">
-                  {sol.cover_image_url ? (
-                    <img src={sol.cover_image_url} alt="" className="h-full w-full object-cover" />
-                  ) : null}
+          filtered.map((sol) => {
+            const expanded = expandedId === sol.id;
+            return (
+              <div key={sol.id} className="rounded-xl border border-gray-200 bg-white">
+                <div className="flex items-center justify-between gap-3 px-4 py-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="h-10 w-16 shrink-0 overflow-hidden rounded bg-zinc-100">
+                      {sol.cover_image_url ? (
+                        <img src={sol.cover_image_url} alt="" className="h-full w-full object-cover" />
+                      ) : null}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-semibold text-gray-900">{sol.title}</div>
+                      <div className="text-xs text-gray-500">
+                        {sol.category} · {(sol.resources ?? []).length} recursos
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setExpandedId((prev) => (prev === sol.id ? null : sol.id))}
+                    className="shrink-0 rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
+                  >
+                    {expanded ? "Cerrar" : "Editar"}
+                  </button>
                 </div>
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold text-gray-900">{sol.title}</div>
-                  <div className="text-xs text-gray-500">
-                    {sol.category} · {(sol.resources ?? []).length} recursos
+
+                {expanded && (
+                  <div className="border-t border-gray-100 bg-gray-50/70 px-4 py-4 transition-all duration-200">
+                    <SolutionInlineEditor key={sol.id} solution={sol} onCancel={() => setExpandedId(null)} />
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; onCancel: () => void }) {
+  const qc = useQueryClient();
+  const [activeTab, setActiveTab] = useState<"general" | "cover" | "tools" | "resources">("general");
+  const [form, setForm] = useState<SolutionForm>(() => initialFormFromSolution(solution));
+  const [assignedTools, setAssignedTools] = useState<SolutionToolInlineRow[]>(() => initialToolsFromSolution(solution));
+  const [toolSearch, setToolSearch] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const { data: allTools = [] } = useQuery({
+    queryKey: ["admin-tools-all"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tools")
+        .select("id, name, slug, logo_url, website, description")
+        .order("name");
+      if (error) throw error;
+      return (data ?? []) as ToolRow[];
+    },
+  });
+
+  const assignedToolIds = new Set(assignedTools.map((tool) => tool.tool_id));
+  const toolSearchValue = toolSearch.trim().toLowerCase();
+  const availableTools = allTools.filter((tool) => {
+    if (assignedToolIds.has(tool.id)) return false;
+    if (!toolSearchValue) return true;
+    return tool.name.toLowerCase().includes(toolSearchValue);
+  });
+
+  const updateField = <K extends keyof SolutionForm>(key: K, value: SolutionForm[K]) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
+  const save = async () => {
+    let builderQuestions: unknown = null;
+    if (form.builder_questions_text.trim()) {
+      try {
+        builderQuestions = JSON.parse(form.builder_questions_text);
+      } catch {
+        toast.error("Builder questions debe ser JSON válido", { duration: 4000 });
+        return;
+      }
+    }
+
+    setSaving(true);
+    const solutionPayload = {
+      title: form.title.trim(),
+      slug: form.slug.trim(),
+      category: form.category as never,
+      difficulty: form.difficulty as never,
+      short_description: form.short_description,
+      long_description: form.long_description,
+      estimated_time: form.estimated_time,
+      roi_estimate: form.roi_estimate,
+      platform_investment: form.platform_investment || null,
+      development_time_minutes: form.development_time_minutes || 0,
+      tokens_per_execution: form.tokens_per_execution || 0,
+      cover_image_url: form.cover_image_url.trim() || null,
+      icon_name: form.icon_name.trim() || "Sparkles",
+      tools_required: linesToArray(form.tools_required_text),
+      integrations: linesToArray(form.integrations_text),
+      features: linesToArray(form.features_text),
+      video_url: form.video_url.trim() || null,
+      lovable_remix_url: form.lovable_remix_url.trim() || null,
+      prompt_template: form.prompt_template.trim() || null,
+      n8n_template: form.n8n_template.trim() || null,
+      checklist_items: linesToArray(form.checklist_items_text),
+      builder_questions: builderQuestions as never,
+      resources: form.resources.map(({ client_id: _clientId, ...resource }) => ({
+        ...resource,
+        title: resource.title.trim(),
+        url: resource.url.trim(),
+        description: resource.description?.trim() || undefined,
+        domain: extractDomain(resource.url.trim()),
+      })) as never,
+      is_featured: form.is_featured,
+    };
+
+    const { error } = await supabase
+      .from("solutions")
+      .update(solutionPayload)
+      .eq("id", solution.id);
+
+    if (error) {
+      setSaving(false);
+      toast.error("Error al guardar: " + error.message, { duration: 4000 });
+      return;
+    }
+
+    const { error: deleteError } = await supabase
+      .from("solution_tools")
+      .delete()
+      .eq("solution_id", solution.id);
+
+    if (deleteError) {
+      setSaving(false);
+      toast.error("Error al guardar herramientas: " + deleteError.message, { duration: 4000 });
+      return;
+    }
+
+    if (assignedTools.length > 0) {
+      const { error: insertError } = await supabase.from("solution_tools").insert(
+        assignedTools.map((tool) => ({
+          solution_id: solution.id,
+          tool_id: tool.tool_id,
+          is_essential: tool.is_essential,
+          display_order: tool.display_order ?? 0,
+        })),
+      );
+
+      if (insertError) {
+        setSaving(false);
+        toast.error("Error al guardar herramientas: " + insertError.message, { duration: 4000 });
+        return;
+      }
+    }
+
+    setSaving(false);
+    toast.success("Solución actualizada", { duration: 4000 });
+    qc.invalidateQueries({ queryKey: ["admin-solutions"] });
+    qc.invalidateQueries({ queryKey: ["solutions"] });
+    qc.invalidateQueries({ queryKey: ["solution-by-id", solution.id] });
+    onCancel();
+  };
+
+  const uploadCover = async (file: File) => {
+    setUploading(true);
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `covers/${solution.id}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("solution-covers")
+      .upload(path, file, { upsert: true, contentType: file.type });
+
+    if (uploadError) {
+      setUploading(false);
+      toast.error("Error subiendo imagen: " + uploadError.message, { duration: 4000 });
+      return;
+    }
+
+    const { data } = supabase.storage.from("solution-covers").getPublicUrl(path);
+    updateField("cover_image_url", `${data.publicUrl}?v=${Date.now()}`);
+    setUploading(false);
+  };
+
+  const updateResource = (clientId: string, patch: Partial<ResourceFormItem>) =>
+    setForm((prev) => ({
+      ...prev,
+      resources: prev.resources.map((resource) =>
+        resource.client_id === clientId ? { ...resource, ...patch } : resource,
+      ),
+    }));
+
+  const moveResource = (clientId: string, direction: -1 | 1) =>
+    setForm((prev) => {
+      const resources = [...prev.resources];
+      const index = resources.findIndex((resource) => resource.client_id === clientId);
+      const nextIndex = index + direction;
+      if (index < 0 || nextIndex < 0 || nextIndex >= resources.length) return prev;
+      [resources[index], resources[nextIndex]] = [resources[nextIndex], resources[index]];
+      return { ...prev, resources };
+    });
+
+  const addAssignedTool = (tool: ToolRow) =>
+    setAssignedTools((prev) => [
+      ...prev,
+      { tool_id: tool.id, is_essential: true, display_order: prev.length, tool },
+    ]);
+
+  return (
+    <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4">
+      <div className="flex flex-wrap gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1 text-xs w-fit">
+        {([
+          ["general", "General"],
+          ["cover", "Cover"],
+          ["tools", "Herramientas"],
+          ["resources", "Recursos"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key)}
+            className={`rounded-md px-3 py-1.5 transition ${
+              activeTab === key ? "bg-foreground text-background" : "text-gray-600 hover:bg-white"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "general" && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <AdminField label="Título">
+              <Input value={form.title} onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))} />
+            </AdminField>
+            <AdminField label="Slug">
+              <Input value={form.slug} onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))} />
+            </AdminField>
+            <AdminField label="Categoría">
+              <select
+                value={form.category}
+                onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              >
+                {CATEGORY_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </AdminField>
+            <AdminField label="Dificultad">
+              <select
+                value={form.difficulty}
+                onChange={(e) => setForm((prev) => ({ ...prev, difficulty: e.target.value }))}
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              >
+                {DIFFICULTY_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </AdminField>
+            <AdminField label="Tiempo estimado">
+              <Input value={form.estimated_time} onChange={(e) => setForm((prev) => ({ ...prev, estimated_time: e.target.value }))} />
+            </AdminField>
+            <AdminField label="ROI estimado">
+              <Input value={form.roi_estimate} onChange={(e) => setForm((prev) => ({ ...prev, roi_estimate: e.target.value }))} />
+            </AdminField>
+            <AdminField label="Inversión plataforma">
+              <Input value={form.platform_investment} onChange={(e) => setForm((prev) => ({ ...prev, platform_investment: e.target.value }))} />
+            </AdminField>
+            <AdminField label="Icon name">
+              <Input value={form.icon_name} onChange={(e) => setForm((prev) => ({ ...prev, icon_name: e.target.value }))} />
+            </AdminField>
+            <AdminField label="Minutos desarrollo">
+              <Input type="number" value={form.development_time_minutes} onChange={(e) => setForm((prev) => ({ ...prev, development_time_minutes: Number(e.target.value) }))} />
+            </AdminField>
+            <AdminField label="Tokens por ejecución">
+              <Input type="number" value={form.tokens_per_execution} onChange={(e) => setForm((prev) => ({ ...prev, tokens_per_execution: Number(e.target.value) }))} />
+            </AdminField>
+          </div>
+
+          <AdminField label="Descripción corta">
+            <textarea value={form.short_description} onChange={(e) => setForm((prev) => ({ ...prev, short_description: e.target.value }))} rows={2} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+          </AdminField>
+          <AdminField label="Descripción larga">
+            <textarea value={form.long_description} onChange={(e) => setForm((prev) => ({ ...prev, long_description: e.target.value }))} rows={5} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+          </AdminField>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <AdminField label="Herramientas requeridas (una por línea)">
+              <textarea value={form.tools_required_text} onChange={(e) => setForm((prev) => ({ ...prev, tools_required_text: e.target.value }))} rows={5} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+            </AdminField>
+            <AdminField label="Integraciones (una por línea)">
+              <textarea value={form.integrations_text} onChange={(e) => setForm((prev) => ({ ...prev, integrations_text: e.target.value }))} rows={5} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+            </AdminField>
+            <AdminField label="Features (una por línea)">
+              <textarea value={form.features_text} onChange={(e) => setForm((prev) => ({ ...prev, features_text: e.target.value }))} rows={5} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+            </AdminField>
+          </div>
+
+          <AdminField label="Checklist items (uno por línea)">
+            <textarea value={form.checklist_items_text} onChange={(e) => setForm((prev) => ({ ...prev, checklist_items_text: e.target.value }))} rows={4} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+          </AdminField>
+          <AdminField label="Builder questions JSON">
+            <textarea value={form.builder_questions_text} onChange={(e) => setForm((prev) => ({ ...prev, builder_questions_text: e.target.value }))} rows={5} className="w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-xs" />
+          </AdminField>
+          <label className="flex items-center gap-2 text-sm text-gray-700">
+            <input type="checkbox" checked={form.is_featured} onChange={(e) => setForm((prev) => ({ ...prev, is_featured: e.target.checked }))} />
+            Destacada
+          </label>
+        </div>
+      )}
+
+      {activeTab === "cover" && (
+        <div className="space-y-3">
+          <div className="aspect-video max-w-2xl overflow-hidden rounded-lg border bg-zinc-100">
+            {form.cover_image_url ? <img src={form.cover_image_url} alt="" className="h-full w-full object-cover" /> : null}
+          </div>
+          <AdminField label="Cover image URL">
+            <Input value={form.cover_image_url} onChange={(e) => setForm((prev) => ({ ...prev, cover_image_url: e.target.value }))} />
+          </AdminField>
+          <div className="flex flex-wrap gap-2">
+            <label className="inline-flex cursor-pointer rounded-md bg-foreground px-3 py-2 text-xs font-medium text-background hover:opacity-90">
+              {uploading ? "Subiendo…" : "Subir imagen"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploading}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) uploadCover(file);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+            <button onClick={() => setForm((prev) => ({ ...prev, cover_image_url: "" }))} className="rounded-md border px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+              Quitar imagen
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "tools" && (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Asignadas ({assignedTools.length})</div>
+            <div className="space-y-2">
+              {assignedTools.length === 0 ? (
+                <div className="rounded-lg border border-dashed p-4 text-center text-xs text-gray-400">Sin herramientas</div>
+              ) : (
+                assignedTools
+                  .slice()
+                  .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+                  .map((assigned) => {
+                    const tool = assigned.tool ?? allTools.find((item) => item.id === assigned.tool_id);
+                    return (
+                      <div key={assigned.tool_id} className="flex items-center gap-2 rounded-lg border bg-white p-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm font-medium text-gray-900">{tool?.name ?? assigned.tool_id}</div>
+                          <label className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                            <input
+                              type="checkbox"
+                              checked={assigned.is_essential}
+                              onChange={(e) =>
+                                setAssignedTools((prev) =>
+                                  prev.map((item) => item.tool_id === assigned.tool_id ? { ...item, is_essential: e.target.checked } : item),
+                                )
+                              }
+                            />
+                            Esencial
+                          </label>
+                        </div>
+                        <Input
+                          type="number"
+                          value={assigned.display_order ?? 0}
+                          onChange={(e) =>
+                            setAssignedTools((prev) =>
+                              prev.map((item) => item.tool_id === assigned.tool_id ? { ...item, display_order: Number(e.target.value) } : item),
+                            )
+                          }
+                          className="h-8 w-16 text-xs"
+                        />
+                        <button
+                          onClick={() => setAssignedTools((prev) => prev.filter((item) => item.tool_id !== assigned.tool_id))}
+                          className="rounded border px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                        >
+                          Quitar
+                        </button>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Catálogo</div>
+            <Input value={toolSearch} onChange={(e) => setToolSearch(e.target.value)} placeholder="Buscar herramienta…" className="mb-2 h-8 text-xs" />
+            <div className="max-h-80 space-y-1.5 overflow-y-auto pr-1">
+              {availableTools.length === 0 ? (
+                <div className="rounded-lg border border-dashed p-4 text-center text-xs text-gray-400">Sin resultados</div>
+              ) : (
+                availableTools.map((tool) => (
+                  <div key={tool.id} className="flex items-center gap-2 rounded-lg border bg-white p-2">
+                    <div className="min-w-0 flex-1 truncate text-sm text-gray-900">{tool.name}</div>
+                    <button onClick={() => addAssignedTool(tool)} className="rounded-md border px-2 py-1 text-xs text-gray-700 hover:bg-gray-50">
+                      Agregar
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "resources" && (
+        <div className="space-y-3">
+          {form.resources.length === 0 ? (
+            <div className="rounded-lg border border-dashed p-4 text-center text-xs text-gray-400">Sin recursos</div>
+          ) : (
+            form.resources.map((resource) => (
+              <div key={resource.client_id} className="rounded-lg border bg-white p-3">
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_1fr_1.4fr_auto]">
+                  <Input value={resource.title} onChange={(e) => updateResource(resource.client_id, { title: e.target.value })} placeholder="Título" className="h-8 text-sm" />
+                  <Input value={resource.description ?? ""} onChange={(e) => updateResource(resource.client_id, { description: e.target.value })} placeholder="Descripción" className="h-8 text-sm" />
+                  <Input value={resource.url} onChange={(e) => updateResource(resource.client_id, { url: e.target.value, domain: extractDomain(e.target.value) })} placeholder="https://…" className="h-8 text-sm" />
+                  <div className="flex gap-1">
+                    <button onClick={() => moveResource(resource.client_id, -1)} className="rounded border px-2 text-xs text-gray-600 hover:bg-gray-50">↑</button>
+                    <button onClick={() => moveResource(resource.client_id, 1)} className="rounded border px-2 text-xs text-gray-600 hover:bg-gray-50">↓</button>
+                    <button onClick={() => setForm((prev) => ({ ...prev, resources: prev.resources.filter((item) => item.client_id !== resource.client_id) }))} className="rounded border px-2 text-xs text-red-600 hover:bg-red-50">Quitar</button>
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => setEditingId(sol.id)}
-                className="shrink-0 rounded-md bg-foreground px-3 py-1.5 text-xs font-medium text-background hover:opacity-90"
-              >
-                Editar
-              </button>
-            </div>
-          ))
-        )}
-      </div>
+            ))
+          )}
+          <button
+            onClick={() =>
+              setForm((prev) => ({
+                ...prev,
+                resources: [...prev.resources, { client_id: makeClientId("resource"), type: "link", title: "", description: "", url: "", domain: "" }],
+              }))
+            }
+            className="w-full rounded-md border border-dashed px-3 py-2 text-xs text-gray-600 hover:bg-gray-50"
+          >
+            + Agregar recurso
+          </button>
+        </div>
+      )}
 
-      <SolutionEditorDrawer
-        solutionId={editingId}
-        open={!!editingId}
-        onOpenChange={(v) => {
-          if (!v) setEditingId(null);
-        }}
-      />
+      <div className="flex justify-end gap-2 border-t border-gray-100 pt-4">
+        <button onClick={onCancel} className="rounded-md border px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button onClick={save} disabled={saving || uploading} className="rounded-md bg-foreground px-3 py-2 text-xs font-medium text-background hover:opacity-90 disabled:opacity-50">
+          {saving ? "Guardando…" : "Guardar"}
+        </button>
+      </div>
     </div>
+  );
+}
+
+function AdminField({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-medium text-gray-600">{label}</span>
+      {children}
+    </label>
   );
 }
