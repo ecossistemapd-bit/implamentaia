@@ -377,7 +377,9 @@ export type Database = {
           builder_questions: Json | null
           category: Database["public"]["Enums"]["solution_category"]
           checklist_items: string[] | null
+          cover_image_url: string | null
           created_at: string
+          development_time_minutes: number | null
           difficulty: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time: string
           features: string[]
@@ -387,12 +389,14 @@ export type Database = {
           is_featured: boolean
           long_description: string
           n8n_template: string | null
+          platform_investment: string | null
           prompt_template: string | null
           resources: Json
           roi_estimate: string
           short_description: string
           slug: string
           title: string
+          tokens_per_execution: number | null
           tools_required: string[]
           video_url: string | null
         }
@@ -400,7 +404,9 @@ export type Database = {
           builder_questions?: Json | null
           category: Database["public"]["Enums"]["solution_category"]
           checklist_items?: string[] | null
+          cover_image_url?: string | null
           created_at?: string
+          development_time_minutes?: number | null
           difficulty: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time: string
           features?: string[]
@@ -410,12 +416,14 @@ export type Database = {
           is_featured?: boolean
           long_description: string
           n8n_template?: string | null
+          platform_investment?: string | null
           prompt_template?: string | null
           resources?: Json
           roi_estimate: string
           short_description: string
           slug: string
           title: string
+          tokens_per_execution?: number | null
           tools_required?: string[]
           video_url?: string | null
         }
@@ -423,7 +431,9 @@ export type Database = {
           builder_questions?: Json | null
           category?: Database["public"]["Enums"]["solution_category"]
           checklist_items?: string[] | null
+          cover_image_url?: string | null
           created_at?: string
+          development_time_minutes?: number | null
           difficulty?: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time?: string
           features?: string[]
@@ -433,12 +443,14 @@ export type Database = {
           is_featured?: boolean
           long_description?: string
           n8n_template?: string | null
+          platform_investment?: string | null
           prompt_template?: string | null
           resources?: Json
           roi_estimate?: string
           short_description?: string
           slug?: string
           title?: string
+          tokens_per_execution?: number | null
           tools_required?: string[]
           video_url?: string | null
         }
