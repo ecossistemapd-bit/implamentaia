@@ -183,31 +183,31 @@ function SolutionByIdDetail() {
                   )}
                   <button
                     onClick={() => setActiveStep(step.key)}
-                    className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 transition ${
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition ${
                       isCompleted
-                        ? "border-white bg-white text-black"
+                        ? "border-green-500 bg-green-500 text-white"
                         : isActive
-                        ? "border-white bg-white text-black shadow-lg shadow-violet-500/30"
-                        : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-600"
+                        ? "border-violet-500 bg-violet-500 text-white"
+                        : "border-white/10 bg-transparent text-zinc-600 hover:border-white/20"
                     }`}
                     aria-label={step.label}
                   >
-                    {isCompleted ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+                    {isCompleted ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
                   </button>
                   {i < STEPS.length - 1 && (
                     <div
-                      className={`h-0.5 flex-1 transition ${
-                        isCompleted ? "bg-violet-500" : "bg-zinc-800"
+                      className={`h-px flex-1 transition ${
+                        isCompleted ? "bg-green-500" : "bg-white/8"
                       }`}
                     />
                   )}
                 </div>
                 <span
-                  className={`mt-3 text-center text-xs transition ${
+                  className={`mt-2.5 text-center text-xs transition ${
                     isActive
-                      ? "font-bold text-violet-400"
+                      ? "text-white font-medium"
                       : isCompleted
-                      ? "text-zinc-300"
+                      ? "text-green-500"
                       : "text-zinc-600"
                   }`}
                 >
