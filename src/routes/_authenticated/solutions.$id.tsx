@@ -18,7 +18,11 @@ import {
   FileText,
   Lock,
   Loader2,
+  ArrowRight,
+  Sparkles,
+  CheckCircle2,
 } from "lucide-react";
+import { CATEGORIES, CATEGORY_LABEL, DIFFICULTY_LABEL, type CategoryKey, type Difficulty } from "@/lib/categories";
 import confetti from "canvas-confetti";
 
 import { supabase } from "@/integrations/supabase/client";
