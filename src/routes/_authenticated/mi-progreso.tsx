@@ -126,7 +126,7 @@ function MiProgreso() {
   });
 
   const cards = [
-    { icon: Sparkles, label: "Soluciones iniciadas", value: data?.solutionsStarted ?? 0 },
+    { icon: Sparkles, label: "Soluciones en progreso", value: data?.solutionsActive ?? 0 },
     { icon: Trophy, label: "Soluciones completadas", value: data?.solutionsCompleted ?? 0 },
     { icon: BookOpen, label: "Cursos en progreso", value: data?.coursesStarted ?? 0 },
     { icon: TrendingUp, label: "Proyectos activos", value: data?.projectsActive ?? 0 },
