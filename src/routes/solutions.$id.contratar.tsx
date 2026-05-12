@@ -101,7 +101,7 @@ function ContratarPage() {
       });
     } catch (e) {
       console.error(e);
-      toast.error("Hubo un error. Intentá de nuevo.");
+      toast.error("Hubo un error. Intentá de nuevo.", { duration: 4000 });
       setSubmitting(false);
     }
   };
