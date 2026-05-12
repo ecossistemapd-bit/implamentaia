@@ -99,6 +99,7 @@ function SolutionByIdDetail() {
         video_url: string | null;
         resources: { title: string; url: string; type?: string; description?: string; domain?: string }[] | null;
         solution_tools: SolutionToolItem[] | null;
+        lovable_remix_url: string | null;
       };
     },
   });
