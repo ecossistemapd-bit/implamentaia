@@ -134,7 +134,7 @@ function Dashboard() {
               <Flame className="h-3.5 w-3.5" /> {streakDays} días consecutivos
             </span>
             <h1 className="mt-4 text-4xl font-bold tracking-tight text-white">
-              {tod}, <span className="text-white">{greetName}</span>! 👋
+              {tod}, <span className="text-white">{greetName}</span>
             </h1>
             <p className="mt-2 max-w-lg text-sm text-zinc-400">
               Seguí construyendo tu negocio con IA. Explorá soluciones, avanzá en tus cursos.
