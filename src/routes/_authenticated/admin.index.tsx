@@ -1082,3 +1082,144 @@ function AdminField({ label, children }: { label: string; children: ReactNode })
     </label>
   );
 }
+
+function AccessTab() {
+  const qc = useQueryClient();
+  const [email, setEmail] = useState("");
+  const [adding, setAdding] = useState(false);
+
+  const allowedQ = useQuery({
+    queryKey: ["admin-allowed-emails"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("allowed_emails")
+        .select("email, created_at, invited_by")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const usersQ = useQuery({
+    queryKey: ["admin-users-emails"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_list_users");
+      if (error) throw error;
+      return (data ?? []) as Array<{ email: string; created_at: string }>;
+    },
+  });
+
+  const registered = useMemo(() => {
+    const m = new Map<string, string>();
+    (usersQ.data ?? []).forEach((u) => m.set(u.email.toLowerCase(), u.created_at));
+    return m;
+  }, [usersQ.data]);
+
+  const handleAdd = async () => {
+    const e = email.trim().toLowerCase();
+    if (!e || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
+      toast.error("Email inválido");
+      return;
+    }
+    setAdding(true);
+    const { error } = await supabase.from("allowed_emails").insert({ email: e });
+    setAdding(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Email autorizado");
+    setEmail("");
+    qc.invalidateQueries({ queryKey: ["admin-allowed-emails"] });
+  };
+
+  const handleDelete = async (e: string) => {
+    if (!confirm(`¿Revocar acceso a ${e}?`)) return;
+    const { error } = await supabase.from("allowed_emails").delete().eq("email", e);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Acceso revocado");
+    qc.invalidateQueries({ queryKey: ["admin-allowed-emails"] });
+  };
+
+  const fmt = (d: string | null) =>
+    d ? new Date(d).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" }) : "—";
+
+  return (
+    <div className="mt-8">
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold">Acceso a la Plataforma</h2>
+        <p className="mt-1 text-sm text-gray-500">Gestioná qué emails pueden registrarse.</p>
+      </div>
+
+      <div className="mb-4 flex gap-2">
+        <Input
+          type="email"
+          placeholder="email@empresa.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); }}
+          className="max-w-sm"
+        />
+        <button
+          onClick={handleAdd}
+          disabled={adding}
+          className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
+        >
+          {adding ? "Agregando…" : "+ Autorizar email"}
+        </button>
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
+            <tr>
+              <th className="px-4 py-3 font-medium">Email</th>
+              <th className="px-4 py-3 font-medium">Autorizado</th>
+              <th className="px-4 py-3 font-medium">Registrado</th>
+              <th className="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {allowedQ.isLoading ? (
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400">Cargando…</td></tr>
+            ) : (allowedQ.data ?? []).length === 0 ? (
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400">No hay emails autorizados.</td></tr>
+            ) : (
+              (allowedQ.data ?? []).map((row) => {
+                const regAt = registered.get(row.email.toLowerCase());
+                return (
+                  <tr key={row.email} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900">{row.email}</td>
+                    <td className="px-4 py-3 text-gray-600">{fmt(row.created_at)}</td>
+                    <td className="px-4 py-3">
+                      {regAt ? (
+                        <span className="inline-flex items-center gap-1.5 text-green-700">
+                          <span>✓</span>{fmt(regAt)}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 text-gray-400">
+                          <span>✗</span>pendiente
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => handleDelete(row.email)}
+                        className="text-xs text-gray-400 transition hover:text-red-600"
+                      >
+                        Revocar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
