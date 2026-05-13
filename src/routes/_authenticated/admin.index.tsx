@@ -12,6 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPanel,
@@ -1087,9 +1090,12 @@ function AccessTab() {
   const qc = useQueryClient();
   const [email, setEmail] = useState("");
   const [adding, setAdding] = useState(false);
+  const [openAdd, setOpenAdd] = useState(false);
+  const [toDelete, setToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const allowedQ = useQuery({
-    queryKey: ["admin-allowed-emails"],
+    queryKey: ["allowed-emails"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("allowed_emails")
@@ -1105,121 +1111,205 @@ function AccessTab() {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_list_users");
       if (error) throw error;
-      return (data ?? []) as Array<{ email: string; created_at: string }>;
+      return (data ?? []) as Array<{ email: string }>;
     },
   });
 
   const registered = useMemo(() => {
-    const m = new Map<string, string>();
-    (usersQ.data ?? []).forEach((u) => m.set(u.email.toLowerCase(), u.created_at));
-    return m;
+    const s = new Set<string>();
+    (usersQ.data ?? []).forEach((u) => s.add(u.email.toLowerCase()));
+    return s;
   }, [usersQ.data]);
 
   const handleAdd = async () => {
     const e = email.trim().toLowerCase();
-    if (!e || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
       toast.error("Email inválido");
       return;
     }
     setAdding(true);
-    const { error } = await supabase.from("allowed_emails").insert({ email: e });
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from("allowed_emails")
+      .insert({ email: e, invited_by: user?.email ?? null });
     setAdding(false);
     if (error) {
-      toast.error(error.message);
+      if ((error as { code?: string }).code === "23505") {
+        toast.error("Este email ya está autorizado");
+      } else {
+        toast.error("No se pudo autorizar el email");
+      }
       return;
     }
-    toast.success("Email autorizado");
+    toast.success("Email autorizado. La persona ya puede registrarse.");
     setEmail("");
-    qc.invalidateQueries({ queryKey: ["admin-allowed-emails"] });
+    setOpenAdd(false);
+    qc.invalidateQueries({ queryKey: ["allowed-emails"] });
   };
 
-  const handleDelete = async (e: string) => {
-    if (!confirm(`¿Revocar acceso a ${e}?`)) return;
-    const { error } = await supabase.from("allowed_emails").delete().eq("email", e);
+  const handleDelete = async () => {
+    if (!toDelete) return;
+    setDeleting(true);
+    const { error } = await supabase.from("allowed_emails").delete().eq("email", toDelete);
+    setDeleting(false);
     if (error) {
-      toast.error(error.message);
+      toast.error("No se pudo quitar el acceso");
       return;
     }
-    toast.success("Acceso revocado");
-    qc.invalidateQueries({ queryKey: ["admin-allowed-emails"] });
+    toast.success("Acceso eliminado");
+    setToDelete(null);
+    qc.invalidateQueries({ queryKey: ["allowed-emails"] });
   };
 
-  const fmt = (d: string | null) =>
-    d ? new Date(d).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" }) : "—";
+  const formatRelative = (d: string) => {
+    const diff = Date.now() - new Date(d).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return "hace instantes";
+    if (m < 60) return `hace ${m} min`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `hace ${h} h`;
+    const days = Math.floor(h / 24);
+    if (days < 30) return `hace ${days} día${days === 1 ? "" : "s"}`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `hace ${months} mes${months === 1 ? "" : "es"}`;
+    return new Date(d).toLocaleDateString("es-AR");
+  };
+
+  const rows = allowedQ.data ?? [];
 
   return (
     <div className="mt-8">
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold">Acceso a la Plataforma</h2>
-        <p className="mt-1 text-sm text-gray-500">Gestioná qué emails pueden registrarse.</p>
-      </div>
-
-      <div className="mb-4 flex gap-2">
-        <Input
-          type="email"
-          placeholder="email@empresa.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); }}
-          className="max-w-sm"
-        />
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold">Acceso a la Plataforma</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Gestioná qué emails pueden registrarse en Implementa AI.
+          </p>
+        </div>
         <button
-          onClick={handleAdd}
-          disabled={adding}
-          className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
+          onClick={() => setOpenAdd(true)}
+          className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:opacity-90"
         >
-          {adding ? "Agregando…" : "+ Autorizar email"}
+          + Autorizar email
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
-            <tr>
-              <th className="px-4 py-3 font-medium">Email</th>
-              <th className="px-4 py-3 font-medium">Autorizado</th>
-              <th className="px-4 py-3 font-medium">Registrado</th>
-              <th className="px-4 py-3"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {allowedQ.isLoading ? (
-              <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400">Cargando…</td></tr>
-            ) : (allowedQ.data ?? []).length === 0 ? (
-              <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400">No hay emails autorizados.</td></tr>
-            ) : (
-              (allowedQ.data ?? []).map((row) => {
-                const regAt = registered.get(row.email.toLowerCase());
+      <div className="mt-6 overflow-hidden rounded-lg border border-gray-200 bg-white">
+        {allowedQ.isLoading ? (
+          <div className="px-4 py-12 text-center text-sm text-gray-400">Cargando…</div>
+        ) : rows.length === 0 ? (
+          <div className="px-4 py-16 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-2xl">
+              ✉️
+            </div>
+            <p className="text-sm font-medium text-gray-900">No hay emails autorizados aún</p>
+            <p className="mt-1 text-sm text-gray-500">
+              Autorizá un email para que esa persona pueda crear su cuenta.
+            </p>
+          </div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
+              <tr>
+                <th className="px-4 py-3 font-medium">Email</th>
+                <th className="px-4 py-3 font-medium">Autorizado</th>
+                <th className="px-4 py-3 font-medium">Invitado por</th>
+                <th className="px-4 py-3 font-medium">Estado</th>
+                <th className="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {rows.map((row) => {
+                const isReg = registered.has(row.email.toLowerCase());
                 return (
                   <tr key={row.email} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium text-gray-900">{row.email}</td>
-                    <td className="px-4 py-3 text-gray-600">{fmt(row.created_at)}</td>
+                    <td className="px-4 py-3 text-gray-600">{formatRelative(row.created_at)}</td>
+                    <td className="px-4 py-3 text-gray-500">{row.invited_by ?? "—"}</td>
                     <td className="px-4 py-3">
-                      {regAt ? (
-                        <span className="inline-flex items-center gap-1.5 text-green-700">
-                          <span>✓</span>{fmt(regAt)}
+                      {isReg ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                          ✓ Registrado
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 text-gray-400">
-                          <span>✗</span>pendiente
+                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                          ○ Pendiente
                         </span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
-                        onClick={() => handleDelete(row.email)}
-                        className="text-xs text-gray-400 transition hover:text-red-600"
+                        onClick={() => setToDelete(row.email)}
+                        className="rounded p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+                        aria-label="Quitar acceso"
                       >
-                        Revocar
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
                   </tr>
                 );
-              })
-            )}
-          </tbody>
-        </table>
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
+
+      <Dialog open={openAdd} onOpenChange={(o) => { setOpenAdd(o); if (!o) setEmail(""); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Autorizar email</DialogTitle>
+            <DialogDescription>
+              La persona con este email va a poder crear su cuenta en Implementa AI.
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            type="email"
+            placeholder="email@empresa.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); }}
+            autoFocus
+          />
+          <DialogFooter>
+            <button
+              onClick={() => setOpenAdd(false)}
+              className="rounded-md border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleAdd}
+              disabled={adding}
+              className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50"
+            >
+              {adding ? "Autorizando…" : "Autorizar"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Quitar acceso?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Vas a quitar el acceso de <span className="font-medium text-foreground">{toDelete}</span>.
+              Si esa persona ya tiene cuenta creada, su cuenta seguirá funcionando, pero no podrá
+              registrarse de nuevo. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleDelete(); }}
+              disabled={deleting}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              {deleting ? "Quitando…" : "Quitar acceso"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
