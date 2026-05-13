@@ -71,11 +71,11 @@ export function OnboardingModal() {
             <div className="mt-6 w-full space-y-3 text-left">
               <div>
                 <label className="mb-1 block text-xs font-medium text-gray-600">Tu nombre completo</label>
-                <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Juan García" />
+                <Input className="text-gray-900" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Juan García" />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-gray-600">Nombre de tu empresa</label>
-                <Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Mi Empresa S.A." />
+                <Input className="text-gray-900" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Mi Empresa S.A." />
               </div>
             </div>
             <Button
