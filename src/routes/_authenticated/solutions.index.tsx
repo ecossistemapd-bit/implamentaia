@@ -28,7 +28,12 @@ function SolutionsList() {
   const { data, isLoading } = useQuery({
     queryKey: ["solutions"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("solutions").select("*").order("title");
+      const { data, error } = await supabase
+        .from("solutions")
+        .select("*")
+        .order("featured", { ascending: false })
+        .order("category")
+        .order("title");
       if (error) throw error;
       return data;
     },
