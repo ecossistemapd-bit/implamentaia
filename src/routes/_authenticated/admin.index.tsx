@@ -42,7 +42,7 @@ const ROLE_LABEL: Record<string, string> = {
 function AdminPanel() {
   const { role, loading: roleLoading, isAdmin } = useRole();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"users" | "projects" | "solutions">("users");
+  const [tab, setTab] = useState<"users" | "projects" | "solutions" | "access">("users");
   const [filterUserId, setFilterUserId] = useState<string | null>(null);
 
   useEffect(() => {
