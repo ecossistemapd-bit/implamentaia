@@ -256,7 +256,9 @@ function SolutionByIdDetail() {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (view === "overview") {
+  const inDev = s.status === "en_desarrollo";
+
+  if (view === "overview" || inDev) {
     return (
       <div className="mx-auto max-w-[1100px] px-6 py-8">
         <Link to="/solutions" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white">
