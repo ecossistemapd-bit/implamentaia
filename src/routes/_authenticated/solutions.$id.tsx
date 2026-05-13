@@ -103,6 +103,7 @@ function SolutionByIdDetail() {
         resources: { title: string; url: string; type?: string; description?: string; domain?: string }[] | null;
         solution_tools: SolutionToolItem[] | null;
         lovable_remix_url: string | null;
+        status: string | null;
       };
     },
   });
@@ -142,9 +143,13 @@ function SolutionByIdDetail() {
     setActiveStep(firstIncomplete ? firstIncomplete.key : "conclusion");
   }, [progress, progressLoading, completedSet]);
 
-  // If user already has progress, jump straight into journey view
+  // If user already has progress, jump straight into journey view (skip for in-dev solutions)
   useEffect(() => {
     if (viewInitializedRef.current || progressLoading || !progress) return;
+    if (s?.status === "en_desarrollo") {
+      viewInitializedRef.current = true;
+      return;
+    }
     viewInitializedRef.current = true;
     if (completedSet.size > 0) {
       setView("journey");
@@ -153,7 +158,7 @@ function SolutionByIdDetail() {
         duration: 4000,
       });
     }
-  }, [progress, progressLoading, completedSet]);
+  }, [progress, progressLoading, completedSet, s?.status]);
 
   // Confetti when reaching conclusion with all prior done
   useEffect(() => {
@@ -251,7 +256,9 @@ function SolutionByIdDetail() {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (view === "overview") {
+  const inDev = s.status === "en_desarrollo";
+
+  if (view === "overview" || inDev) {
     return (
       <div className="mx-auto max-w-[1100px] px-6 py-8">
         <Link to="/solutions" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white">
@@ -273,12 +280,14 @@ function SolutionByIdDetail() {
             {s.short_description && (
               <p className="mt-3 max-w-xl text-base text-zinc-400">{s.short_description}</p>
             )}
-            <Button
-              onClick={goToJourney}
-              className="mt-6 rounded-lg bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-violet-600"
-            >
-              Continuar Solución <ArrowRight className="ml-1.5 h-4 w-4" />
-            </Button>
+            {!inDev && (
+              <Button
+                onClick={goToJourney}
+                className="mt-6 rounded-lg bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-violet-600"
+              >
+                Continuar Solución <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Button>
+            )}
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
@@ -369,6 +378,24 @@ function SolutionByIdDetail() {
           </div>
           )}
         </div>
+
+        {inDev && (
+          <div className="mt-8 rounded-2xl border border-white/10 bg-zinc-900/60 p-6 text-center">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-zinc-400">
+              <Lock className="h-4 w-4" />
+            </div>
+            <h3 className="mt-3 text-lg font-semibold text-white">Solución en desarrollo</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-zinc-400">
+              Estamos puliendo los últimos detalles. Suscribite para recibir un aviso cuando esté disponible.
+            </p>
+            <Button
+              onClick={() => toast.success("Te avisaremos al email cuando esté lista.", { duration: 4000 })}
+              className="mt-5 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-zinc-100"
+            >
+              Avisarme cuando esté lista
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
