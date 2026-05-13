@@ -137,19 +137,13 @@ function SolutionsList() {
           const catColor = CATEGORY_COLOR[s.category as CategoryKey] ?? CATEGORY_COLOR.default;
           const diffColor = DIFFICULTY_COLOR[s.difficulty as Difficulty];
           const inDev = (s as { status?: string }).status === "en_desarrollo";
-          const ctaLabel = isDone
-            ? null
-            : inDev && completed === 0
-              ? "Próximamente"
-              : completed > 0
-                ? "Continuar →"
-                : "Comenzar →";
-          const ctaDisabled = inDev && completed === 0;
+          const showProgress = !isDone && !inDev && completed > 0;
+          const ctaLabel = isDone ? null : completed > 0 ? "Continuar →" : "Comenzar →";
           return (
             <Link
               key={s.id}
               {...linkProps}
-              className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 transition duration-200 hover:border-zinc-700"
+              className={`group relative flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 transition duration-200 hover:border-zinc-700 ${inDev ? "opacity-75 hover:opacity-90" : ""}`}
             >
               <div className="relative aspect-video w-full overflow-hidden bg-zinc-950">
                 <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-1">
@@ -159,8 +153,8 @@ function SolutionsList() {
                     </span>
                   )}
                   {inDev && (
-                    <span className="inline-flex items-center gap-1 rounded-md border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-400">
-                      En desarrollo
+                    <span className="inline-flex items-center rounded-md bg-zinc-800/60 px-2 py-0.5 text-[10px] font-medium text-zinc-400 backdrop-blur">
+                      Próximamente
                     </span>
                   )}
                 </div>
@@ -169,7 +163,7 @@ function SolutionsList() {
                     src={s.cover_image_url}
                     alt={s.title}
                     loading="lazy"
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                    className={`h-full w-full object-cover transition duration-300 group-hover:scale-[1.02] ${inDev ? "grayscale-[30%]" : ""}`}
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
@@ -194,7 +188,7 @@ function SolutionsList() {
                     {DIFFICULTY_LABEL[s.difficulty as Difficulty]}
                   </span>
                 </div>
-                {!isDone && ctaLabel && (
+                {showProgress && ctaLabel && (
                   <div className="mt-3">
                     <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
                       <div
@@ -204,9 +198,7 @@ function SolutionsList() {
                     </div>
                     <div className="mt-1.5 flex items-center justify-between text-[11px] text-zinc-500">
                       <span>{completed} de 5 pasos</span>
-                      <span className={`font-medium ${ctaDisabled ? "text-zinc-500" : "text-violet-400"}`}>
-                        {ctaLabel}
-                      </span>
+                      <span className="font-medium text-violet-400">{ctaLabel}</span>
                     </div>
                   </div>
                 )}
