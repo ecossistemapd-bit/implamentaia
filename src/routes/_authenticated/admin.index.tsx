@@ -63,6 +63,7 @@ function AdminPanel() {
           ["users", "Usuarios"],
           ["projects", "Proyectos"],
           ["solutions", "Soluciones"],
+          ["access", "Acceso"],
         ] as const).map(([k, label]) => (
           <button
             key={k}
@@ -83,8 +84,10 @@ function AdminPanel() {
         <UsersTab onViewProjects={(uid) => { setFilterUserId(uid); setTab("projects"); }} />
       ) : tab === "projects" ? (
         <ProjectsTab filterUserId={filterUserId} onClearFilter={() => setFilterUserId(null)} />
-      ) : (
+      ) : tab === "solutions" ? (
         <SolutionsTab />
+      ) : (
+        <AccessTab />
       )}
     </div>
   );
