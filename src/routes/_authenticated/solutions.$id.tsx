@@ -378,6 +378,24 @@ function SolutionByIdDetail() {
           </div>
           )}
         </div>
+
+        {inDev && (
+          <div className="mt-8 rounded-2xl border border-white/10 bg-zinc-900/60 p-6 text-center">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-zinc-400">
+              <Lock className="h-4 w-4" />
+            </div>
+            <h3 className="mt-3 text-lg font-semibold text-white">Solución en desarrollo</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-zinc-400">
+              Estamos puliendo los últimos detalles. Suscribite para recibir un aviso cuando esté disponible.
+            </p>
+            <Button
+              onClick={() => toast.success("Te avisaremos al email cuando esté lista.", { duration: 4000 })}
+              className="mt-5 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-zinc-100"
+            >
+              Avisarme cuando esté lista
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
