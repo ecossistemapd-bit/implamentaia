@@ -418,6 +418,7 @@ export type Database = {
           development_time_minutes: number | null
           difficulty: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time: string
+          featured: boolean | null
           features: string[]
           icon_name: string
           id: string
@@ -432,6 +433,7 @@ export type Database = {
           roi_estimate: string
           short_description: string
           slug: string
+          status: string | null
           title: string
           tokens_per_execution: number | null
           tools_required: string[]
@@ -446,6 +448,7 @@ export type Database = {
           development_time_minutes?: number | null
           difficulty: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time: string
+          featured?: boolean | null
           features?: string[]
           icon_name?: string
           id?: string
@@ -460,6 +463,7 @@ export type Database = {
           roi_estimate: string
           short_description: string
           slug: string
+          status?: string | null
           title: string
           tokens_per_execution?: number | null
           tools_required?: string[]
@@ -474,6 +478,7 @@ export type Database = {
           development_time_minutes?: number | null
           difficulty?: Database["public"]["Enums"]["solution_difficulty"]
           estimated_time?: string
+          featured?: boolean | null
           features?: string[]
           icon_name?: string
           id?: string
@@ -488,6 +493,7 @@ export type Database = {
           roi_estimate?: string
           short_description?: string
           slug?: string
+          status?: string | null
           title?: string
           tokens_per_execution?: number | null
           tools_required?: string[]
@@ -599,6 +605,8 @@ export type Database = {
         | "finanzas"
         | "operaciones"
         | "rrhh"
+        | "modelos_ia"
+        | "juridico"
       solution_difficulty: "principiante" | "intermedio" | "avanzado"
     }
     CompositeTypes: {
@@ -744,6 +752,8 @@ export const Constants = {
         "finanzas",
         "operaciones",
         "rrhh",
+        "modelos_ia",
+        "juridico",
       ],
       solution_difficulty: ["principiante", "intermedio", "avanzado"],
     },
