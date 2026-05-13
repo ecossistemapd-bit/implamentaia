@@ -280,12 +280,14 @@ function SolutionByIdDetail() {
             {s.short_description && (
               <p className="mt-3 max-w-xl text-base text-zinc-400">{s.short_description}</p>
             )}
-            <Button
-              onClick={goToJourney}
-              className="mt-6 rounded-lg bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-violet-600"
-            >
-              Continuar Solución <ArrowRight className="ml-1.5 h-4 w-4" />
-            </Button>
+            {!inDev && (
+              <Button
+                onClick={goToJourney}
+                className="mt-6 rounded-lg bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-violet-600"
+              >
+                Continuar Solución <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Button>
+            )}
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
