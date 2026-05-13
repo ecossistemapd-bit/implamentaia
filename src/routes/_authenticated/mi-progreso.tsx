@@ -1,10 +1,22 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import {
-  TrendingUp, BookOpen, Sparkles, Trophy, ArrowRight, FolderKanban, Rocket,
+  TrendingUp, BookOpen, Sparkles, Trophy, ArrowRight, FolderKanban, Rocket, Trash2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/mi-progreso")({
   component: MiProgreso,
@@ -32,6 +44,29 @@ const PROJECT_STATUS: Record<string, { label: string; cls: string }> = {
 function MiProgreso() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [toDelete, setToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteProgress = async () => {
+    if (!toDelete || !user) return;
+    setDeleting(true);
+    const { error } = await supabase
+      .from("solution_steps_progress" as never)
+      .delete()
+      .eq("user_id", user.id)
+      .eq("solution_id", toDelete.id);
+    setDeleting(false);
+    if (error) {
+      toast.error("No pudimos eliminar el progreso. Intentá de nuevo.", { duration: 4000 });
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["solution-step-progress", toDelete.id, user.id] });
+    qc.invalidateQueries({ queryKey: ["solutions-progress-all", user.id] });
+    qc.invalidateQueries({ queryKey: ["mi-progreso", user.id] });
+    toast.success("Progreso eliminado", { duration: 4000 });
+    setToDelete(null);
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["mi-progreso", user?.id],
@@ -191,13 +226,24 @@ function MiProgreso() {
                         <span className="shrink-0 text-xs text-zinc-400">{s.completed} de 5 pasos</span>
                       </div>
                     </div>
-                    <Link
-                      to="/solutions/$id"
-                      params={{ id: s.id }}
-                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
-                    >
-                      Continuar <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setToDelete({ id: s.id, title: s.title })}
+                        aria-label="Eliminar progreso"
+                        title="Eliminar progreso"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 text-zinc-500 transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      <Link
+                        to="/solutions/$id"
+                        params={{ id: s.id }}
+                        className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
+                      >
+                        Continuar <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );
@@ -295,6 +341,27 @@ function MiProgreso() {
           </div>
         )}
       </Section>
+
+      <AlertDialog open={!!toDelete} onOpenChange={(open) => !open && !deleting && setToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar progreso?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Vas a eliminar TODO el progreso de "{toDelete?.title}". Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleDeleteProgress(); }}
+              disabled={deleting}
+              className="bg-red-500 text-white hover:bg-red-600"
+            >
+              {deleting ? "Eliminando..." : "Eliminar progreso"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
