@@ -341,6 +341,27 @@ function MiProgreso() {
           </div>
         )}
       </Section>
+
+      <AlertDialog open={!!toDelete} onOpenChange={(open) => !open && !deleting && setToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar progreso?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Vas a eliminar TODO el progreso de "{toDelete?.title}". Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleDeleteProgress(); }}
+              disabled={deleting}
+              className="bg-red-500 text-white hover:bg-red-600"
+            >
+              {deleting ? "Eliminando..." : "Eliminar progreso"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
