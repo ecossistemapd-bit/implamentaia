@@ -103,6 +103,7 @@ function SolutionByIdDetail() {
         resources: { title: string; url: string; type?: string; description?: string; domain?: string }[] | null;
         solution_tools: SolutionToolItem[] | null;
         lovable_remix_url: string | null;
+        status: string | null;
       };
     },
   });
