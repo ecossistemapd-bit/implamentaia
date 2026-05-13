@@ -44,6 +44,29 @@ const PROJECT_STATUS: Record<string, { label: string; cls: string }> = {
 function MiProgreso() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [toDelete, setToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteProgress = async () => {
+    if (!toDelete || !user) return;
+    setDeleting(true);
+    const { error } = await supabase
+      .from("solution_steps_progress" as never)
+      .delete()
+      .eq("user_id", user.id)
+      .eq("solution_id", toDelete.id);
+    setDeleting(false);
+    if (error) {
+      toast.error("No pudimos eliminar el progreso. Intentá de nuevo.", { duration: 4000 });
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["solution-step-progress", toDelete.id, user.id] });
+    qc.invalidateQueries({ queryKey: ["solutions-progress-all", user.id] });
+    qc.invalidateQueries({ queryKey: ["mi-progreso", user.id] });
+    toast.success("Progreso eliminado", { duration: 4000 });
+    setToDelete(null);
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["mi-progreso", user?.id],
