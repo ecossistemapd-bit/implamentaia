@@ -226,13 +226,24 @@ function MiProgreso() {
                         <span className="shrink-0 text-xs text-zinc-400">{s.completed} de 5 pasos</span>
                       </div>
                     </div>
-                    <Link
-                      to="/solutions/$id"
-                      params={{ id: s.id }}
-                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
-                    >
-                      Continuar <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setToDelete({ id: s.id, title: s.title })}
+                        aria-label="Eliminar progreso"
+                        title="Eliminar progreso"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 text-zinc-500 transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      <Link
+                        to="/solutions/$id"
+                        params={{ id: s.id }}
+                        className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
+                      >
+                        Continuar <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );
