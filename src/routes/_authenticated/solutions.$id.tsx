@@ -143,9 +143,13 @@ function SolutionByIdDetail() {
     setActiveStep(firstIncomplete ? firstIncomplete.key : "conclusion");
   }, [progress, progressLoading, completedSet]);
 
-  // If user already has progress, jump straight into journey view
+  // If user already has progress, jump straight into journey view (skip for in-dev solutions)
   useEffect(() => {
     if (viewInitializedRef.current || progressLoading || !progress) return;
+    if (s?.status === "en_desarrollo") {
+      viewInitializedRef.current = true;
+      return;
+    }
     viewInitializedRef.current = true;
     if (completedSet.size > 0) {
       setView("journey");
@@ -154,7 +158,7 @@ function SolutionByIdDetail() {
         duration: 4000,
       });
     }
-  }, [progress, progressLoading, completedSet]);
+  }, [progress, progressLoading, completedSet, s?.status]);
 
   // Confetti when reaching conclusion with all prior done
   useEffect(() => {
