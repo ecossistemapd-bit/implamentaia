@@ -179,8 +179,42 @@
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
-  h1, h2, h3, h4 {
-    letter-spacing: -0.025em;
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: #E8EDF5;
+    letter-spacing: -0.02em;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+  }
+  h3, h4 {
+    font-family: var(--font-sans);
+    letter-spacing: -0.02em;
+  }
+  p, label, button, nav, a, span, div, input, textarea, select {
+    font-family: var(--font-sans);
+  }
+
+  /* Sidebar section labels (INICIO, APRENDIZAJE, etc.) */
+  [data-sidebar="group-label"],
+  .sidebar-section-label {
+    font-size: 10px !important;
+    letter-spacing: 0.15em !important;
+    font-weight: 600 !important;
+    color: #6B7A99 !important;
+    text-transform: uppercase !important;
+    font-family: var(--font-sans) !important;
+  }
+
+  /* Page subtitles */
+  .page-subtitle {
+    color: #A0AABF;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: var(--font-sans);
   }
   ::selection {
     background-color: var(--color-foreground);
