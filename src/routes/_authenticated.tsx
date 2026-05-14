@@ -136,7 +136,10 @@ function AuthenticatedLayout() {
 
 function DesktopSidebar() {
   return (
-    <aside className="sticky top-0 hidden h-screen w-[220px] shrink-0 border-r border-white/6 bg-[#0A0A0A] lg:flex lg:flex-col">
+    <aside
+      className="sticky top-0 hidden h-screen w-[220px] shrink-0 lg:flex lg:flex-col"
+      style={{ backgroundColor: "#0F1624", borderRight: "1px solid rgba(201,168,76,0.12)" }}
+    >
       <div className="px-5 py-5">
         <Logo />
       </div>
