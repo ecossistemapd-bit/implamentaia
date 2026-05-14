@@ -274,20 +274,34 @@ function SolutionsList() {
   );
 }
 
+const CAT_TAG = "rounded text-[11px] font-semibold px-2 py-0.5";
 const CATEGORY_COLOR: Record<string, string> = {
-  ventas: "border-zinc-700 bg-zinc-800 text-zinc-300",
-  marketing: "border-zinc-700 bg-zinc-800 text-zinc-300",
-  atencion: "border-zinc-700 bg-zinc-800 text-zinc-300",
-  finanzas: "border-zinc-700 bg-zinc-800 text-zinc-300",
-  operaciones: "border-zinc-700 bg-zinc-800 text-zinc-300",
-  rrhh: "border-zinc-700 bg-zinc-800 text-zinc-300",
-  default: "border-zinc-700 bg-zinc-800 text-zinc-300",
+  ventas: CAT_TAG,
+  marketing: CAT_TAG,
+  atencion: CAT_TAG,
+  finanzas: CAT_TAG,
+  operaciones: CAT_TAG,
+  rrhh: CAT_TAG,
+  default: CAT_TAG,
+};
+const CAT_TAG_STYLE: React.CSSProperties = {
+  backgroundColor: "rgba(201,168,76,0.1)",
+  color: "#C9A84C",
+  border: "1px solid rgba(201,168,76,0.25)",
+  borderRadius: "4px",
 };
 
+const DIFF_TAG = "rounded text-[11px] font-semibold px-2 py-0.5";
 const DIFFICULTY_COLOR: Record<Difficulty, string> = {
-  principiante: "border-zinc-700 bg-zinc-800 text-zinc-300",
-  intermedio: "border-zinc-700 bg-zinc-800 text-zinc-300",
-  avanzado: "border-zinc-700 bg-zinc-800 text-zinc-300",
+  principiante: DIFF_TAG,
+  intermedio: DIFF_TAG,
+  avanzado: DIFF_TAG,
+};
+const DIFF_TAG_STYLE: React.CSSProperties = {
+  backgroundColor: "rgba(59,130,246,0.1)",
+  color: "#3B82F6",
+  border: "1px solid rgba(59,130,246,0.25)",
+  borderRadius: "4px",
 };
 
 function FilterChip({
