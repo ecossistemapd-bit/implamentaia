@@ -104,7 +104,7 @@ function SolutionsList() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Buscar soluciones..."
-            className="h-10 rounded-lg border-zinc-800 bg-zinc-900 pl-9 text-sm text-white placeholder:text-zinc-600"
+            className="h-10 pl-9 text-sm"
           />
         </div>
         <div className="flex flex-wrap gap-1.5">
