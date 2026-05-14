@@ -330,11 +330,13 @@ function FilterChip({
   return (
     <button
       onClick={onClick}
-      className={`h-8 rounded-full border px-3.5 text-xs font-medium transition ${
-        active
-          ? "border-white bg-white text-black"
-          : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:text-white"
-      }`}
+      className="h-8 rounded-full px-3.5 text-xs transition-all duration-200"
+      style={{
+        backgroundColor: active ? "rgba(201,168,76,0.15)" : "#1C2333",
+        border: active ? "1px solid #C9A84C" : "1px solid rgba(255,255,255,0.08)",
+        color: active ? "#C9A84C" : "#A0AABF",
+        fontWeight: active ? 600 : 500,
+      }}
     >
       {children}
     </button>
