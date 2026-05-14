@@ -185,7 +185,14 @@ function CursosPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar cursos..."
-            className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 py-3 pl-11 pr-4 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/20"
+            className="w-full rounded-md py-3 pl-11 pr-4 outline-none transition-colors duration-200"
+            style={{
+              backgroundColor: "#1C2333",
+              border: "1px solid rgba(201,168,76,0.12)",
+              color: "#E8EDF5",
+            }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)")}
+            onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.12)")}
           />
         </div>
 
@@ -196,11 +203,13 @@ function CursosPage() {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
-                  active
-                    ? "border-white bg-white text-black"
-                    : "border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-zinc-700 hover:text-zinc-100"
-                }`}
+                className="rounded-full px-4 py-1.5 text-sm transition-all duration-200"
+                style={{
+                  backgroundColor: active ? "rgba(201,168,76,0.15)" : "#1C2333",
+                  border: active ? "1px solid #C9A84C" : "1px solid rgba(255,255,255,0.08)",
+                  color: active ? "#C9A84C" : "#A0AABF",
+                  fontWeight: active ? 600 : 500,
+                }}
               >
                 {f}
               </button>

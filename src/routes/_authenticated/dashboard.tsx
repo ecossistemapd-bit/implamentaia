@@ -147,7 +147,10 @@ function Dashboard() {
             </p>
             <Link
               to="/solutions"
-              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-black transition hover:bg-zinc-100"
+              className="mt-5 inline-flex items-center gap-2 rounded-md px-6 py-3 font-semibold transition-all duration-200 ease-out hover:shadow-[0_4px_16px_rgba(201,168,76,0.3)]"
+              style={{ backgroundColor: "#C9A84C", color: "#0B0F1A" }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#B8972E")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#C9A84C")}
             >
               Explorar Soluciones <ArrowRight className="h-4 w-4" />
             </Link>
