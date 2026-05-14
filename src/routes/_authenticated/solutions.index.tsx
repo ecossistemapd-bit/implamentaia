@@ -143,7 +143,20 @@ function SolutionsList() {
             <Link
               key={s.id}
               {...linkProps}
-              className={`group relative flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 transition duration-200 hover:border-zinc-700 ${inDev ? "opacity-75 hover:opacity-90" : ""}`}
+              className={`group relative flex flex-col overflow-hidden transition-all duration-[250ms] ease-out ${inDev ? "opacity-75 hover:opacity-90" : ""}`}
+              style={{
+                backgroundColor: "#111827",
+                border: "1px solid rgba(201,168,76,0.12)",
+                borderRadius: "8px",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "rgba(201,168,76,0.35)";
+                e.currentTarget.style.boxShadow = "0 4px 24px rgba(201,168,76,0.06)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "rgba(201,168,76,0.12)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             >
               <div className="relative aspect-video w-full overflow-hidden bg-zinc-950">
                 <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-1">
@@ -181,10 +194,10 @@ function SolutionsList() {
                   {s.short_description}
                 </p>
                 <div className="mt-auto flex flex-wrap gap-1.5 pt-4">
-                  <span className={`rounded-md border px-2 py-0.5 text-[11px] font-medium ${catColor}`}>
+                  <span className={catColor} style={CAT_TAG_STYLE}>
                     {CATEGORIES.find((c) => c.key === s.category)?.label}
                   </span>
-                  <span className={`rounded-md border px-2 py-0.5 text-[11px] font-medium ${diffColor}`}>
+                  <span className={diffColor} style={DIFF_TAG_STYLE}>
                     {DIFFICULTY_LABEL[s.difficulty as Difficulty]}
                   </span>
                 </div>
