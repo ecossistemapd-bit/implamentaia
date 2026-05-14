@@ -172,12 +172,30 @@ function Dashboard() {
         {/* Stats */}
         <section className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
           {stats.map((s) => (
-            <div key={s.label} className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-zinc-700">
-              <s.icon className="h-5 w-5 text-zinc-400" strokeWidth={1.75} />
-              <div className="mt-3 text-3xl font-bold text-white">{s.value}</div>
-              <div className="mt-1 text-xs text-zinc-400">{s.label}</div>
-              <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
-                <div className="h-full bg-violet-400 transition-all" style={{ width: `${Math.min(100, s.value * 20)}%` }} />
+            <div
+              key={s.label}
+              className="p-5 transition-all duration-[250ms] ease-out"
+              style={{
+                backgroundColor: "#111827",
+                border: "1px solid rgba(201,168,76,0.12)",
+                borderRadius: "8px",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "rgba(201,168,76,0.35)";
+                e.currentTarget.style.boxShadow = "0 4px 24px rgba(201,168,76,0.06)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "rgba(201,168,76,0.12)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              <s.icon className="h-5 w-5" strokeWidth={1.75} style={{ color: "#C9A84C" }} />
+              <div className="mt-3 font-bold" style={{ fontSize: "2.5rem", color: "#E8EDF5", lineHeight: 1.1 }}>
+                {s.value}
+              </div>
+              <div className="mt-1" style={{ fontSize: "13px", color: "#6B7A99" }}>{s.label}</div>
+              <div className="mt-3 h-1 w-full overflow-hidden rounded-full" style={{ backgroundColor: "#1C2333" }}>
+                <div className="h-full transition-all" style={{ width: `${Math.min(100, s.value * 20)}%`, backgroundColor: "#C9A84C" }} />
               </div>
             </div>
           ))}

@@ -89,7 +89,7 @@ function Thumbnail({
   locked?: boolean;
 }) {
   return (
-    <div className={`relative w-full overflow-hidden ${size === "lg" ? "aspect-[16/10]" : "aspect-video"} bg-gradient-to-br ${style.gradient}`}>
+    <div className={`course-card-gradient relative w-full overflow-hidden ${size === "lg" ? "aspect-[16/10]" : "aspect-video"} bg-gradient-to-br ${style.gradient}`}>
       <div className="absolute inset-0 opacity-20" style={{
         backgroundImage:
           "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15) 0, transparent 40%), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0, transparent 40%)",
