@@ -11,6 +11,31 @@
 
 @theme inline {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Premium gold remap — todas las utilidades violet-*/purple-* del código existente
+   * pasan automáticamente al dorado institucional #C9A84C. */
+  --color-violet-50:  #FBF6E4;
+  --color-violet-100: #F5EBC2;
+  --color-violet-200: #EBD891;
+  --color-violet-300: #DDC066;
+  --color-violet-400: #C9A84C;
+  --color-violet-500: #C9A84C;
+  --color-violet-600: #B8972E;
+  --color-violet-700: #8E7322;
+  --color-violet-800: #6A561A;
+  --color-violet-900: #463A12;
+  --color-violet-950: #2A2208;
+  --color-purple-50:  #FBF6E4;
+  --color-purple-100: #F5EBC2;
+  --color-purple-200: #EBD891;
+  --color-purple-300: #DDC066;
+  --color-purple-400: #C9A84C;
+  --color-purple-500: #C9A84C;
+  --color-purple-600: #B8972E;
+  --color-purple-700: #8E7322;
+  --color-purple-800: #6A561A;
+  --color-purple-900: #463A12;
+  --color-purple-950: #2A2208;
   --radius-sm: calc(var(--radius) - 6px);
   --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
