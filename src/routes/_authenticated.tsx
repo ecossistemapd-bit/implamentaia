@@ -140,7 +140,7 @@ function DesktopSidebar() {
       className="sticky top-0 hidden h-screen w-[220px] shrink-0 lg:flex lg:flex-col"
       style={{ backgroundColor: "#0F1624", borderRight: "1px solid rgba(201,168,76,0.12)" }}
     >
-      <div className="px-5 py-5">
+      <div className="px-5" style={{ paddingTop: "20px", paddingBottom: "20px" }}>
         <Logo />
       </div>
       <NavList />
