@@ -207,7 +207,15 @@ function NavList() {
     <nav className="flex-1 overflow-y-auto px-3 pb-4">
       {sections.map((sec) => (
         <div key={sec.label} className="mb-4">
-          <div className="px-3 pb-2 pt-1 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
+          <div
+            className="px-3 pb-2 pt-1 uppercase"
+            style={{
+              fontSize: "10px",
+              letterSpacing: "0.15em",
+              fontWeight: 600,
+              color: "#6B7A99",
+            }}
+          >
             {sec.label}
           </div>
           <div className="space-y-1">
@@ -220,19 +228,39 @@ function NavList() {
                 <Link
                   key={item.label}
                   to={item.to}
-                  className={`group flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-colors ${
-                    active
-                      ? "bg-zinc-900 text-white font-medium"
-                      : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
-                  }`}
+                  className="group flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-colors duration-200"
+                  style={{
+                    borderLeft: active ? "2px solid #C9A84C" : "2px solid transparent",
+                    backgroundColor: active ? "rgba(201,168,76,0.07)" : "transparent",
+                    color: active ? "#E8EDF5" : "#A0AABF",
+                    fontWeight: active ? 500 : 400,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (active) return;
+                    e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.04)";
+                    e.currentTarget.style.color = "#C9A84C";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (active) return;
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = "#A0AABF";
+                  }}
                 >
                   <Icon
                     className="h-[18px] w-[18px] shrink-0"
                     strokeWidth={1.75}
+                    style={{ color: active ? "#C9A84C" : "#6B7A99" }}
                   />
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span className="ml-auto rounded-md border border-violet-500/30 bg-violet-500/10 px-1.5 py-0.5 text-[10px] font-medium text-violet-400">
+                    <span
+                      className="ml-auto rounded-md px-1.5 py-0.5 text-[10px] font-medium"
+                      style={{
+                        border: "1px solid rgba(201,168,76,0.4)",
+                        backgroundColor: "rgba(201,168,76,0.1)",
+                        color: "#C9A84C",
+                      }}
+                    >
                       {item.badge}
                     </span>
                   )}
