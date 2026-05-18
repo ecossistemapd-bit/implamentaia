@@ -370,10 +370,10 @@ function SolutionByIdDetail() {
               ))}
             </ul>
             <Button
-              onClick={() => navigate({ to: "/contratar-experto" })}
-              className="mt-5 w-full rounded-lg bg-teal-500 py-2.5 text-sm font-semibold text-white hover:bg-teal-600"
+              disabled
+              className="mt-5 w-full cursor-not-allowed rounded-lg bg-zinc-700/60 py-2.5 text-sm font-semibold text-zinc-400 hover:bg-zinc-700/60"
             >
-              Contratar Implementador <ArrowRight className="ml-1.5 h-4 w-4" />
+              Próximamente
             </Button>
           </div>
           )}
