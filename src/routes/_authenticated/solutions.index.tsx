@@ -1,12 +1,42 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
-import { Search } from "lucide-react";
+import * as Lucide from "lucide-react";
+import { Search, type LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Input } from "@/components/ui/input";
 import { CATEGORIES, DIFFICULTY_LABEL, type CategoryKey, type Difficulty } from "@/lib/categories";
-import { getLucideIcon } from "@/lib/icon";
+
+// Icono distintivo por tarjeta: primero el icon_name de la solución (si es
+// un icono lucide válido), si no el icono de su categoría, y como último
+// recurso Sparkles. Así las 90+ tarjetas se diferencian visualmente.
+function resolveCardIcon(iconName: string | null | undefined, category: string): LucideIcon {
+  if (iconName) {
+    const byName = (Lucide as unknown as Record<string, LucideIcon>)[iconName];
+    if (byName) return byName;
+  }
+  const cat = CATEGORIES.find((c) => c.key === category);
+  return cat?.icon ?? Lucide.Sparkles;
+}
+
+// Paleta por categoría — un color por familia para diferenciar de un
+// vistazo (en vez de la misma imagen "planeta" violeta en todas).
+const CAT_COLOR: Record<string, string> = {
+  ventas: "#34D399",
+  marketing: "#FB923C",
+  atencion: "#38BDF8",
+  finanzas: "#2DD4BF",
+  operaciones: "#94A3B8",
+  rrhh: "#F472B6",
+  modelos_ia: "#C9A84C",
+  juridico: "#818CF8",
+  default: "#C9A84C",
+};
+function hexA(hex: string, a: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+}
 
 type SolutionsSearch = { mode?: "builder" };
 
@@ -25,8 +55,13 @@ function SolutionsList() {
   const [cat, setCat] = useState<CategoryKey | "all">("all");
   const [diff, setDiff] = useState<Difficulty | "all">("all");
   const railRef = useRef<HTMLDivElement>(null);
-  const scrollRail = (dir: number) =>
-    railRef.current?.scrollBy({ left: dir * 340, behavior: "smooth" });
+  const scrollRail = (dir: number) => {
+    const el = railRef.current;
+    if (!el) return;
+    const first = el.firstElementChild as HTMLElement | null;
+    const step = first ? first.offsetWidth + 16 : 356; // ancho tarjeta + gap
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["solutions"],
@@ -132,7 +167,8 @@ function SolutionsList() {
 
       {(() => {
         const renderCard = (s: NonNullable<typeof data>[number]) => {
-          const Icon = getLucideIcon(s.icon_name);
+          const Icon = resolveCardIcon(s.icon_name, s.category);
+          const cc = CAT_COLOR[s.category] ?? CAT_COLOR.default;
           const linkProps = { to: "/solutions/$id" as const, params: { id: s.id } };
           const completed = progressBySolution[s.id] ?? 0;
           const pct = Math.min(100, (completed / 5) * 100);
@@ -161,7 +197,12 @@ function SolutionsList() {
                 e.currentTarget.style.boxShadow = "none";
               }}
             >
-              <div className="relative aspect-video w-full overflow-hidden bg-zinc-950">
+              <div
+                className="relative flex aspect-video w-full items-center justify-center overflow-hidden"
+                style={{
+                  background: `linear-gradient(135deg, ${hexA(cc, inDev ? 0.06 : 0.13)} 0%, #0B0F19 72%)`,
+                }}
+              >
                 <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-1">
                   {isDone && (
                     <span className="inline-flex items-center gap-1 rounded-md border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-green-400">
@@ -174,20 +215,19 @@ function SolutionsList() {
                     </span>
                   )}
                 </div>
-                {s.cover_image_url ? (
-                  <img
-                    src={s.cover_image_url}
-                    alt={s.title}
-                    loading="lazy"
-                    className={`h-full w-full object-cover transition duration-300 group-hover:scale-[1.02] ${inDev ? "grayscale-[30%]" : ""}`}
+                <div
+                  className="flex h-[68px] w-[68px] items-center justify-center rounded-2xl transition-transform duration-300 ease-out group-hover:scale-110"
+                  style={{
+                    backgroundColor: hexA(cc, inDev ? 0.08 : 0.15),
+                    border: `1px solid ${hexA(cc, inDev ? 0.18 : 0.34)}`,
+                  }}
+                >
+                  <Icon
+                    className="h-8 w-8"
+                    strokeWidth={1.5}
+                    style={{ color: inDev ? hexA(cc, 0.55) : cc }}
                   />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-zinc-800 bg-zinc-900">
-                      <Icon className="h-9 w-9 text-zinc-300" strokeWidth={1.5} />
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
               <div className="flex flex-1 flex-col p-5">
                 <h3 className="line-clamp-1 text-base font-semibold leading-tight text-white">
@@ -197,7 +237,15 @@ function SolutionsList() {
                   {s.short_description}
                 </p>
                 <div className="mt-auto flex flex-wrap gap-1.5 pt-4">
-                  <span className={catColor} style={CAT_TAG_STYLE}>
+                  <span
+                    className={catColor}
+                    style={{
+                      backgroundColor: hexA(cc, 0.1),
+                      color: cc,
+                      border: `1px solid ${hexA(cc, 0.28)}`,
+                      borderRadius: "4px",
+                    }}
+                  >
                     {CATEGORIES.find((c) => c.key === s.category)?.label}
                   </span>
                   <span className={diffColor} style={DIFF_TAG_STYLE}>
@@ -251,9 +299,12 @@ function SolutionsList() {
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => scrollRail(-1)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        scrollRail(-1);
+                      }}
                       aria-label="Anterior"
-                      className="grid h-8 w-8 place-items-center rounded-full text-zinc-300 transition hover:text-white"
+                      className="grid h-9 w-9 place-items-center rounded-full text-lg leading-none text-zinc-300 transition hover:bg-[#262f44] hover:text-white"
                       style={{
                         backgroundColor: "#1C2333",
                         border: "1px solid rgba(255,255,255,0.08)",
@@ -263,9 +314,12 @@ function SolutionsList() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => scrollRail(1)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        scrollRail(1);
+                      }}
                       aria-label="Siguiente"
-                      className="grid h-8 w-8 place-items-center rounded-full text-zinc-300 transition hover:text-white"
+                      className="grid h-9 w-9 place-items-center rounded-full text-lg leading-none text-zinc-300 transition hover:bg-[#262f44] hover:text-white"
                       style={{
                         backgroundColor: "#1C2333",
                         border: "1px solid rgba(255,255,255,0.08)",
@@ -398,13 +452,6 @@ const CATEGORY_COLOR: Record<string, string> = {
   rrhh: CAT_TAG,
   default: CAT_TAG,
 };
-const CAT_TAG_STYLE: React.CSSProperties = {
-  backgroundColor: "rgba(201,168,76,0.1)",
-  color: "#C9A84C",
-  border: "1px solid rgba(201,168,76,0.25)",
-  borderRadius: "4px",
-};
-
 const DIFF_TAG = "rounded text-[11px] font-semibold px-2 py-0.5";
 const DIFFICULTY_COLOR: Record<Difficulty, string> = {
   principiante: DIFF_TAG,
