@@ -42,7 +42,11 @@ function Dashboard() {
         supabase.from("builder_projects").select("id, status").eq("user_id", user!.id),
         supabase.from("user_progress" as never).select("module_id, completed, modules:module_id(course_id)").eq("user_id", user!.id),
         supabase.from("modules" as never).select("id, course_id"),
-        supabase.from("solutions").select("id, title, slug, short_description, icon_name").limit(20),
+        // Sin .limit(): el catálogo tiene 90+ soluciones. Con limit(20) la
+        // solución del usuario podía no estar en el lote → el join por id
+        // fallaba → "no iniciaste ninguna solución" y "en una solución"
+        // genérico pese a tener progreso real.
+        supabase.from("solutions").select("id, title, slug, short_description, icon_name"),
         supabase.from("solution_comments").select("solution_id, created_at").eq("user_id", user!.id).order("created_at", { ascending: false }).limit(5),
       ]);
 
