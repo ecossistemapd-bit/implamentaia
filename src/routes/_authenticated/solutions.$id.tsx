@@ -172,7 +172,7 @@ function SolutionByIdDetail() {
         particleCount: 120,
         spread: 80,
         origin: { y: 0.3 },
-        colors: ["#22c55e", "#8b5cf6", "#ffffff"],
+        colors: ["#FFFFFF", "#D2D2D7", "#86868B"],
       });
     }
   }, [activeStep, allPriorDone]);
@@ -223,8 +223,8 @@ function SolutionByIdDetail() {
   if (isLoading || !s || activeStep === null) {
     return (
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="h-8 w-64 animate-pulse rounded bg-zinc-900" />
-        <div className="mt-6 h-24 w-full animate-pulse rounded bg-zinc-900" />
+        <div className="h-8 w-64 animate-pulse rounded bg-card" />
+        <div className="mt-6 h-24 w-full animate-pulse rounded bg-card" />
       </div>
     );
   }
@@ -232,8 +232,8 @@ function SolutionByIdDetail() {
   if (progressError) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-16 text-center">
-        <p className="text-sm text-zinc-300">No pudimos cargar tu progreso.</p>
-        <Button onClick={() => refetchProgress()} className="mt-4 bg-white text-black hover:bg-zinc-100">
+        <p className="text-sm text-muted-foreground">No pudimos cargar tu progreso.</p>
+        <Button onClick={() => refetchProgress()} className="mt-4 bg-primary text-primary-foreground hover:opacity-90">
           Reintentar
         </Button>
       </div>
@@ -261,7 +261,7 @@ function SolutionByIdDetail() {
   if (view === "overview" || inDev) {
     return (
       <div className="mx-auto max-w-[1100px] px-6 py-8">
-        <Link to="/solutions" className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white">
+        <Link to="/solutions" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Soluciones
         </Link>
 
@@ -269,28 +269,28 @@ function SolutionByIdDetail() {
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[3fr_2fr] md:items-center">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
                 <CategoryIcon className="h-3.5 w-3.5" /> {categoryLabel}
               </span>
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
+              <span className="inline-flex items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
                 {difficultyLabel}
               </span>
             </div>
-            <h1 className="mt-4 text-3xl font-bold leading-tight text-white md:text-5xl">{s.title}</h1>
+            <h1 className="mt-4 text-3xl font-bold leading-tight text-foreground md:text-5xl">{s.title}</h1>
             {s.short_description && (
-              <p className="mt-3 max-w-xl text-base text-zinc-400">{s.short_description}</p>
+              <p className="mt-3 max-w-xl text-base text-muted-foreground">{s.short_description}</p>
             )}
             {!inDev && (
               <Button
                 onClick={goToJourney}
-                className="mt-6 rounded-lg bg-violet-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-violet-600"
+                className="mt-6 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-foreground hover:bg-primary"
               >
                 Continuar Solución <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             )}
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
             {s.cover_image_url ? (
               <img
                 src={s.cover_image_url}
@@ -298,8 +298,8 @@ function SolutionByIdDetail() {
                 className="h-full max-h-[260px] w-full object-cover"
               />
             ) : (
-              <div className="flex h-[220px] w-full items-center justify-center bg-gradient-to-br from-zinc-900 to-black">
-                <CategoryIcon className="h-20 w-20 text-zinc-700" strokeWidth={1.2} />
+              <div className="flex h-[220px] w-full items-center justify-center bg-gradient-to-br from-card to-background">
+                <CategoryIcon className="h-20 w-20 text-muted-foreground" strokeWidth={1.2} />
               </div>
             )}
           </div>
@@ -331,47 +331,47 @@ function SolutionByIdDetail() {
 
         {/* About + Experto */}
         <div className={`mt-6 grid grid-cols-1 gap-4 ${FEATURES.MARKETPLACE ? "lg:grid-cols-[7fr_3fr]" : ""}`}>
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
-            <h2 className="text-xl font-bold text-white">Sobre esta solución</h2>
-            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-300">
+          <div className="rounded-2xl border border-border bg-card/60 p-4">
+            <h2 className="text-xl font-bold text-foreground">Sobre esta solución</h2>
+            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
               {longDesc || "Sin descripción disponible."}
             </p>
           </div>
 
           {FEATURES.MARKETPLACE && (
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/60 p-4">
+          <div className="rounded-2xl border border-border bg-card/60 p-4">
             <div className="flex items-center -space-x-2">
-              {["bg-violet-500", "bg-emerald-500", "bg-amber-500"].map((c, i) => (
+              {["bg-secondary", "bg-muted", "bg-secondary"].map((c, i) => (
                 <div
                   key={i}
-                  className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-zinc-900 ${c} text-xs font-bold text-white`}
+                  className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-border ${c} text-xs font-bold text-foreground`}
                 >
                   {String.fromCharCode(65 + i)}
                 </div>
               ))}
             </div>
-            <span className="mt-4 inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
+            <span className="mt-4 inline-flex items-center gap-1 rounded-full border border-border bg-secondary px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               <CheckCircle2 className="h-3 w-3" /> Verificados
             </span>
-            <h3 className="mt-3 text-lg font-bold text-white">Implementador Partner</h3>
-            <p className="mt-2 text-sm text-zinc-400">
+            <h3 className="mt-3 text-lg font-bold text-foreground">Implementador Partner</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
               Conectá con un especialista dedicado para implementar esta solución en tu negocio.
             </p>
-            <ul className="mt-4 space-y-2 text-sm text-zinc-300">
+            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
               {[
                 "Implementador dedicado a tu proyecto",
                 "Acompañamiento completo del proceso",
                 "Soporte durante la implementación",
               ].map((t) => (
                 <li key={t} className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                   <span>{t}</span>
                 </li>
               ))}
             </ul>
             <Button
               disabled
-              className="mt-5 w-full cursor-not-allowed rounded-lg bg-zinc-700/60 py-2.5 text-sm font-semibold text-zinc-400 hover:bg-zinc-700/60"
+              className="mt-5 w-full cursor-not-allowed rounded-lg bg-muted/60 py-2.5 text-sm font-semibold text-muted-foreground hover:bg-muted/60"
             >
               Próximamente
             </Button>
@@ -380,17 +380,17 @@ function SolutionByIdDetail() {
         </div>
 
         {inDev && (
-          <div className="mt-8 rounded-2xl border border-white/10 bg-zinc-900/60 p-6 text-center">
-            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-zinc-400">
+          <div className="mt-8 rounded-2xl border border-border bg-card/60 p-6 text-center">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
               <Lock className="h-4 w-4" />
             </div>
-            <h3 className="mt-3 text-lg font-semibold text-white">Solución en desarrollo</h3>
-            <p className="mx-auto mt-2 max-w-md text-sm text-zinc-400">
+            <h3 className="mt-3 text-lg font-semibold text-foreground">Solución en desarrollo</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
               Estamos puliendo los últimos detalles. Suscribite para recibir un aviso cuando esté disponible.
             </p>
             <Button
               onClick={() => toast.success("Te avisaremos al email cuando esté lista.", { duration: 4000 })}
-              className="mt-5 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-zinc-100"
+              className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
               Avisarme cuando esté lista
             </Button>
@@ -406,25 +406,25 @@ function SolutionByIdDetail() {
       {/* Minimal header */}
       <button
         onClick={goToOverview}
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" /> Soluciones
       </button>
-      <h1 className="mt-4 text-2xl font-bold text-white md:text-3xl">{s.title}</h1>
+      <h1 className="mt-4 text-2xl font-bold text-foreground md:text-3xl">{s.title}</h1>
 
       {/* Progress summary */}
-      <div className="mt-6 rounded-xl border border-white/8 bg-[#111111] p-4">
+      <div className="mt-6 rounded-xl border border-border bg-card p-4">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-500">Tu progreso</div>
-            <div className="mt-1 text-2xl font-semibold text-white">{progressPct}%</div>
+            <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">Tu progreso</div>
+            <div className="mt-1 text-2xl font-semibold text-foreground">{progressPct}%</div>
           </div>
-          <div className="text-xs text-zinc-500">
+          <div className="text-xs text-muted-foreground">
             {completedCount} de {STEPS.length} etapas completadas
           </div>
         </div>
-        <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-white/8">
-          <div className="h-full bg-green-500 transition-all" style={{ width: `${progressPct}%` }} />
+        <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-border">
+          <div className="h-full bg-primary transition-all" style={{ width: `${progressPct}%` }} />
         </div>
       </div>
 
@@ -440,10 +440,10 @@ function SolutionByIdDetail() {
               <div key={step.key} className="relative flex flex-1 flex-col items-center">
                 {/* Connector lines (behind, top half aligned with circle center) */}
                 {i > 0 && (
-                  <div className={`absolute left-0 top-[18px] h-px w-1/2 -translate-y-1/2 ${prevCompleted ? "bg-green-500" : "bg-white/8"}`} />
+                  <div className={`absolute left-0 top-[18px] h-px w-1/2 -translate-y-1/2 ${prevCompleted ? "bg-primary" : "bg-border"}`} />
                 )}
                 {i < STEPS.length - 1 && (
-                  <div className={`absolute right-0 top-[18px] h-px w-1/2 -translate-y-1/2 ${isCompleted ? "bg-green-500" : "bg-white/8"}`} />
+                  <div className={`absolute right-0 top-[18px] h-px w-1/2 -translate-y-1/2 ${isCompleted ? "bg-primary" : "bg-border"}`} />
                 )}
                 <button
                   type="button"
@@ -454,17 +454,17 @@ function SolutionByIdDetail() {
                   <span
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition ${
                       isCompleted
-                        ? "border-green-500 bg-green-500 text-white"
+                        ? "border-primary bg-primary text-primary-foreground"
                         : isActive
-                        ? "border-violet-500 bg-violet-500 text-white"
-                        : "border-white/10 bg-background text-zinc-600 group-hover:border-white/20"
+                        ? "border-primary bg-primary text-foreground"
+                        : "border-border bg-background text-muted-foreground group-hover:border-border"
                     }`}
                   >
                     {isCompleted ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
                   </span>
                   <span
-                    className={`text-center text-xs transition group-hover:text-white ${
-                      isActive ? "text-white font-medium" : isCompleted ? "text-green-500" : "text-zinc-600"
+                    className={`text-center text-xs transition group-hover:text-foreground ${
+                      isActive ? "text-foreground font-medium" : isCompleted ? "text-primary" : "text-muted-foreground"
                     }`}
                   >
                     {step.label}
@@ -534,7 +534,7 @@ function SolutionByIdDetail() {
 }
 
 const TOOL_ICON: { match: RegExp; render: () => React.ReactNode }[] = [
-  { match: /n8n/i, render: () => <span className="font-bold text-orange-500">n8n</span> },
+  { match: /n8n/i, render: () => <span className="font-bold text-muted-foreground">n8n</span> },
   { match: /openai|gpt/i, render: () => <span className="text-2xl">🤖</span> },
   { match: /whatsapp|z-?api|evolution/i, render: () => <span className="text-2xl">💬</span> },
   { match: /hubspot|kommo/i, render: () => <span className="text-2xl">📊</span> },
@@ -568,7 +568,7 @@ function CompleteButton({
 }) {
   if (isCompleted) {
     return (
-      <Button disabled className="rounded-lg bg-zinc-800 px-6 py-2 text-zinc-400">
+      <Button disabled className="rounded-lg bg-muted px-6 py-2 text-muted-foreground">
         <Check className="mr-1.5 h-4 w-4" /> Paso completado
       </Button>
     );
@@ -577,7 +577,7 @@ function CompleteButton({
     <Button
       onClick={onClick}
       disabled={disabled || saving}
-      className="rounded-lg bg-violet-500 px-6 py-2 text-white hover:bg-violet-600 disabled:opacity-40"
+      className="rounded-lg bg-primary px-6 py-2 text-foreground hover:bg-primary disabled:opacity-40"
     >
       {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
       {disabled && !saving ? disabledLabel ?? label : label}
@@ -587,10 +587,10 @@ function CompleteButton({
 
 function StatCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-xl border border-white/8 bg-[#111111] p-4">
-      <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-zinc-500">{label}</div>
-      <div className="mt-1 text-lg font-semibold text-white">{value}</div>
-      {hint && <div className="mt-1.5 text-xs text-zinc-500">{hint}</div>}
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">{label}</div>
+      <div className="mt-1 text-lg font-semibold text-foreground">{value}</div>
+      {hint && <div className="mt-1.5 text-xs text-muted-foreground">{hint}</div>}
     </div>
   );
 }
@@ -598,7 +598,7 @@ function StatCard({ label, value, hint }: { label: string; value: string; hint?:
 function SectionHeader({ text, action }: { text: string; action?: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <h2 className="text-2xl font-bold text-white">{text}</h2>
+      <h2 className="text-2xl font-bold text-foreground">{text}</h2>
       {action}
     </div>
   );
@@ -693,13 +693,13 @@ function ToolLogo({ name, logoUrl, website }: { name: string; logoUrl?: string |
 
   if (!src) {
     return (
-      <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-zinc-900">
-        <span className="text-lg font-bold tracking-tight text-white">{initials}</span>
+      <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-card">
+        <span className="text-lg font-bold tracking-tight text-foreground">{initials}</span>
       </div>
     );
   }
   return (
-    <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+    <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-card p-2">
       <img
         src={src}
         alt={name}
@@ -781,12 +781,12 @@ function StepHerramientas({
           />
         }
       />
-      <p className="mt-2 text-sm text-zinc-400">
+      <p className="mt-2 text-sm text-muted-foreground">
         Conocé las herramientas que usaremos en esta implementación.
       </p>
 
       {items.length === 0 ? (
-        <div className="mt-6 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-10 text-center text-sm text-zinc-400">
+        <div className="mt-6 rounded-xl border border-dashed border-border bg-card/50 p-10 text-center text-sm text-muted-foreground">
           No hay herramientas asignadas a esta solución.
         </div>
       ) : (
@@ -805,17 +805,17 @@ function StepHerramientas({
                 onClick={() => toggle(tool.name)}
                 className={`group relative overflow-hidden rounded-xl border p-5 text-left transition duration-200 ${
                   isOk
-                    ? "border-green-500 bg-secondary"
-                    : "border-white/8 bg-secondary hover:border-white/20"
+                    ? "border-primary bg-secondary"
+                    : "border-border bg-secondary hover:border-border"
                 }`}
               >
-                {isOk && <span className="pointer-events-none absolute inset-0 bg-green-500/10" />}
+                {isOk && <span className="pointer-events-none absolute inset-0 bg-primary/10" />}
 
                 {/* Type badge */}
-                <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
+                <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${
-                      isOptional ? "bg-amber-400" : "bg-green-500"
+                      isOptional ? "bg-muted-foreground" : "bg-primary"
                     }`}
                   />
                   {isOptional ? "Opcional" : "Esencial"}
@@ -824,12 +824,12 @@ function StepHerramientas({
                 {/* Top-right: cost badge + check */}
                 <div className="absolute right-3 top-3 flex items-center gap-2">
                   {tool.cost_label && (
-                    <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-300">
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
                       {tool.cost_label}
                     </span>
                   )}
                   {isOk && (
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
                       <Check className="h-3 w-3" />
                     </span>
                   )}
@@ -840,18 +840,18 @@ function StepHerramientas({
                   <ToolLogo name={tool.name} logoUrl={tool.logo_url} website={tool.website} />
                 </div>
 
-                <div className="relative mt-3 text-center text-base font-semibold text-white">
+                <div className="relative mt-3 text-center text-base font-semibold text-foreground">
                   {tool.name}
                 </div>
                 {tool.description && (
-                  <p className="relative mt-1 text-center text-xs text-zinc-400 line-clamp-2">
+                  <p className="relative mt-1 text-center text-xs text-muted-foreground line-clamp-2">
                     {tool.description}
                   </p>
                 )}
 
                 <div
                   className={`relative mt-2 text-center text-xs ${
-                    isOk ? "font-medium text-green-500" : "text-zinc-500"
+                    isOk ? "font-medium text-primary" : "text-muted-foreground"
                   }`}
                 >
                   {isOk ? "Entendido ✓" : "Click para marcar como entendido"}
@@ -864,7 +864,7 @@ function StepHerramientas({
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="text-xs text-zinc-500 hover:text-white"
+                      className="text-xs text-muted-foreground hover:text-foreground"
                     >
                       Sitio oficial →
                     </a>
@@ -934,17 +934,17 @@ function StepArchivos({
           />
         }
       />
-      <p className="mt-2 text-sm text-zinc-400">
+      <p className="mt-2 text-sm text-muted-foreground">
         Descargá los materiales necesarios para implementar esta solución.
       </p>
 
       <div className="mt-8">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
-          <LinkIcon className="h-4 w-4 text-zinc-400" />
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+          <LinkIcon className="h-4 w-4 text-muted-foreground" />
           Links Auxiliares
         </h3>
         {cards.length === 0 ? (
-          <div className="mt-4 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-10 text-center text-sm text-zinc-500">
+          <div className="mt-4 rounded-xl border border-dashed border-border bg-card/50 p-10 text-center text-sm text-muted-foreground">
             Recursos disponibles próximamente
           </div>
         ) : (
@@ -952,18 +952,18 @@ function StepArchivos({
             {cards.map((c) => (
               <div
                 key={c.url}
-                className="flex items-center gap-4 rounded-xl border border-white/8 bg-secondary p-4 transition hover:border-white/20"
+                className="flex items-center gap-4 rounded-xl border border-border bg-secondary p-4 transition hover:border-border"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-800">
-                  <LinkIcon className="h-5 w-5 text-zinc-400" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                  <LinkIcon className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-semibold text-white">{c.title}</div>
+                  <div className="truncate text-sm font-semibold text-foreground">{c.title}</div>
                   {c.description && (
-                    <div className="truncate text-xs text-zinc-400">{c.description}</div>
+                    <div className="truncate text-xs text-muted-foreground">{c.description}</div>
                   )}
                   {c.domain && (
-                    <div className="mt-0.5 truncate text-[10px] font-medium uppercase tracking-wider text-zinc-500">
+                    <div className="mt-0.5 truncate text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                       {c.domain}
                     </div>
                   )}
@@ -972,7 +972,7 @@ function StepArchivos({
                   href={c.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/10 bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white transition hover:border-white/30 hover:bg-zinc-800"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-border hover:bg-muted"
                 >
                   Acceder
                   <ExternalLink className="h-3 w-3" />
@@ -1007,26 +1007,26 @@ function StepVideo({
           <CompleteButton onClick={onComplete} saving={saving} isCompleted={isCompleted} label="Marcar como visto" />
         }
       />
-      <p className="mt-2 text-sm text-zinc-400">Seguí el tutorial paso a paso.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Seguí el tutorial paso a paso.</p>
 
       <div className="mt-6">
         {videoUrl ? (
           <>
             <iframe
               src={videoUrl}
-              className="aspect-video w-full overflow-hidden rounded-xl bg-zinc-900"
+              className="aspect-video w-full overflow-hidden rounded-xl bg-card"
               allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
             />
-            <p className="mt-2 text-sm text-zinc-400">{title}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{title}</p>
           </>
         ) : (
-          <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-900">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-violet-500/20 ring-2 ring-violet-500/30">
-              <Play className="h-9 w-9 fill-violet-400 text-violet-400" />
+          <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border border-border bg-gradient-to-br from-card to-card">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/20 ring-2 ring-primary/30">
+              <Play className="h-9 w-9 fill-primary text-primary" />
             </div>
-            <p className="text-sm font-medium text-zinc-300">Video de implementación próximamente</p>
-            <p className="text-xs text-zinc-600">Estamos preparando el tutorial de esta solución.</p>
+            <p className="text-sm font-medium text-muted-foreground">Video de implementación próximamente</p>
+            <p className="text-xs text-muted-foreground">Estamos preparando el tutorial de esta solución.</p>
           </div>
         )}
       </div>
@@ -1116,25 +1116,25 @@ function StepComentarios({
           />
         }
       />
-      <p className="mt-2 text-sm text-zinc-400">Dejá tu evaluación y mirá qué piensan otros.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Dejá tu evaluación y mirá qué piensan otros.</p>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[3fr_2fr]">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-          <div className="text-sm font-semibold text-white">Tu evaluación</div>
+        <div className="rounded-xl border border-border bg-card p-6">
+          <div className="text-sm font-semibold text-foreground">Tu evaluación</div>
 
           {myComment ? (
-            <div className="mt-4 rounded-lg border border-green-500/30 bg-green-500/5 p-4">
-              <div className="flex items-center gap-2 text-sm text-green-400">
+            <div className="mt-4 rounded-lg border border-primary/30 bg-primary/5 p-4">
+              <div className="flex items-center gap-2 text-sm text-primary">
                 <Check className="h-4 w-4" /> Ya enviaste tu evaluación
               </div>
-              <div className="mt-3 text-2xl font-bold text-white">{myComment.rating}/10</div>
+              <div className="mt-3 text-2xl font-bold text-foreground">{myComment.rating}/10</div>
               {myComment.comment && (
-                <p className="mt-2 text-sm text-zinc-300">{myComment.comment}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{myComment.comment}</p>
               )}
             </div>
           ) : (
             <>
-              <p className="mt-1 text-xs text-zinc-400">
+              <p className="mt-1 text-xs text-muted-foreground">
                 ¿Qué tan probable es que recomiendes esta solución?
               </p>
               <div className="mt-4 flex flex-wrap gap-1.5">
@@ -1144,15 +1144,15 @@ function StepComentarios({
                     onClick={() => setRating(n)}
                     className={`h-11 w-11 rounded-lg text-sm font-medium transition ${
                       rating === n
-                        ? "scale-110 bg-violet-500 text-white shadow-md shadow-violet-500/30"
-                        : "bg-zinc-800 text-zinc-300 hover:bg-violet-500 hover:text-white"
+                        ? "scale-110 bg-primary text-foreground shadow-md shadow-primary/30"
+                        : "bg-muted text-muted-foreground hover:bg-primary hover:text-foreground"
                     }`}
                   >
                     {n}
                   </button>
                 ))}
               </div>
-              <div className="mt-2 flex justify-between text-xs text-zinc-600">
+              <div className="mt-2 flex justify-between text-xs text-muted-foreground">
                 <span>Nada probable</span>
                 <span>Muy probable</span>
               </div>
@@ -1160,12 +1160,12 @@ function StepComentarios({
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Comentario sobre tu implementación (opcional)..."
-                className="mt-5 min-h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-violet-500 focus:outline-none"
+                className="mt-5 min-h-24 w-full resize-none rounded-lg border border-border bg-card p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
               />
               <Button
                 onClick={submit}
                 disabled={submitting}
-                className="mt-4 h-11 w-full rounded-lg bg-violet-500 text-white hover:bg-violet-600"
+                className="mt-4 h-11 w-full rounded-lg bg-primary text-foreground hover:bg-primary"
               >
                 {submitting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
                 Enviar evaluación
@@ -1175,35 +1175,35 @@ function StepComentarios({
         </div>
 
         <div>
-          <div className="flex items-center text-sm font-semibold text-white">
+          <div className="flex items-center text-sm font-semibold text-foreground">
             Comentarios de la comunidad
-            <span className="ml-2 rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300">
+            <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
               {comments?.length ?? 0}
             </span>
           </div>
           <div className="mt-3 space-y-3">
             {!comments || comments.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-zinc-800 bg-zinc-900/50 p-6 text-center text-sm text-zinc-600">
+              <p className="rounded-xl border border-dashed border-border bg-card/50 p-6 text-center text-sm text-muted-foreground">
                 Sé el primero en comentar.
               </p>
             ) : (
               comments.slice(0, 5).map((c) => {
                 const time = relativeTime(c.created_at);
                 return (
-                  <div key={c.id} className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                  <div key={c.id} className="rounded-xl border border-border bg-card p-4">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/20 text-xs font-bold text-violet-300">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
                         U
                       </div>
-                      <span className="text-sm font-medium text-white">Usuario</span>
-                      <span className="text-xs text-zinc-600">{time}</span>
+                      <span className="text-sm font-medium text-foreground">Usuario</span>
+                      <span className="text-xs text-muted-foreground">{time}</span>
                       {c.rating !== null && (
-                        <span className="ml-auto rounded-md bg-violet-500/15 px-2 py-0.5 text-xs font-semibold text-violet-300">
+                        <span className="ml-auto rounded-md bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary">
                           {c.rating}/10
                         </span>
                       )}
                     </div>
-                    {c.comment && <p className="mt-2 text-sm text-zinc-300">{c.comment}</p>}
+                    {c.comment && <p className="mt-2 text-sm text-muted-foreground">{c.comment}</p>}
                   </div>
                 );
               })
@@ -1248,33 +1248,33 @@ function StepConclusion({
 
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-900/30 to-zinc-900 p-10 text-center">
+      <div className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/30 to-card p-10 text-center">
         <div className="text-6xl">🏆</div>
-        <h2 className="mt-4 text-3xl font-bold text-white">¡Implementación Completada!</h2>
-        <p className="mt-2 text-sm text-zinc-300">
-          Completaste los 5 pasos de <span className="font-semibold text-white">{solutionTitle}</span>.
+        <h2 className="mt-4 text-3xl font-bold text-foreground">¡Implementación Completada!</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Completaste los 5 pasos de <span className="font-semibold text-foreground">{solutionTitle}</span>.
         </p>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+        <div className="rounded-xl border border-border bg-card p-6">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold text-white">Tu progreso</div>
-            <span className="rounded-full bg-green-500/15 px-3 py-1 text-xs font-semibold text-green-400">
+            <div className="text-sm font-semibold text-foreground">Tu progreso</div>
+            <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
               100% COMPLETADO
             </span>
           </div>
-          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-            <div className="h-full w-full bg-green-500" />
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div className="h-full w-full bg-primary" />
           </div>
           <div className="mt-4 space-y-2">
             {STEPS.map((s) => (
               <div
                 key={s.key}
-                className="flex items-center gap-2 rounded-lg bg-zinc-900/60 px-3 py-2 text-xs text-zinc-300"
+                className="flex items-center gap-2 rounded-lg bg-card/60 px-3 py-2 text-xs text-muted-foreground"
               >
                 <Check
-                  className={`h-3.5 w-3.5 ${completedSet.has(s.key) ? "text-green-500" : "text-zinc-700"}`}
+                  className={`h-3.5 w-3.5 ${completedSet.has(s.key) ? "text-primary" : "text-muted-foreground"}`}
                 />
                 <span>{s.label}</span>
               </div>
@@ -1282,24 +1282,24 @@ function StepConclusion({
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-          <div className="text-sm font-semibold text-white">Próximos pasos</div>
+        <div className="rounded-xl border border-border bg-card p-6">
+          <div className="text-sm font-semibold text-foreground">Próximos pasos</div>
           <div className="mt-4 space-y-3">
             <div className="flex items-start gap-3">
-              <Award className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
-              <div className="text-xs text-zinc-400">
+              <Award className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div className="text-xs text-muted-foreground">
                 Revisá otras soluciones del catálogo para seguir avanzando.
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <FileText className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
-              <div className="text-xs text-zinc-400">
+              <FileText className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div className="text-xs text-muted-foreground">
                 Tu prompt personalizado está guardado en Mis Proyectos.
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Lock className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
-              <div className="text-xs text-zinc-400">
+              <Lock className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div className="text-xs text-muted-foreground">
                 Compartí tu experiencia con la comunidad.
               </div>
             </div>
@@ -1307,7 +1307,7 @@ function StepConclusion({
           <div className="mt-6 space-y-2">
             <Button
               onClick={() => navigate({ to: "/solutions" })}
-              className="h-11 w-full rounded-xl bg-white text-black hover:bg-zinc-100"
+              className="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:opacity-90"
             >
               Ver todas las soluciones →
             </Button>
@@ -1315,7 +1315,7 @@ function StepConclusion({
               <Button
                 onClick={() => navigate({ to: "/projects" })}
                 variant="outline"
-                className="h-11 w-full rounded-xl border-zinc-700 bg-transparent text-zinc-200 hover:bg-zinc-800"
+                className="h-11 w-full rounded-xl border-border bg-transparent text-foreground hover:bg-muted"
               >
                 Ver mi proyecto →
               </Button>
@@ -1324,7 +1324,7 @@ function StepConclusion({
               onClick={onFinalize}
               disabled={saving || completedSet.has("conclusion")}
               variant="ghost"
-              className="h-10 w-full text-xs text-zinc-500 hover:bg-zinc-800/50"
+              className="h-10 w-full text-xs text-muted-foreground hover:bg-muted/50"
             >
               {saving && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
               {completedSet.has("conclusion") ? "Finalizado" : "Marcar como finalizado"}
