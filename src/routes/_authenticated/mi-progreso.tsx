@@ -193,6 +193,17 @@ function MiProgreso() {
         ))}
       </div>
 
+      {isLoading && (
+        <div className="mt-8 space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-20 animate-pulse rounded-xl border border-zinc-800 bg-muted" />
+          ))}
+        </div>
+      )}
+
+
+
+
       {/* Soluciones en progreso */}
       <Section title="Soluciones en progreso">
         {!isLoading && (data?.solutionsInProgress.length ?? 0) === 0 ? (

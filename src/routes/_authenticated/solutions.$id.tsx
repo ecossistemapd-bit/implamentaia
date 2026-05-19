@@ -283,7 +283,7 @@ function SolutionByIdDetail() {
             {!inDev && (
               <Button
                 onClick={goToJourney}
-                className="mt-6 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-foreground hover:bg-primary"
+                className="mt-6 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:opacity-90"
               >
                 Continuar Solución <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
@@ -577,7 +577,7 @@ function CompleteButton({
     <Button
       onClick={onClick}
       disabled={disabled || saving}
-      className="rounded-lg bg-primary px-6 py-2 text-foreground hover:bg-primary disabled:opacity-40"
+      className="rounded-lg bg-primary px-6 py-2 text-primary-foreground transition-all duration-200 hover:opacity-90 disabled:opacity-40"
     >
       {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
       {disabled && !saving ? disabledLabel ?? label : label}
@@ -1144,8 +1144,8 @@ function StepComentarios({
                     onClick={() => setRating(n)}
                     className={`h-11 w-11 rounded-lg text-sm font-medium transition ${
                       rating === n
-                        ? "scale-110 bg-primary text-foreground shadow-md shadow-primary/30"
-                        : "bg-muted text-muted-foreground hover:bg-primary hover:text-foreground"
+                        ? "scale-110 bg-primary text-primary-foreground shadow-md shadow-primary/30"
+                        : "bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground"
                     }`}
                   >
                     {n}
@@ -1165,7 +1165,7 @@ function StepComentarios({
               <Button
                 onClick={submit}
                 disabled={submitting}
-                className="mt-4 h-11 w-full rounded-lg bg-primary text-foreground hover:bg-primary"
+                className="mt-4 h-11 w-full rounded-lg bg-primary text-primary-foreground transition-all duration-200 hover:opacity-90"
               >
                 {submitting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
                 Enviar evaluación

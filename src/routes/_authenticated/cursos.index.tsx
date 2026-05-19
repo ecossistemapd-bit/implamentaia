@@ -118,7 +118,7 @@ function CursosPage() {
   const [filter, setFilter] = useState<Filter>("Todos");
   const [query, setQuery] = useState("");
 
-  const { data: courses } = useQuery({
+  const { data: courses, isLoading } = useQuery({
     queryKey: ["courses"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -217,6 +217,23 @@ function CursosPage() {
           })}
         </div>
       </div>
+
+      {/* Loading skeleton */}
+      {isLoading && (
+        <section className="mt-10">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="overflow-hidden rounded-xl border border-zinc-800/50 bg-muted animate-pulse">
+                <div className="aspect-video bg-zinc-800/60" />
+                <div className="space-y-2 p-4">
+                  <div className="h-4 w-3/4 rounded bg-zinc-800/60" />
+                  <div className="h-3 w-1/2 rounded bg-zinc-800/60" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Featured */}
       {featured && (

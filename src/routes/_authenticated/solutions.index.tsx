@@ -142,7 +142,7 @@ function SolutionsList() {
             <Link
               key={s.id}
               {...linkProps}
-              className={`premium-card group relative flex flex-col overflow-hidden ${
+              className={`premium-card group relative flex cursor-pointer flex-col overflow-hidden border border-transparent transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 ${
                 inDev ? "opacity-70" : ""
               }`}
             >
