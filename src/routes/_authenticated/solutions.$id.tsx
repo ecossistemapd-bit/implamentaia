@@ -283,7 +283,7 @@ function SolutionByIdDetail() {
             {!inDev && (
               <Button
                 onClick={goToJourney}
-                className="mt-6 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-foreground hover:bg-primary"
+                className="mt-6 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:opacity-90"
               >
                 Continuar Solución <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
