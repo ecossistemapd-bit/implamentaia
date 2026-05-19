@@ -32,13 +32,13 @@ const STEP_LABELS: Record<string, string> = {
 };
 
 const PROJECT_STATUS: Record<string, { label: string; cls: string }> = {
-  pending: { label: "Pendiente", cls: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
-  assigned: { label: "Asignado", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
-  in_progress: { label: "En curso", cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
-  completed: { label: "Completado", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
-  generating: { label: "Generando", cls: "bg-zinc-600/20 text-zinc-400 border-zinc-600/30" },
-  ready: { label: "Listo", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
-  error: { label: "Error", cls: "bg-red-500/20 text-red-400 border-red-500/30" },
+  pending: { label: "Pendiente", cls: "bg-muted text-muted-foreground border-border" },
+  assigned: { label: "Asignado", cls: "bg-primary/20 text-primary border-primary" },
+  in_progress: { label: "En curso", cls: "bg-primary/20 text-primary border-primary" },
+  completed: { label: "Completado", cls: "bg-primary/20 text-primary border-primary" },
+  generating: { label: "Generando", cls: "bg-muted text-muted-foreground border-border" },
+  ready: { label: "Listo", cls: "bg-primary/20 text-primary border-primary" },
+  error: { label: "Error", cls: "bg-muted text-muted-foreground border-border" },
 };
 
 function MiProgreso() {
@@ -170,10 +170,10 @@ function MiProgreso() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-white">
-          Mi <span className="text-violet-400">Progreso</span>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Mi <span className="text-primary">Progreso</span>
         </h1>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           Un resumen de todo lo que estás aprendiendo e implementando.
         </p>
       </header>
@@ -182,13 +182,13 @@ function MiProgreso() {
         {cards.map((c) => (
           <div
             key={c.label}
-            className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition duration-200 hover:scale-[1.02] hover:border-violet-500/50"
+            className="rounded-xl border border-border bg-card p-5 transition duration-200 hover:scale-[1.02] hover:border-primary"
           >
-            <c.icon className="h-5 w-5 text-violet-400" strokeWidth={1.75} />
-            <div className="mt-3 text-3xl font-bold tracking-tight text-violet-400">
+            <c.icon className="h-5 w-5 text-primary" strokeWidth={1.75} />
+            <div className="mt-3 text-3xl font-bold tracking-tight text-primary">
               {isLoading ? "—" : c.value}
             </div>
-            <div className="mt-1 text-sm text-zinc-400">{c.label}</div>
+            <div className="mt-1 text-sm text-muted-foreground">{c.label}</div>
           </div>
         ))}
       </div>
@@ -209,21 +209,21 @@ function MiProgreso() {
               return (
                 <div
                   key={s.id}
-                  className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-violet-500/50"
+                  className="rounded-xl border border-border bg-card p-5 transition hover:border-primary"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-zinc-100">{s.title}</h3>
-                        <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2 py-0.5 text-xs text-violet-400">
+                        <h3 className="font-semibold text-foreground">{s.title}</h3>
+                        <span className="rounded-full border border-primary bg-primary/10 px-2 py-0.5 text-xs text-primary">
                           En: {s.currentStep}
                         </span>
                       </div>
                       <div className="mt-3 flex items-center gap-3">
-                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
-                          <div className="h-full bg-violet-400 transition-all" style={{ width: `${pct}%` }} />
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                          <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
                         </div>
-                        <span className="shrink-0 text-xs text-zinc-400">{s.completed} de 5 pasos</span>
+                        <span className="shrink-0 text-xs text-muted-foreground">{s.completed} de 5 pasos</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -232,14 +232,14 @@ function MiProgreso() {
                         onClick={() => setToDelete({ id: s.id, title: s.title })}
                         aria-label="Eliminar progreso"
                         title="Eliminar progreso"
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 text-zinc-500 transition hover:border-red-500/40 hover:bg-red-500/10 hover:text-red-400"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition hover:border-border hover:bg-muted hover:text-muted-foreground"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                       <Link
                         to="/solutions/$id"
                         params={{ id: s.id }}
-                        className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
+                        className="inline-flex items-center gap-1 rounded-lg border border-border px-4 py-1.5 text-sm text-muted-foreground transition hover:border-primary hover:text-primary"
                       >
                         Continuar <ArrowRight className="h-3.5 w-3.5" />
                       </Link>
@@ -268,24 +268,24 @@ function MiProgreso() {
               return (
                 <div
                   key={c.id}
-                  className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-violet-500/50"
+                  className="rounded-xl border border-border bg-card p-5 transition hover:border-primary"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4 text-violet-400" />
-                        <h3 className="font-semibold text-zinc-100">{c.title}</h3>
+                        <BookOpen className="h-4 w-4 text-primary" />
+                        <h3 className="font-semibold text-foreground">{c.title}</h3>
                       </div>
                       <div className="mt-3 flex items-center gap-3">
-                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
-                          <div className="h-full bg-violet-400 transition-all" style={{ width: `${pct}%` }} />
+                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                          <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
                         </div>
-                        <span className="shrink-0 text-xs text-zinc-400">{c.done} de {c.total} módulos</span>
+                        <span className="shrink-0 text-xs text-muted-foreground">{c.done} de {c.total} módulos</span>
                       </div>
                     </div>
                     <Link
                       to="/cursos"
-                      className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
+                      className="inline-flex items-center gap-1 rounded-lg border border-border px-4 py-1.5 text-sm text-muted-foreground transition hover:border-primary hover:text-primary"
                     >
                       Continuar <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
@@ -316,11 +316,11 @@ function MiProgreso() {
               return (
                 <div
                   key={p.id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:border-violet-500/50"
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-5 transition hover:border-primary"
                 >
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-zinc-100">{p.title}</h3>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+                    <h3 className="font-semibold text-foreground">{p.title}</h3>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       <span>{p.solutions?.title ?? "Sin solución"}</span>
                       <span>·</span>
                       <span>{new Date(p.created_at).toLocaleDateString("es", { day: "2-digit", month: "2-digit", year: "numeric" })}</span>
@@ -331,7 +331,7 @@ function MiProgreso() {
                   </span>
                   <Link
                     to="/projects"
-                    className="inline-flex items-center gap-1 rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
+                    className="inline-flex items-center gap-1 rounded-lg border border-border px-4 py-1.5 text-sm text-muted-foreground transition hover:border-primary hover:text-primary"
                   >
                     Ver proyecto <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
@@ -355,7 +355,7 @@ function MiProgreso() {
             <AlertDialogAction
               onClick={(e) => { e.preventDefault(); handleDeleteProgress(); }}
               disabled={deleting}
-              className="bg-red-500 text-white hover:bg-red-600"
+              className="bg-muted text-foreground hover:bg-muted"
             >
               {deleting ? "Eliminando..." : "Eliminar progreso"}
             </AlertDialogAction>
@@ -369,7 +369,7 @@ function MiProgreso() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-10">
-      <h2 className="mb-4 text-lg font-semibold text-white">{title}</h2>
+      <h2 className="mb-4 text-lg font-semibold text-foreground">{title}</h2>
       {children}
     </section>
   );
@@ -379,12 +379,12 @@ function EmptyState({
   icon: Icon, text, cta, onClick,
 }: { icon: typeof Rocket; text: string; cta: string; onClick: () => void }) {
   return (
-    <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-900/40 p-10 text-center">
-      <Icon className="mx-auto h-8 w-8 text-zinc-600" strokeWidth={1.5} />
-      <p className="mt-3 text-sm text-zinc-400">{text}</p>
+    <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center">
+      <Icon className="mx-auto h-8 w-8 text-muted-foreground" strokeWidth={1.5} />
+      <p className="mt-3 text-sm text-muted-foreground">{text}</p>
       <button
         onClick={onClick}
-        className="mt-4 inline-flex items-center gap-1 rounded-lg border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-400 transition hover:bg-violet-500/20"
+        className="mt-4 inline-flex items-center gap-1 rounded-lg border border-primary bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/20"
       >
         {cta} <ArrowRight className="h-3.5 w-3.5" />
       </button>
