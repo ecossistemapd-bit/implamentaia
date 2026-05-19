@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, LayoutGrid, Rows3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,15 @@ function SolutionsList() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<CategoryKey | "all">("all");
   const [diff, setDiff] = useState<Difficulty | "all">("all");
+  const [viewMode, setViewMode] = useState<"carousel" | "grid">(() => {
+    if (typeof window === "undefined") return "carousel";
+    return localStorage.getItem("solutions-view-mode") === "grid" ? "grid" : "carousel";
+  });
+
+  const changeViewMode = (m: "carousel" | "grid") => {
+    setViewMode(m);
+    if (typeof window !== "undefined") localStorage.setItem("solutions-view-mode", m);
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["solutions"],
@@ -119,13 +128,16 @@ function SolutionsList() {
             </FilterChip>
           ))}
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          <FilterChip active={diff === "all"} onClick={() => setDiff("all")}>Toda dificultad</FilterChip>
-          {(["principiante","intermedio","avanzado"] as Difficulty[]).map((d) => (
-            <FilterChip key={d} active={diff === d} onClick={() => setDiff(d)}>
-              {DIFFICULTY_LABEL[d]}
-            </FilterChip>
-          ))}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-1.5">
+            <FilterChip active={diff === "all"} onClick={() => setDiff("all")}>Toda dificultad</FilterChip>
+            {(["principiante","intermedio","avanzado"] as Difficulty[]).map((d) => (
+              <FilterChip key={d} active={diff === d} onClick={() => setDiff(d)}>
+                {DIFFICULTY_LABEL[d]}
+              </FilterChip>
+            ))}
+          </div>
+          <ViewModeToggle mode={viewMode} onChange={changeViewMode} />
         </div>
       </div>
 
@@ -256,7 +268,7 @@ function SolutionsList() {
 
         return (
           <>
-            {showFeatured && !isLoading && (
+            {viewMode === "carousel" && showFeatured && !isLoading && (
               <div className="mt-6">
                 <CardRail
                   header={
@@ -297,6 +309,15 @@ function SolutionsList() {
                 <p className="text-sm text-muted-foreground">
                   No encontramos soluciones con esos filtros.
                 </p>
+              </div>
+            ) : viewMode === "grid" ? (
+              <div className="mt-8">
+                <div className="mb-4 text-xs uppercase tracking-wider text-muted-foreground">
+                  {filtered.length} solución{filtered.length === 1 ? "" : "es"}
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {filtered.map((s) => renderCard(s))}
+                </div>
               </div>
             ) : (
               <div className="mt-8 space-y-12">
@@ -447,6 +468,48 @@ function CardRail({
   );
 }
 
+
+// Segmented control para alternar entre carrusel por categoría y grilla flat.
+function ViewModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: "carousel" | "grid";
+  onChange: (m: "carousel" | "grid") => void;
+}) {
+  const item =
+    "flex h-7 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors duration-150";
+  // Usamos tint de foreground (10%) para que el pill activo sea visible
+  // en LIGHT (foreground=dark) y en DARK (foreground=light). Cero raw hex.
+  const active = "bg-foreground/10 text-foreground shadow-sm";
+  const idle = "text-muted-foreground hover:text-foreground";
+  return (
+    <div
+      role="tablist"
+      aria-label="Vista de soluciones"
+      className="inline-flex shrink-0 items-center rounded-full border border-border bg-secondary p-0.5"
+    >
+      <button
+        role="tab"
+        aria-selected={mode === "carousel"}
+        onClick={() => onChange("carousel")}
+        className={`${item} ${mode === "carousel" ? active : idle}`}
+      >
+        <Rows3 className="h-3.5 w-3.5" />
+        <span className="hidden sm:inline">Carrusel</span>
+      </button>
+      <button
+        role="tab"
+        aria-selected={mode === "grid"}
+        onClick={() => onChange("grid")}
+        className={`${item} ${mode === "grid" ? active : idle}`}
+      >
+        <LayoutGrid className="h-3.5 w-3.5" />
+        <span className="hidden sm:inline">Grilla</span>
+      </button>
+    </div>
+  );
+}
 
 function FilterChip({
   children,
