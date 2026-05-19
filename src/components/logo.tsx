@@ -1,15 +1,33 @@
 import { Link } from "@tanstack/react-router";
 
+// Logo Implementa IA — lockup horizontal: marca "ΛI" + wordmark.
+// Monocromo vía currentColor → blanco en oscuro, grafito en claro
+// (hereda el color de texto del contenedor). Sin dorado.
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <Link
       to="/"
-      className={`inline-flex items-center gap-2.5 text-base tracking-tight ${className}`}
+      aria-label="Implementa IA"
+      className={`inline-flex items-center gap-2.5 text-foreground ${className}`}
     >
-      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-[#C9A84C] to-[#B8972E] text-[#0B0F1A] font-bold text-[12px]">
-        I
+      <svg
+        viewBox="0 0 26 22"
+        className="h-[22px] w-auto shrink-0"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.9}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        {/* "A" como pico (sin travesaño) */}
+        <path d="M1.8 20.5 L10 2 L18.2 20.5" />
+        {/* "I" como barra */}
+        <path d="M23.2 2 L23.2 20.5" />
+      </svg>
+      <span className="text-[13px] font-medium uppercase tracking-[0.2em] leading-none">
+        Implementa&nbsp;IA
       </span>
-      <span className="font-semibold text-white">Implementa AI</span>
     </Link>
   );
 }
