@@ -72,7 +72,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="dark flex min-h-screen flex-col bg-zinc-950 text-white">
+    <div className="dark flex min-h-screen flex-col bg-background text-foreground">
       <main className="flex flex-1 items-center justify-center px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -85,10 +85,10 @@ function LoginPage() {
           </div>
 
           <div className="mt-10 text-center">
-            <h1 className="text-2xl font-semibold text-white">
+            <h1 className="text-2xl font-semibold text-foreground">
               {mode === "signin" ? "Ingresar" : "Crear cuenta"}
             </h1>
-            <p className="mt-2 text-sm text-zinc-400">
+            <p className="mt-2 text-sm text-muted-foreground">
               {mode === "signin"
                 ? "Bienvenido de vuelta a Implementa AI"
                 : "Plataforma por invitación. Tu email debe estar autorizado."}
@@ -102,10 +102,10 @@ function LoginPage() {
                 type="email"
                 placeholder="Email"
                 autoComplete="email"
-                className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 text-white placeholder-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-0"
+                className="h-12 w-full rounded-xl border border-border bg-card px-4 text-foreground placeholder-zinc-600 focus:border-border focus:outline-none focus:ring-0"
                 {...register("email")}
               />
-              {errors.email && <p className="mt-1.5 text-xs text-red-400">{errors.email.message}</p>}
+              {errors.email && <p className="mt-1.5 text-xs text-muted-foreground">{errors.email.message}</p>}
             </div>
             <div>
               <input
@@ -113,15 +113,15 @@ function LoginPage() {
                 type="password"
                 placeholder="Contraseña"
                 autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                className="h-12 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 text-white placeholder-zinc-600 focus:border-zinc-600 focus:outline-none focus:ring-0"
+                className="h-12 w-full rounded-xl border border-border bg-card px-4 text-foreground placeholder-zinc-600 focus:border-border focus:outline-none focus:ring-0"
                 {...register("password")}
               />
-              {errors.password && <p className="mt-1.5 text-xs text-red-400">{errors.password.message}</p>}
+              {errors.password && <p className="mt-1.5 text-xs text-muted-foreground">{errors.password.message}</p>}
             </div>
             <button
               type="submit"
               disabled={submitting}
-              className="h-12 w-full rounded-xl bg-white font-semibold text-black transition hover:bg-zinc-100 disabled:opacity-60"
+              className="h-12 w-full rounded-xl bg-primary font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
             >
               {submitting ? "Procesando..." : mode === "signin" ? "Ingresar" : "Crear cuenta"}
             </button>
@@ -130,18 +130,18 @@ function LoginPage() {
           <div className="mt-6 flex items-center justify-between text-sm">
             <button
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-              className="text-zinc-500 hover:text-zinc-300"
+              className="text-muted-foreground hover:text-muted-foreground"
             >
               {mode === "signin" ? "Crear cuenta" : "Ya tengo cuenta"}
             </button>
-            <Link to="/" className="text-zinc-500 hover:text-zinc-300">
+            <Link to="/" className="text-muted-foreground hover:text-muted-foreground">
               Volver al inicio
             </Link>
           </div>
 
-          <p className="mt-10 text-center text-xs text-zinc-600">
+          <p className="mt-10 text-center text-xs text-muted-foreground">
             ¿No tenés invitación?{" "}
-            <a className="text-zinc-400 underline-offset-4 hover:underline" href="mailto:hola@implementa.ai?subject=Solicitar%20acceso">
+            <a className="text-muted-foreground underline-offset-4 hover:underline" href="mailto:hola@implementa.ai?subject=Solicitar%20acceso">
               Solicitar acceso
             </a>
           </p>

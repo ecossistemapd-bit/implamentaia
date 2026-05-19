@@ -59,23 +59,23 @@ export function OnboardingModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/50 p-4">
+      <div className="w-full max-w-md rounded-2xl bg-primary p-8 shadow-2xl">
         {status === "step1" ? (
           <div className="flex flex-col items-center text-center">
             <div className="text-4xl">👋</div>
-            <h2 className="mt-3 text-xl font-bold text-gray-900">Bienvenido a Implementa AI</h2>
-            <p className="mt-2 text-sm text-gray-500">
+            <h2 className="mt-3 text-xl font-bold text-muted-foreground">Bienvenido a Implementa AI</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
               La plataforma que te guía paso a paso para implementar soluciones de IA en tu empresa.
             </p>
             <div className="mt-6 w-full space-y-3 text-left">
               <div>
-                <label className="mb-1 block text-xs font-medium text-gray-600">Tu nombre completo</label>
-                <Input className="text-gray-900" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Juan García" />
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Tu nombre completo</label>
+                <Input className="text-muted-foreground" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Juan García" />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-gray-600">Nombre de tu empresa</label>
-                <Input className="text-gray-900" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Mi Empresa S.A." />
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre de tu empresa</label>
+                <Input className="text-muted-foreground" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Mi Empresa S.A." />
               </div>
             </div>
             <Button
@@ -85,13 +85,13 @@ export function OnboardingModal() {
             >
               {saving ? "Guardando…" : "Continuar →"}
             </Button>
-            <div className="mt-4 text-[11px] text-gray-400">Paso 1 de 2</div>
+            <div className="mt-4 text-[11px] text-muted-foreground">Paso 1 de 2</div>
           </div>
         ) : (
           <div className="flex flex-col text-center">
             <div className="text-4xl">🚀</div>
-            <h2 className="mt-3 text-xl font-bold text-gray-900">¿Por dónde empezar?</h2>
-            <p className="mt-2 text-sm text-gray-500">Elegí cómo querés arrancar.</p>
+            <h2 className="mt-3 text-xl font-bold text-muted-foreground">¿Por dónde empezar?</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Elegí cómo querés arrancar.</p>
             <div className="mt-4 space-y-2 text-left">
               <Option
                 emoji="🔧"
@@ -114,11 +114,11 @@ export function OnboardingModal() {
             </div>
             <button
               onClick={() => finish()}
-              className="mt-4 block cursor-pointer text-center text-xs text-gray-400 hover:text-gray-600"
+              className="mt-4 block cursor-pointer text-center text-xs text-muted-foreground hover:text-muted-foreground"
             >
               Saltar por ahora
             </button>
-            <div className="mt-3 text-[11px] text-gray-400">Paso 2 de 2</div>
+            <div className="mt-3 text-[11px] text-muted-foreground">Paso 2 de 2</div>
           </div>
         )}
       </div>
@@ -130,12 +130,12 @@ function Option({ emoji, title, subtitle, onClick }: { emoji: string; title: str
   return (
     <button
       onClick={onClick}
-      className="flex w-full cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4 text-left transition-colors hover:border-black"
+      className="flex w-full cursor-pointer items-start gap-3 rounded-xl border border-border p-4 text-left transition-colors hover:border-black"
     >
       <div className="text-2xl">{emoji}</div>
       <div className="flex-1">
-        <div className="text-sm font-semibold text-gray-900">{title}</div>
-        <div className="mt-0.5 text-xs text-gray-500">{subtitle}</div>
+        <div className="text-sm font-semibold text-muted-foreground">{title}</div>
+        <div className="mt-0.5 text-xs text-muted-foreground">{subtitle}</div>
       </div>
     </button>
   );
