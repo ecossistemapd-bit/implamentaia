@@ -28,11 +28,11 @@ export const Route = createFileRoute(
 });
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  pending: { label: "Pendiente", cls: "bg-yellow-50 text-yellow-700 border-yellow-200" },
-  assigned: { label: "Asignado", cls: "bg-blue-50 text-blue-700 border-blue-200" },
-  in_progress: { label: "En curso", cls: "bg-purple-50 text-purple-700 border-purple-200" },
-  completed: { label: "Completado", cls: "bg-green-50 text-green-700 border-green-200" },
-  cancelled: { label: "Cancelado", cls: "bg-gray-50 text-gray-500 border-gray-200" },
+  pending: { label: "Pendiente", cls: "bg-muted text-muted-foreground border-border" },
+  assigned: { label: "Asignado", cls: "bg-muted text-muted-foreground border-border" },
+  in_progress: { label: "En curso", cls: "bg-primary text-primary border-primary" },
+  completed: { label: "Completado", cls: "bg-muted text-muted-foreground border-border" },
+  cancelled: { label: "Cancelado", cls: "bg-muted text-muted-foreground border-border" },
 };
 
 function ProjectDetail() {
@@ -93,11 +93,11 @@ function ProjectDetail() {
   const allChecked = checklist.length > 0 && checklist.every((_, i) => checked[i]);
 
   if (roleLoading || isLoading) {
-    return <div className="p-10 text-sm text-gray-400">Cargando…</div>;
+    return <div className="p-10 text-sm text-muted-foreground">Cargando…</div>;
   }
   if (!data || !data.project) {
     return (
-      <div className="p-10 text-sm text-gray-500">
+      <div className="p-10 text-sm text-muted-foreground">
         Proyecto no encontrado.{" "}
         <button className="underline" onClick={() => navigate({ to: "/implementador" })}>Volver</button>
       </div>
@@ -130,17 +130,17 @@ function ProjectDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9f9f9]">
-      <div className="border-b border-gray-200 bg-white">
+    <div className="min-h-screen bg-background">
+      <div className="border-b border-border bg-primary">
         <div className="mx-auto flex max-w-[1100px] items-center gap-4 px-6 py-4">
           <button
             onClick={() => navigate({ to: "/implementador" })}
-            className="flex items-center gap-1 text-sm text-gray-600 hover:text-black"
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary-foreground"
           >
             <ArrowLeft className="h-4 w-4" /> Volver
           </button>
           <div className="flex-1">
-            <div className="text-lg font-bold text-gray-900">
+            <div className="text-lg font-bold text-muted-foreground">
               {p.company_name ?? p.contact_name ?? "Proyecto"} · {p.solutions?.title ?? "—"}
             </div>
           </div>
@@ -153,15 +153,15 @@ function ProjectDetail() {
       <div className="mx-auto grid max-w-[1100px] grid-cols-1 gap-6 px-6 py-6 lg:grid-cols-[3fr_2fr]">
         {/* LEFT */}
         <div className="space-y-4">
-          <section className="rounded-xl border border-gray-200 bg-white p-5">
-            <div className="text-xs font-semibold uppercase tracking-widest text-gray-400">Datos del cliente</div>
+          <section className="rounded-xl border border-border bg-primary p-5">
+            <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Datos del cliente</div>
             <div className="mt-3 space-y-2 text-sm">
               <Row label="Nombre" value={p.contact_name ?? "—"} />
               <Row
                 label="Email"
                 value={
                   p.contact_email ? (
-                    <a href={`mailto:${p.contact_email}`} className="text-blue-600 hover:underline">
+                    <a href={`mailto:${p.contact_email}`} className="text-muted-foreground hover:underline">
                       {p.contact_email}
                     </a>
                   ) : ("—")
@@ -172,7 +172,7 @@ function ProjectDetail() {
                 label="Mensaje inicial"
                 value={
                   p.context_message ? (
-                    <span className="italic text-gray-600">{p.context_message}</span>
+                    <span className="italic text-muted-foreground">{p.context_message}</span>
                   ) : ("—")
                 }
               />
@@ -185,9 +185,9 @@ function ProjectDetail() {
             </div>
           </section>
 
-          <section className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+          <section className="rounded-xl border border-border bg-muted p-5">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+              <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Prompt generado por el cliente
               </div>
               {s?.generated_prompt && (
@@ -197,40 +197,40 @@ function ProjectDetail() {
               )}
             </div>
             {s?.generated_prompt ? (
-              <pre className="mt-3 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg bg-white p-3 font-mono text-xs text-gray-700">
+              <pre className="mt-3 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg bg-primary p-3 font-mono text-xs text-muted-foreground">
                 {s.generated_prompt}
               </pre>
             ) : (
-              <div className="mt-3 text-sm text-gray-400">El cliente no completó el Builder.</div>
+              <div className="mt-3 text-sm text-muted-foreground">El cliente no completó el Builder.</div>
             )}
           </section>
 
-          <section className="rounded-xl border border-gray-200 bg-white p-5">
-            <div className="text-xs font-semibold uppercase tracking-widest text-gray-400">Respuestas del Builder</div>
+          <section className="rounded-xl border border-border bg-primary p-5">
+            <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Respuestas del Builder</div>
             {s?.answers && Object.keys(s.answers).length > 0 ? (
               <div className="mt-3 space-y-3">
                 {Object.entries(s.answers).map(([k, v]) => (
                   <div key={k}>
-                    <div className="text-xs uppercase text-gray-400">{k}</div>
-                    <div className="text-sm text-gray-700">
+                    <div className="text-xs uppercase text-muted-foreground">{k}</div>
+                    <div className="text-sm text-muted-foreground">
                       {typeof v === "string" ? v : JSON.stringify(v)}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="mt-3 text-sm text-gray-400">El cliente no completó el diagnóstico.</div>
+              <div className="mt-3 text-sm text-muted-foreground">El cliente no completó el diagnóstico.</div>
             )}
           </section>
         </div>
 
         {/* RIGHT */}
         <div className="space-y-4 lg:sticky lg:top-6 lg:self-start">
-          <section className="rounded-xl border border-gray-200 bg-white p-5">
-            <div className="text-xs font-semibold uppercase tracking-widest text-gray-400">Gestión del proyecto</div>
+          <section className="rounded-xl border border-border bg-primary p-5">
+            <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Gestión del proyecto</div>
 
             <div className="mt-4">
-              <div className="mb-1 text-xs text-gray-400">Estado actual</div>
+              <div className="mb-1 text-xs text-muted-foreground">Estado actual</div>
               <Select value={status} onValueChange={setStatus}>
                 <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -244,7 +244,7 @@ function ProjectDetail() {
             </div>
 
             <div className="mt-4">
-              <div className="mb-1 text-xs text-gray-400">Nota interna</div>
+              <div className="mb-1 text-xs text-muted-foreground">Nota interna</div>
               <Textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -262,10 +262,10 @@ function ProjectDetail() {
             </Button>
           </section>
 
-          <section className="rounded-xl border border-gray-200 bg-white p-5">
-            <div className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Checklist</div>
+          <section className="rounded-xl border border-border bg-primary p-5">
+            <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Checklist</div>
             {checklist.length === 0 ? (
-              <div className="text-sm text-gray-400">Esta solución no tiene checklist.</div>
+              <div className="text-sm text-muted-foreground">Esta solución no tiene checklist.</div>
             ) : (
               <div className="space-y-2">
                 {checklist.map((item, i) => (
@@ -275,11 +275,11 @@ function ProjectDetail() {
                       onCheckedChange={(v) => setChecked((c) => ({ ...c, [i]: !!v }))}
                       className="mt-0.5"
                     />
-                    <span className="text-sm text-gray-700">{item}</span>
+                    <span className="text-sm text-muted-foreground">{item}</span>
                   </label>
                 ))}
                 {allChecked && (
-                  <div className="mt-3 text-sm font-medium text-green-700">
+                  <div className="mt-3 text-sm font-medium text-muted-foreground">
                     ✓ Implementación lista para entregar
                   </div>
                 )}
@@ -295,8 +295,8 @@ function ProjectDetail() {
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-      <div className="w-32 shrink-0 text-xs uppercase text-gray-400">{label}</div>
-      <div className="flex-1 text-gray-700">{value}</div>
+      <div className="w-32 shrink-0 text-xs uppercase text-muted-foreground">{label}</div>
+      <div className="flex-1 text-muted-foreground">{value}</div>
     </div>
   );
 }

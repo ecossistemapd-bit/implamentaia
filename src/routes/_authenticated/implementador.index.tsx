@@ -27,14 +27,14 @@ type Row = {
 };
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  pending: { label: "Pendiente", cls: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
-  assigned: { label: "Asignado", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
-  in_progress: { label: "En curso", cls: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
-  completed: { label: "Completado", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
-  cancelled: { label: "Cancelado", cls: "bg-zinc-600/20 text-zinc-400 border-zinc-600/30" },
-  generating: { label: "Generando", cls: "bg-zinc-600/20 text-zinc-400 border-zinc-600/30" },
-  ready: { label: "Listo", cls: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
-  error: { label: "Error", cls: "bg-red-500/20 text-red-400 border-red-500/30" },
+  pending: { label: "Pendiente", cls: "bg-muted text-muted-foreground border-border" },
+  assigned: { label: "Asignado", cls: "bg-primary/20 text-primary border-primary" },
+  in_progress: { label: "En curso", cls: "bg-primary/20 text-primary border-primary" },
+  completed: { label: "Completado", cls: "bg-primary/20 text-primary border-primary" },
+  cancelled: { label: "Cancelado", cls: "bg-muted text-muted-foreground border-border" },
+  generating: { label: "Generando", cls: "bg-muted text-muted-foreground border-border" },
+  ready: { label: "Listo", cls: "bg-primary/20 text-primary border-primary" },
+  error: { label: "Error", cls: "bg-muted text-muted-foreground border-border" },
 };
 
 function ImplementerPanel() {
@@ -94,7 +94,7 @@ function ImplementerPanel() {
   }, [data, tab, search]);
 
   if (roleLoading || !isImplementer) {
-    return <div className="p-10 text-sm text-zinc-400">Cargando…</div>;
+    return <div className="p-10 text-sm text-muted-foreground">Cargando…</div>;
   }
 
   const stats = [
@@ -106,26 +106,26 @@ function ImplementerPanel() {
 
   return (
     <div className="mx-auto max-w-[1100px] px-6 py-10">
-      <h1 className="text-3xl font-bold tracking-tight text-white">
-        Panel del <span className="text-violet-400">Implementador</span>
+      <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        Panel del <span className="text-primary">Implementador</span>
       </h1>
-      <p className="mt-1 text-sm text-zinc-400">Proyectos asignados a tu cuenta.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Proyectos asignados a tu cuenta.</p>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {stats.map((s) => (
           <div
             key={s.l}
-            className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 transition hover:scale-[1.02] hover:border-violet-500/50"
+            className="rounded-xl border border-border bg-card p-5 transition hover:scale-[1.02] hover:border-primary"
           >
-            <s.icon className="h-4 w-4 text-violet-400" strokeWidth={1.75} />
-            <div className="mt-3 text-3xl font-bold text-violet-400">{s.n}</div>
-            <div className="mt-1 text-sm text-zinc-400">{s.l}</div>
+            <s.icon className="h-4 w-4 text-primary" strokeWidth={1.75} />
+            <div className="mt-3 text-3xl font-bold text-primary">{s.n}</div>
+            <div className="mt-1 text-sm text-muted-foreground">{s.l}</div>
           </div>
         ))}
       </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-1 rounded-xl bg-zinc-900/50 p-1 text-xs">
+        <div className="flex gap-1 rounded-xl bg-card p-1 text-xs">
           {([
             ["all", "Todos"],
             ["pending", "Pendientes"],
@@ -137,8 +137,8 @@ function ImplementerPanel() {
               onClick={() => setTab(k)}
               className={`rounded-lg border px-3 py-1.5 transition ${
                 tab === k
-                  ? "border-violet-500/50 bg-violet-500/20 text-violet-400"
-                  : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200"
+                  ? "border-primary bg-primary/20 text-primary"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
               {label}
@@ -149,13 +149,13 @@ function ImplementerPanel() {
           placeholder="Buscar por cliente o empresa…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="h-9 w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-violet-500/50 focus:outline-none sm:max-w-xs"
+          className="h-9 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none sm:max-w-xs"
         />
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
+      <div className="mt-4 overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
-          <thead className="bg-zinc-900 text-left text-xs uppercase tracking-wide text-zinc-400">
+          <thead className="bg-card text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Cliente</th>
               <th className="px-4 py-3 font-medium">Solución</th>
@@ -166,38 +166,38 @@ function ImplementerPanel() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-zinc-600">Cargando…</td></tr>
+              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-muted-foreground">Cargando…</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-zinc-600">Sin proyectos.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-10 text-center text-xs text-muted-foreground">Sin proyectos.</td></tr>
             ) : (
               filtered.map((r) => {
                 const meta = STATUS_META[r.status] ?? STATUS_META.pending;
                 const hasName = !!r.contact_name;
                 return (
-                  <tr key={r.id} className="border-b border-zinc-800/50 bg-zinc-900 transition hover:bg-zinc-800/50">
+                  <tr key={r.id} className="border-b border-border bg-card transition hover:bg-muted">
                     <td className="px-4 py-3">
                       {hasName ? (
                         <>
-                          <div className="font-medium text-zinc-200">{r.contact_name}</div>
-                          <div className="text-xs text-zinc-600">{r.company_name ?? ""}</div>
+                          <div className="font-medium text-foreground">{r.contact_name}</div>
+                          <div className="text-xs text-muted-foreground">{r.company_name ?? ""}</div>
                         </>
                       ) : (
-                        <span className="italic text-zinc-600">Sin asignar</span>
+                        <span className="italic text-muted-foreground">Sin asignar</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-zinc-300">{r.solutions?.title ?? "—"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{r.solutions?.title ?? "—"}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium ${meta.cls}`}>
                         {meta.label}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-zinc-400">
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
                       {new Date(r.created_at).toLocaleDateString("es", { day: "2-digit", month: "2-digit", year: "numeric" })}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => navigate({ to: "/implementador/proyecto/$projectId", params: { projectId: r.id } })}
-                        className="rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-400"
+                        className="rounded-lg border border-border px-4 py-1.5 text-sm text-muted-foreground transition hover:border-primary hover:text-primary"
                       >
                         Ver detalle →
                       </button>

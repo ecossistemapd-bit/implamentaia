@@ -21,20 +21,20 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 });
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  pending: { label: "Pendiente", cls: "bg-yellow-50 text-yellow-700 border-yellow-200" },
-  assigned: { label: "Asignado", cls: "bg-blue-50 text-blue-700 border-blue-200" },
-  in_progress: { label: "En curso", cls: "bg-purple-50 text-purple-700 border-purple-200" },
-  completed: { label: "Completado", cls: "bg-green-50 text-green-700 border-green-200" },
-  cancelled: { label: "Cancelado", cls: "bg-gray-50 text-gray-500 border-gray-200" },
-  generating: { label: "Generando", cls: "bg-gray-50 text-gray-500 border-gray-200" },
-  ready: { label: "Listo", cls: "bg-green-50 text-green-700 border-green-200" },
-  error: { label: "Error", cls: "bg-red-50 text-red-700 border-red-200" },
+  pending: { label: "Pendiente", cls: "bg-muted text-muted-foreground border-border" },
+  assigned: { label: "Asignado", cls: "bg-muted text-muted-foreground border-border" },
+  in_progress: { label: "En curso", cls: "bg-primary text-primary border-primary" },
+  completed: { label: "Completado", cls: "bg-muted text-muted-foreground border-border" },
+  cancelled: { label: "Cancelado", cls: "bg-muted text-muted-foreground border-border" },
+  generating: { label: "Generando", cls: "bg-muted text-muted-foreground border-border" },
+  ready: { label: "Listo", cls: "bg-muted text-muted-foreground border-border" },
+  error: { label: "Error", cls: "bg-muted text-muted-foreground border-border" },
 };
 
 const ROLE_BADGE: Record<string, string> = {
-  user: "bg-gray-100 text-gray-600",
-  implementador: "bg-blue-50 text-blue-700",
-  admin: "bg-black text-white",
+  user: "bg-muted text-muted-foreground",
+  implementador: "bg-muted text-muted-foreground",
+  admin: "bg-background text-foreground",
 };
 const ROLE_LABEL: Record<string, string> = {
   user: "Usuario",
@@ -53,15 +53,15 @@ function AdminPanel() {
   }, [roleLoading, role, isAdmin, navigate]);
 
   if (roleLoading || !isAdmin) {
-    return <div className="p-10 text-sm text-gray-400">Cargando…</div>;
+    return <div className="p-10 text-sm text-muted-foreground">Cargando…</div>;
   }
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 py-8 sm:px-6 sm:py-10">
       <h1 className="text-2xl font-bold tracking-tight">Panel de Administración</h1>
-      <p className="mt-1 text-sm text-gray-500">Gestión de usuarios y proyectos de Implementa AI.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Gestión de usuarios y proyectos de Implementa AI.</p>
 
-      <div className="mt-6 flex gap-1 rounded-lg border border-gray-200 bg-white p-1 text-xs w-fit">
+      <div className="mt-6 flex gap-1 rounded-lg border border-border bg-primary p-1 text-xs w-fit">
         {([
           ["users", "Usuarios"],
           ["projects", "Proyectos"],
@@ -75,7 +75,7 @@ function AdminPanel() {
               if (k === "users") setFilterUserId(null);
             }}
             className={`rounded-md px-3 py-1.5 transition ${
-              tab === k ? "bg-foreground text-background" : "text-gray-600 hover:bg-gray-50"
+              tab === k ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted"
             }`}
           >
             {label}
@@ -144,7 +144,7 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
   return (
     <div className="mt-6">
       <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-sm text-gray-500">{(data ?? []).length} usuarios registrados</div>
+        <div className="text-sm text-muted-foreground">{(data ?? []).length} usuarios registrados</div>
         <Input
           placeholder="Buscar por nombre, email o empresa…"
           value={search}
@@ -152,9 +152,9 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
           className="h-9 w-full sm:max-w-xs text-sm"
         />
       </div>
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-border bg-primary">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs uppercase tracking-wider text-gray-500">
+          <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
               <th className="px-4 py-3">Nombre</th>
               <th className="px-4 py-3">Email</th>
@@ -164,23 +164,23 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
               <th className="px-4 py-3 text-right">Acción</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {isLoading ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-gray-400">Cargando…</td></tr>
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-muted-foreground">Cargando…</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-gray-400">Sin resultados.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-muted-foreground">Sin resultados.</td></tr>
             ) : (
               filtered.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50">
+                <tr key={u.id} className="hover:bg-muted">
                   <td className="px-4 py-3">
                     {u.full_name ? (
-                      <span className="text-gray-900">{u.full_name}</span>
+                      <span className="text-muted-foreground">{u.full_name}</span>
                     ) : (
-                      <span className="italic text-gray-400">Sin nombre</span>
+                      <span className="italic text-muted-foreground">Sin nombre</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-gray-700">{u.email}</td>
-                  <td className="px-4 py-3 text-gray-700">{u.company_name ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{u.email}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{u.company_name ?? "—"}</td>
                   <td className="px-4 py-3">
                     <Select value={u.role} onValueChange={(v) => updateRole(u.id, v)}>
                       <SelectTrigger className={`h-7 w-fit gap-1 border-0 px-2 text-xs ${ROLE_BADGE[u.role] ?? ROLE_BADGE.user}`}>
@@ -193,13 +193,13 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
                       </SelectContent>
                     </Select>
                   </td>
-                  <td className="px-4 py-3 text-xs text-gray-600">
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
                     {new Date(u.created_at).toLocaleDateString("es", { day: "2-digit", month: "2-digit", year: "numeric" })}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => onViewProjects(u.id)}
-                      className="text-xs text-blue-600 hover:underline"
+                      className="text-xs text-muted-foreground hover:underline"
                     >
                       Ver proyectos →
                     </button>
@@ -294,10 +294,10 @@ function ProjectsTab({ filterUserId, onClearFilter }: { filterUserId: string | n
   return (
     <div className="mt-6">
       <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-muted-foreground">
           {(projects ?? []).length} proyectos en total
           {filterUserId && (
-            <button onClick={onClearFilter} className="ml-3 text-xs text-blue-600 hover:underline">
+            <button onClick={onClearFilter} className="ml-3 text-xs text-muted-foreground hover:underline">
               Quitar filtro de usuario
             </button>
           )}
@@ -310,7 +310,7 @@ function ProjectsTab({ filterUserId, onClearFilter }: { filterUserId: string | n
         />
       </div>
 
-      <div className="mb-3 flex gap-1 overflow-x-auto rounded-lg border border-gray-200 bg-white p-1 text-xs w-fit">
+      <div className="mb-3 flex gap-1 overflow-x-auto rounded-lg border border-border bg-primary p-1 text-xs w-fit">
         {([
           ["all", "Todos"],
           ["pending", "Pendientes"],
@@ -321,7 +321,7 @@ function ProjectsTab({ filterUserId, onClearFilter }: { filterUserId: string | n
             key={k}
             onClick={() => setStatusTab(k)}
             className={`rounded-md px-3 py-1.5 transition whitespace-nowrap ${
-              statusTab === k ? "bg-foreground text-background" : "text-gray-600 hover:bg-gray-50"
+              statusTab === k ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted"
             }`}
           >
             {label}
@@ -329,9 +329,9 @@ function ProjectsTab({ filterUserId, onClearFilter }: { filterUserId: string | n
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-xl border border-border bg-primary">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs uppercase tracking-wider text-gray-500">
+          <thead className="bg-muted text-left text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
               <th className="px-4 py-3">Cliente</th>
               <th className="px-4 py-3">Solución</th>
@@ -341,25 +341,25 @@ function ProjectsTab({ filterUserId, onClearFilter }: { filterUserId: string | n
               <th className="px-4 py-3">Fecha</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border">
             {isLoading ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-gray-400">Cargando…</td></tr>
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-muted-foreground">Cargando…</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-gray-400">Sin proyectos.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-muted-foreground">Sin proyectos.</td></tr>
             ) : (
               filtered.map((p) => {
                 const meta = STATUS_META[p.status] ?? STATUS_META.pending;
                 const isImpl = p.type === "implementador";
                 return (
-                  <tr key={p.id} className="hover:bg-gray-50">
+                  <tr key={p.id} className="hover:bg-muted">
                     <td className="px-4 py-3">
-                      <div className="font-medium text-gray-900">{p.contact_name ?? "—"}</div>
-                      <div className="text-xs text-gray-500">{p.company_name ?? ""}</div>
+                      <div className="font-medium text-muted-foreground">{p.contact_name ?? "—"}</div>
+                      <div className="text-xs text-muted-foreground">{p.company_name ?? ""}</div>
                     </td>
-                    <td className="px-4 py-3 text-gray-700">{p.solutions?.title ?? "—"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{p.solutions?.title ?? "—"}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex rounded-md border px-2 py-0.5 text-[11px] font-medium ${
-                        isImpl ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-gray-100 text-gray-600 border-gray-200"
+                        isImpl ? "bg-muted text-muted-foreground border-border" : "bg-muted text-muted-foreground border-border"
                       }`}>
                         {isImpl ? "Con implementador" : "DIY"}
                       </span>
@@ -371,7 +371,7 @@ function ProjectsTab({ filterUserId, onClearFilter }: { filterUserId: string | n
                     </td>
                     <td className="px-4 py-3">
                       {p.implementador_id ? (
-                        <span className="text-sm text-gray-700">{implMap.get(p.implementador_id) ?? "—"}</span>
+                        <span className="text-sm text-muted-foreground">{implMap.get(p.implementador_id) ?? "—"}</span>
                       ) : (
                         <Select value="" onValueChange={(v) => assign(p.id, v)}>
                           <SelectTrigger className="h-7 w-40 text-xs">
@@ -385,7 +385,7 @@ function ProjectsTab({ filterUserId, onClearFilter }: { filterUserId: string | n
                         </Select>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-600">
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
                       {new Date(p.created_at).toLocaleDateString("es", { day: "2-digit", month: "2-digit", year: "numeric" })}
                     </td>
                   </tr>
@@ -595,7 +595,7 @@ function SolutionsTab() {
   return (
     <div className="mt-6">
       <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-muted-foreground">
           {(data ?? []).length} soluciones · editá título, descripción, cover, herramientas y links
         </div>
         <Input
@@ -608,28 +608,28 @@ function SolutionsTab() {
 
       <div className="space-y-2">
         {isLoading ? (
-          <div className="rounded-xl border border-gray-200 bg-white px-4 py-10 text-center text-xs text-gray-400">
+          <div className="rounded-xl border border-border bg-primary px-4 py-10 text-center text-xs text-muted-foreground">
             Cargando…
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-white px-4 py-10 text-center text-xs text-gray-400">
+          <div className="rounded-xl border border-border bg-primary px-4 py-10 text-center text-xs text-muted-foreground">
             Sin resultados.
           </div>
         ) : (
           filtered.map((sol) => {
             const expanded = expandedId === sol.id;
             return (
-              <div key={sol.id} className="rounded-xl border border-gray-200 bg-white">
+              <div key={sol.id} className="rounded-xl border border-border bg-primary">
                 <div className="flex items-center justify-between gap-3 px-4 py-3">
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="h-10 w-16 shrink-0 overflow-hidden rounded bg-zinc-100">
+                    <div className="h-10 w-16 shrink-0 overflow-hidden rounded bg-muted">
                       {sol.cover_image_url ? (
                         <img src={sol.cover_image_url} alt="" className="h-full w-full object-cover" />
                       ) : null}
                     </div>
                     <div className="min-w-0">
-                      <div className="truncate text-sm font-semibold text-gray-900">{sol.title}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="truncate text-sm font-semibold text-muted-foreground">{sol.title}</div>
+                      <div className="text-xs text-muted-foreground">
                         {sol.category} · {(sol.resources ?? []).length} recursos
                       </div>
                     </div>
@@ -643,7 +643,7 @@ function SolutionsTab() {
                 </div>
 
                 {expanded && (
-                  <div className="border-t border-gray-100 bg-gray-50/70 px-4 py-4 transition-all duration-200">
+                  <div className="border-t border-border bg-muted px-4 py-4 transition-all duration-200">
                     <SolutionInlineEditor key={sol.id} solution={sol} onCancel={() => setExpandedId(null)} />
                   </div>
                 )}
@@ -824,8 +824,8 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
     ]);
 
   return (
-    <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 text-gray-900 [&_input]:text-gray-900 [&_textarea]:text-gray-900 [&_select]:text-gray-900 [&_input::placeholder]:text-gray-400 [&_textarea::placeholder]:text-gray-400">
-      <div className="flex flex-wrap gap-1 rounded-lg border border-gray-200 bg-gray-50 p-1 text-xs w-fit">
+    <div className="space-y-4 rounded-lg border border-border bg-primary p-4 text-muted-foreground [&_input]:text-muted-foreground [&_textarea]:text-muted-foreground [&_select]:text-muted-foreground [&_input::placeholder]:text-muted-foreground [&_textarea::placeholder]:text-muted-foreground">
+      <div className="flex flex-wrap gap-1 rounded-lg border border-border bg-muted p-1 text-xs w-fit">
         {([
           ["general", "General"],
           ["cover", "Cover"],
@@ -836,7 +836,7 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
             key={key}
             onClick={() => setActiveTab(key)}
             className={`rounded-md px-3 py-1.5 transition ${
-              activeTab === key ? "bg-foreground text-background" : "text-gray-600 hover:bg-white"
+              activeTab === key ? "bg-foreground text-background" : "text-muted-foreground hover:bg-primary"
             }`}
           >
             {label}
@@ -920,7 +920,7 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
           <AdminField label="Builder questions JSON">
             <textarea value={form.builder_questions_text} onChange={(e) => setForm((prev) => ({ ...prev, builder_questions_text: e.target.value }))} rows={5} className="w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-xs" />
           </AdminField>
-          <label className="flex items-center gap-2 text-sm text-gray-700">
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
             <input type="checkbox" checked={form.is_featured} onChange={(e) => setForm((prev) => ({ ...prev, is_featured: e.target.checked }))} />
             Destacada
           </label>
@@ -929,7 +929,7 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
 
       {activeTab === "cover" && (
         <div className="space-y-3">
-          <div className="aspect-video max-w-2xl overflow-hidden rounded-lg border bg-zinc-100">
+          <div className="aspect-video max-w-2xl overflow-hidden rounded-lg border bg-muted">
             {form.cover_image_url ? <img src={form.cover_image_url} alt="" className="h-full w-full object-cover" /> : null}
           </div>
           <AdminField label="Cover image URL">
@@ -950,7 +950,7 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
                 }}
               />
             </label>
-            <button onClick={() => setForm((prev) => ({ ...prev, cover_image_url: "" }))} className="rounded-md border px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+            <button onClick={() => setForm((prev) => ({ ...prev, cover_image_url: "" }))} className="rounded-md border px-3 py-2 text-xs text-muted-foreground hover:bg-muted">
               Quitar imagen
             </button>
           </div>
@@ -960,10 +960,10 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
       {activeTab === "tools" && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div>
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Asignadas ({assignedTools.length})</div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Asignadas ({assignedTools.length})</div>
             <div className="space-y-2">
               {assignedTools.length === 0 ? (
-                <div className="rounded-lg border border-dashed p-4 text-center text-xs text-gray-400">Sin herramientas</div>
+                <div className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">Sin herramientas</div>
               ) : (
                 assignedTools
                   .slice()
@@ -971,10 +971,10 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
                   .map((assigned) => {
                     const tool = assigned.tool ?? allTools.find((item) => item.id === assigned.tool_id);
                     return (
-                      <div key={assigned.tool_id} className="flex items-center gap-2 rounded-lg border bg-white p-2">
+                      <div key={assigned.tool_id} className="flex items-center gap-2 rounded-lg border bg-primary p-2">
                         <div className="min-w-0 flex-1">
-                          <div className="truncate text-sm font-medium text-gray-900">{tool?.name ?? assigned.tool_id}</div>
-                          <label className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                          <div className="truncate text-sm font-medium text-muted-foreground">{tool?.name ?? assigned.tool_id}</div>
+                          <label className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                             <input
                               type="checkbox"
                               checked={assigned.is_essential}
@@ -999,7 +999,7 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
                         />
                         <button
                           onClick={() => setAssignedTools((prev) => prev.filter((item) => item.tool_id !== assigned.tool_id))}
-                          className="rounded border px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                          className="rounded border px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
                         >
                           Quitar
                         </button>
@@ -1011,16 +1011,16 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
           </div>
 
           <div>
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Catálogo</div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Catálogo</div>
             <Input value={toolSearch} onChange={(e) => setToolSearch(e.target.value)} placeholder="Buscar herramienta…" className="mb-2 h-8 text-xs" />
             <div className="max-h-80 space-y-1.5 overflow-y-auto pr-1">
               {availableTools.length === 0 ? (
-                <div className="rounded-lg border border-dashed p-4 text-center text-xs text-gray-400">Sin resultados</div>
+                <div className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">Sin resultados</div>
               ) : (
                 availableTools.map((tool) => (
-                  <div key={tool.id} className="flex items-center gap-2 rounded-lg border bg-white p-2">
-                    <div className="min-w-0 flex-1 truncate text-sm text-gray-900">{tool.name}</div>
-                    <button onClick={() => addAssignedTool(tool)} className="rounded-md border px-2 py-1 text-xs text-gray-700 hover:bg-gray-50">
+                  <div key={tool.id} className="flex items-center gap-2 rounded-lg border bg-primary p-2">
+                    <div className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{tool.name}</div>
+                    <button onClick={() => addAssignedTool(tool)} className="rounded-md border px-2 py-1 text-xs text-muted-foreground hover:bg-muted">
                       Agregar
                     </button>
                   </div>
@@ -1034,18 +1034,18 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
       {activeTab === "resources" && (
         <div className="space-y-3">
           {form.resources.length === 0 ? (
-            <div className="rounded-lg border border-dashed p-4 text-center text-xs text-gray-400">Sin recursos</div>
+            <div className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">Sin recursos</div>
           ) : (
             form.resources.map((resource) => (
-              <div key={resource.client_id} className="rounded-lg border bg-white p-3">
+              <div key={resource.client_id} className="rounded-lg border bg-primary p-3">
                 <div className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_1fr_1.4fr_auto]">
                   <Input value={resource.title} onChange={(e) => updateResource(resource.client_id, { title: e.target.value })} placeholder="Título" className="h-8 text-sm" />
                   <Input value={resource.description ?? ""} onChange={(e) => updateResource(resource.client_id, { description: e.target.value })} placeholder="Descripción" className="h-8 text-sm" />
                   <Input value={resource.url} onChange={(e) => updateResource(resource.client_id, { url: e.target.value, domain: extractDomain(e.target.value) })} placeholder="https://…" className="h-8 text-sm" />
                   <div className="flex gap-1">
-                    <button onClick={() => moveResource(resource.client_id, -1)} className="rounded border px-2 text-xs text-gray-600 hover:bg-gray-50">↑</button>
-                    <button onClick={() => moveResource(resource.client_id, 1)} className="rounded border px-2 text-xs text-gray-600 hover:bg-gray-50">↓</button>
-                    <button onClick={() => setForm((prev) => ({ ...prev, resources: prev.resources.filter((item) => item.client_id !== resource.client_id) }))} className="rounded border px-2 text-xs text-red-600 hover:bg-red-50">Quitar</button>
+                    <button onClick={() => moveResource(resource.client_id, -1)} className="rounded border px-2 text-xs text-muted-foreground hover:bg-muted">↑</button>
+                    <button onClick={() => moveResource(resource.client_id, 1)} className="rounded border px-2 text-xs text-muted-foreground hover:bg-muted">↓</button>
+                    <button onClick={() => setForm((prev) => ({ ...prev, resources: prev.resources.filter((item) => item.client_id !== resource.client_id) }))} className="rounded border px-2 text-xs text-muted-foreground hover:bg-muted">Quitar</button>
                   </div>
                 </div>
               </div>
@@ -1058,15 +1058,15 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
                 resources: [...prev.resources, { client_id: makeClientId("resource"), type: "link", title: "", description: "", url: "", domain: "" }],
               }))
             }
-            className="w-full rounded-md border border-dashed px-3 py-2 text-xs text-gray-600 hover:bg-gray-50"
+            className="w-full rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground hover:bg-muted"
           >
             + Agregar recurso
           </button>
         </div>
       )}
 
-      <div className="flex justify-end gap-2 border-t border-gray-100 pt-4">
-        <button onClick={onCancel} className="rounded-md border px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50">
+      <div className="flex justify-end gap-2 border-t border-border pt-4">
+        <button onClick={onCancel} className="rounded-md border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-muted">
           Cancelar
         </button>
         <button onClick={save} disabled={saving || uploading} className="rounded-md bg-foreground px-3 py-2 text-xs font-medium text-background hover:opacity-90 disabled:opacity-50">
@@ -1080,7 +1080,7 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
 function AdminField({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-medium text-gray-600">{label}</span>
+      <span className="mb-1 block text-xs font-medium text-muted-foreground">{label}</span>
       {children}
     </label>
   );
@@ -1182,7 +1182,7 @@ function AccessTab() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">Acceso a la Plataforma</h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Gestioná qué emails pueden registrarse en Implementa AI.
           </p>
         </div>
@@ -1194,22 +1194,22 @@ function AccessTab() {
         </button>
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="mt-6 overflow-hidden rounded-lg border border-border bg-primary">
         {allowedQ.isLoading ? (
-          <div className="px-4 py-12 text-center text-sm text-gray-400">Cargando…</div>
+          <div className="px-4 py-12 text-center text-sm text-muted-foreground">Cargando…</div>
         ) : rows.length === 0 ? (
           <div className="px-4 py-16 text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-2xl">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-2xl">
               ✉️
             </div>
-            <p className="text-sm font-medium text-gray-900">No hay emails autorizados aún</p>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="text-sm font-medium text-muted-foreground">No hay emails autorizados aún</p>
+            <p className="mt-1 text-sm text-muted-foreground">
               Autorizá un email para que esa persona pueda crear su cuenta.
             </p>
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
+            <thead className="bg-muted text-left text-xs uppercase text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 font-medium">Email</th>
                 <th className="px-4 py-3 font-medium">Autorizado</th>
@@ -1218,21 +1218,21 @@ function AccessTab() {
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {rows.map((row) => {
                 const isReg = registered.has(row.email.toLowerCase());
                 return (
-                  <tr key={row.email} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{row.email}</td>
-                    <td className="px-4 py-3 text-gray-600">{formatRelative(row.created_at)}</td>
-                    <td className="px-4 py-3 text-gray-500">{row.invited_by ?? "—"}</td>
+                  <tr key={row.email} className="hover:bg-muted">
+                    <td className="px-4 py-3 font-medium text-muted-foreground">{row.email}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{formatRelative(row.created_at)}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{row.invited_by ?? "—"}</td>
                     <td className="px-4 py-3">
                       {isReg ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                           ✓ Registrado
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                           ○ Pendiente
                         </span>
                       )}
@@ -1240,7 +1240,7 @@ function AccessTab() {
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => setToDelete(row.email)}
-                        className="rounded p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+                        className="rounded p-1.5 text-muted-foreground transition hover:bg-muted hover:text-muted-foreground"
                         aria-label="Quitar acceso"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -1273,7 +1273,7 @@ function AccessTab() {
           <DialogFooter>
             <button
               onClick={() => setOpenAdd(false)}
-              className="rounded-md border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
+              className="rounded-md border border-border px-4 py-2 text-sm hover:bg-muted"
             >
               Cancelar
             </button>
@@ -1303,7 +1303,7 @@ function AccessTab() {
             <AlertDialogAction
               onClick={(e) => { e.preventDefault(); handleDelete(); }}
               disabled={deleting}
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="bg-muted text-foreground hover:bg-muted"
             >
               {deleting ? "Quitando…" : "Quitar acceso"}
             </AlertDialogAction>

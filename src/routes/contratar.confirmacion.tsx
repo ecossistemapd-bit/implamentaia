@@ -25,7 +25,7 @@ const STEPS = [
 
 function ConfirmacionPage() {
   return (
-    <div className="min-h-screen bg-[#f9f9f9]">
+    <div className="min-h-screen bg-background">
       <header className="flex items-center justify-between border-b border-border bg-background/80 px-6 py-3">
         <Logo />
       </header>
@@ -39,22 +39,22 @@ function ConfirmacionPage() {
         <h2 className="mt-4 text-2xl font-bold tracking-tight">
           ¡Solicitud enviada!
         </h2>
-        <p className="mt-2.5 text-[14px] leading-relaxed text-[#555]">
+        <p className="mt-2.5 text-[14px] leading-relaxed text-muted-foreground">
           Recibimos tu solicitud. Un implementador verificado te va a contactar
           en las próximas 24 horas hábiles.
         </p>
 
-        <div className="mt-7 rounded-[10px] bg-[#f5f5f5] p-5 text-left">
-          <p className="mb-3.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#999]">
+        <div className="mt-7 rounded-[10px] bg-secondary p-5 text-left">
+          <p className="mb-3.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             ¿Qué sigue?
           </p>
           <ol className="flex flex-col gap-3.5">
             {STEPS.map((t, i) => (
               <li key={i} className="flex gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e5e5e5] text-[12px] font-semibold text-[#555]">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[12px] font-semibold text-muted-foreground">
                   {i + 1}
                 </span>
-                <span className="text-[13px] leading-relaxed text-[#333]">
+                <span className="text-[13px] leading-relaxed text-foreground">
                   {t}
                 </span>
               </li>

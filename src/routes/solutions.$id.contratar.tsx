@@ -111,7 +111,7 @@ function ContratarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9f9f9] text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <header className="flex items-center justify-between border-b border-border bg-background/80 px-6 py-3 backdrop-blur">
         <Logo />
@@ -127,33 +127,33 @@ function ContratarPage() {
       <main className="mx-auto grid max-w-[1000px] gap-10 px-6 py-10 lg:grid-cols-[55fr_45fr]">
         {/* Left column */}
         <section className="order-2 lg:order-1">
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Alternativa con experto
           </p>
-          <h1 className="mt-2 text-[2rem] font-bold leading-[1.2] tracking-tight text-gray-900">
+          <h1 className="mt-2 text-[2rem] font-bold leading-[1.2] tracking-tight text-muted-foreground">
             Implementación con experto
           </h1>
-          <p className="mt-3 max-w-[460px] text-sm leading-relaxed text-gray-700">
+          <p className="mt-3 max-w-[460px] text-sm leading-relaxed text-muted-foreground">
             Para equipos que prefieren delegar la configuración técnica a un
             especialista verificado.
           </p>
 
           {/* Resumen del pedido */}
-          <div className="mt-8 rounded-[10px] border border-[#e5e5e5] bg-white p-5">
+          <div className="mt-8 rounded-[10px] border border-border bg-card p-5">
             <Badge
               variant="outline"
-              className="rounded-full border-foreground/20 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-gray-700"
+              className="rounded-full border-foreground/20 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground"
             >
               {solution?.category ?? "—"}
             </Badge>
-            <div className="mt-1.5 text-[15px] font-semibold text-gray-900">
+            <div className="mt-1.5 text-[15px] font-semibold text-muted-foreground">
               {solution?.title ?? "Cargando…"}
             </div>
           </div>
 
           {/* Próximos pasos */}
           <div className="mt-8">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Próximos pasos
             </p>
             <ol className="relative mt-4 space-y-5 border-l border-border pl-6">
@@ -179,12 +179,12 @@ function ContratarPage() {
 
           {/* Incluido */}
           <div className="mt-8">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Incluido en el servicio
             </p>
             <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               {INCLUDED.map((it) => (
-                <div key={it} className="flex items-start gap-2 text-sm text-gray-700">
+                <div key={it} className="flex items-start gap-2 text-sm text-muted-foreground">
                   <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-foreground text-background">
                     <Check className="h-2.5 w-2.5" strokeWidth={3} />
                   </span>
@@ -197,22 +197,22 @@ function ContratarPage() {
 
         {/* Right column — checkout card */}
         <aside className="order-1 lg:order-2">
-          <div className="rounded-[14px] border-[1.5px] border-[#e5e5e5] bg-white p-6 lg:sticky lg:top-6">
+          <div className="rounded-[14px] border-[1.5px] border-border bg-card p-6 lg:sticky lg:top-6">
             <div className="flex items-center justify-between">
               <div className="text-[13px] font-semibold">Resumen</div>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200">
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-medium text-muted-foreground ring-1 ring-inset ring-ring">
                 🔒 Solicitud gratuita
               </span>
             </div>
 
             <div className="mt-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#999]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                 Inversión estimada
               </p>
               <div className="mt-1 text-[28px] font-bold leading-tight">
                 Desde $500 USD
               </div>
-              <p className="mt-1 text-[12px] text-[#666]">
+              <p className="mt-1 text-[12px] text-muted-foreground">
                 El precio final se acuerda con el implementador según el
                 alcance de tu proyecto.
               </p>
@@ -236,7 +236,7 @@ function ContratarPage() {
               />
             </button>
             {showTerms && (
-              <div className="mt-2 max-h-[140px] overflow-y-auto rounded-lg bg-[#f9f9f9] p-3 text-[12px] leading-relaxed text-[#555]">
+              <div className="mt-2 max-h-[140px] overflow-y-auto rounded-lg bg-background p-3 text-[12px] leading-relaxed text-muted-foreground">
                 <p>
                   • Implementa AI actúa como intermediaria entre la empresa y
                   el implementador independiente.
@@ -267,7 +267,7 @@ function ContratarPage() {
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="h-10 rounded-lg border-[1.5px] border-[#e5e5e5] text-[13px]"
+                  className="h-10 rounded-lg border-[1.5px] border-border text-[13px]"
                 />
               </Field>
               <Field label="Email de contacto">
@@ -275,14 +275,14 @@ function ContratarPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-10 rounded-lg border-[1.5px] border-[#e5e5e5] text-[13px]"
+                  className="h-10 rounded-lg border-[1.5px] border-border text-[13px]"
                 />
               </Field>
               <Field label="Nombre de tu empresa">
                 <Input
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
-                  className="h-10 rounded-lg border-[1.5px] border-[#e5e5e5] text-[13px]"
+                  className="h-10 rounded-lg border-[1.5px] border-border text-[13px]"
                 />
               </Field>
               <Field label="¿Qué querés lograr con esta implementación?">
@@ -291,7 +291,7 @@ function ContratarPage() {
                   onChange={(e) => setContext(e.target.value)}
                   rows={3}
                   placeholder="Contanos brevemente tu situación actual y qué resultado esperás..."
-                  className="rounded-lg border-[1.5px] border-[#e5e5e5] text-[13px]"
+                  className="rounded-lg border-[1.5px] border-border text-[13px]"
                 />
               </Field>
             </div>
@@ -311,7 +311,7 @@ function ContratarPage() {
               )}
             </Button>
 
-            <div className="mt-3.5 flex items-center justify-center gap-1.5 text-[11px] text-[#999]">
+            <div className="mt-3.5 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
               <Lock className="h-3 w-3" /> Sin pago por adelantado · Tu
               información está protegida
             </div>
@@ -325,7 +325,7 @@ function ContratarPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <Label className="mb-1 block text-[12px] font-medium text-[#555]">
+      <Label className="mb-1 block text-[12px] font-medium text-muted-foreground">
         {label}
       </Label>
       {children}
@@ -358,14 +358,14 @@ function Step({
         {num}
       </span>
       <div className="flex items-center gap-2">
-        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+        <h3 className="text-sm font-semibold text-muted-foreground">{title}</h3>
         {badge && (
-          <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+          <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
             {badge}
           </span>
         )}
       </div>
-      <p className="mt-1 text-sm leading-relaxed text-gray-700">{desc}</p>
+      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{desc}</p>
     </li>
   );
 }
