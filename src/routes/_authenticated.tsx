@@ -221,7 +221,7 @@ function NavList() {
                     className={`h-[18px] w-[18px] shrink-0 ${
                       active
                         ? "text-primary"
-                        : "text-muted-foreground group-hover:text-primary"
+                        : "text-muted-foreground group-hover:text-foreground"
                     }`}
                     strokeWidth={1.75}
                   />
