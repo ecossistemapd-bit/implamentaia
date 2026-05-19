@@ -285,6 +285,42 @@
   opacity: 1;
 }
 
+/* ============================================================
+   Card orb alive — animación universal para los 93 covers de
+   /solutions. Sutil por default (breathing + brightness pulse),
+   se acelera en hover. Cero JS, todo GPU-accelerated.
+   ============================================================ */
+.card-orb-alive {
+  --orb-breathe-dur: 6s;
+  --orb-glow-dur: 5s;
+  scale: 1;
+  animation:
+    card-orb-breathe var(--orb-breathe-dur) ease-in-out infinite,
+    card-orb-glow-img var(--orb-glow-dur) ease-in-out infinite;
+}
+/* Al hover del card, se aceleran las duraciones a la mitad. */
+.premium-card:hover .card-orb-alive {
+  --orb-breathe-dur: 3s;
+  --orb-glow-dur: 2.5s;
+  will-change: scale, filter;
+}
+@keyframes card-orb-breathe {
+  0%, 100% { scale: 1; }
+  50%      { scale: 1.04; }
+}
+@keyframes card-orb-glow-img {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50%      { filter: brightness(1.1) saturate(1.15); }
+}
+/* Accesibilidad: usuarios con reduced-motion no ven movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  .card-orb-alive {
+    animation: none !important;
+    scale: 1 !important;
+    filter: none !important;
+  }
+}
+
 /* Markdown prose styles (monocromático) */
 .prose-mono {
   color: var(--color-foreground);
