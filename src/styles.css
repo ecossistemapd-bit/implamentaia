@@ -84,51 +84,57 @@
  * .dark = tema OSCURO negro mate (no navy) / blanco / dorado.
  * El default lo decide el sistema operativo (ver script en __root). */
 :root {
+  /* CLARO — blanco mate por capas (fondo off-white, tarjetas blancas)
+   * y acento GRAFITO/negro estilo Apple (el dorado queda solo en .dark). */
   --radius: 0.625rem;
-  --background: #FFFFFF;
+  --background: #F7F7F5;
   --foreground: #0A0A0A;
   --card: #FFFFFF;
   --card-foreground: #0A0A0A;
   --popover: #FFFFFF;
   --popover-foreground: #0A0A0A;
-  --primary: #C9A84C;
-  --primary-foreground: #0A0A0A;
-  --secondary: #F4F4F5;
+  --primary: #1A1A1A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F0F0EE;
   --secondary-foreground: #0A0A0A;
-  --muted: #F4F4F5;
+  --muted: #F0F0EE;
   --muted-foreground: #6B7280;
-  --accent: #C9A84C;
-  --accent-foreground: #0A0A0A;
+  --accent: #1A1A1A;
+  --accent-foreground: #FFFFFF;
   --destructive: oklch(0.6 0.2 25);
   --destructive-foreground: #FFFFFF;
-  --border: #E5E5E5;
-  --input: #E5E5E5;
-  --ring: #C9A84C;
-  --chart-1: #C9A84C;
+  --border: #E6E6E3;
+  --input: #E6E6E3;
+  --ring: #1A1A1A;
+  --chart-1: #1A1A1A;
   --chart-2: #3B82F6;
-  --chart-3: #B8972E;
-  --chart-4: #6B7280;
-  --chart-5: #9CA3AF;
-  --sidebar: #FAFAFA;
+  --chart-3: #6B7280;
+  --chart-4: #9CA3AF;
+  --chart-5: #D4D4D4;
+  --sidebar: #FFFFFF;
   --sidebar-foreground: #0A0A0A;
-  --sidebar-primary: #C9A84C;
-  --sidebar-primary-foreground: #0A0A0A;
-  --sidebar-accent: #F0F0F0;
+  --sidebar-primary: #1A1A1A;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F2F2F0;
   --sidebar-accent-foreground: #0A0A0A;
-  --sidebar-border: #E5E5E5;
-  --sidebar-ring: #C9A84C;
+  --sidebar-border: #E6E6E3;
+  --sidebar-ring: #1A1A1A;
 
-  /* Premium tokens (claro) */
+  /* Premium tokens (claro — neutro, sin dorado) */
   --gold: #C9A84C;
   --gold-hover: #B8972E;
-  --gold-border: rgba(201, 168, 76, 0.30);
-  --gold-border-hover: rgba(201, 168, 76, 0.55);
+  --gold-border: rgba(0, 0, 0, 0.10);
+  --gold-border-hover: rgba(0, 0, 0, 0.18);
   --accent-blue: #3B82F6;
   --text-primary: #0A0A0A;
   --text-secondary: #4B5563;
   --text-tertiary: #6B7280;
-  --accent-glow: #C9A84C;
-  --gradient-accent: linear-gradient(135deg, #C9A84C, #B8972E);
+  --accent-glow: #1A1A1A;
+  --gradient-accent: linear-gradient(135deg, #1A1A1A, #000000);
+
+  /* Superficie de tarjeta (profundidad Apple en claro) */
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --card-border-hover: #D4D4D4;
 }
 
 .dark {
@@ -173,6 +179,10 @@
   --text-tertiary: #6B7280;
   --accent-glow: #C9A84C;
   --gradient-accent: linear-gradient(135deg, #C9A84C, #B8972E);
+
+  /* Superficie de tarjeta (oscuro: borde dorado en hover, sin sombra) */
+  --card-shadow: none;
+  --card-border-hover: rgba(201, 168, 76, 0.40);
 }
 
 @layer base {
@@ -236,11 +246,12 @@
   background-color: var(--card);
   border: 1px solid var(--border);
   border-radius: 8px;
+  box-shadow: var(--card-shadow);
   transition: all 250ms ease;
 }
 .premium-card:hover {
-  border-color: var(--gold-border-hover);
-  box-shadow: 0 4px 24px rgba(201, 168, 76, 0.06);
+  border-color: var(--card-border-hover);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
 }
 
 /* Course card with gradient — gold underline detail */
