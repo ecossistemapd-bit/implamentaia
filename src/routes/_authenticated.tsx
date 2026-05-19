@@ -214,7 +214,7 @@ function NavList() {
                   className={`group flex items-center gap-2.5 rounded-lg border-l-2 px-3 py-2 text-[13px] transition-colors duration-200 ${
                     active
                       ? "border-primary bg-primary/[0.08] font-medium text-foreground"
-                      : "border-transparent font-normal text-muted-foreground hover:bg-primary/[0.05] hover:text-primary"
+                      : "border-transparent font-normal text-muted-foreground hover:bg-white/[0.08] hover:text-foreground"
                   }`}
                 >
                   <Icon
