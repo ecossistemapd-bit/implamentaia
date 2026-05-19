@@ -151,7 +151,7 @@ function Dashboard() {
             </p>
             <Link
               to="/solutions"
-              className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-semibold text-primary-foreground transition-all duration-200 ease-out hover:bg-[#B8972E] hover:shadow-[0_4px_16px_rgba(201,168,76,0.3)]"
+              className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-semibold text-primary-foreground transition-all duration-200 ease-out hover:opacity-90"
             >
               Explorar Soluciones <ArrowRight className="h-4 w-4" />
             </Link>
