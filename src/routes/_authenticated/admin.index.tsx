@@ -75,7 +75,7 @@ function AdminPanel() {
               if (k === "users") setFilterUserId(null);
             }}
             className={`rounded-md px-3 py-1.5 transition ${
-              tab === k ? "bg-foreground text-background" : "text-gray-600 hover:bg-gray-50"
+              tab === k ? "bg-foreground text-background" : "text-muted-foreground hover:bg-white/[0.08]"
             }`}
           >
             {label}
