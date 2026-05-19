@@ -61,21 +61,21 @@ function timeAgo(iso: string) {
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className="border-l-4 border-violet-500 pl-4">
-      <h2 className="text-xl font-semibold text-zinc-100">{title}</h2>
-      {subtitle && <p className="mt-0.5 text-sm text-zinc-400">{subtitle}</p>}
+    <div className="border-l-4 border-primary pl-4">
+      <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+      {subtitle && <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>}
     </div>
   );
 }
 
 function statusInfo(s: string) {
   if (s === "ready" || s === "completed")
-    return { label: "Completado", cls: "bg-violet-500/15 text-violet-300 border-violet-500/30" };
+    return { label: "Completado", cls: "bg-primary/15 text-primary border-primary" };
   if (s === "pending")
-    return { label: "Pendiente", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
+    return { label: "Pendiente", cls: "bg-muted text-muted-foreground border-border" };
   if (s === "generating")
-    return { label: "En curso", cls: "bg-violet-500/15 text-violet-300 border-violet-500/30" };
-  return { label: s, cls: "bg-zinc-800/50 text-zinc-300 border-zinc-700/40" };
+    return { label: "En curso", cls: "bg-primary/15 text-primary border-primary" };
+  return { label: s, cls: "bg-muted text-muted-foreground border-border" };
 }
 
 function Projects() {
@@ -168,11 +168,11 @@ function Projects() {
 
   return (
     <div className="mx-auto max-w-[960px] px-6 py-10">
-      <div className="border-l-4 border-violet-500 pl-4">
-        <h1 className="text-3xl font-bold tracking-tight text-white">
-          Mis <span className="text-violet-400">proyectos</span>
+      <div className="border-l-4 border-primary pl-4">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Mis <span className="text-primary">proyectos</span>
         </h1>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           Tus implementaciones en curso y completadas.
         </p>
       </div>
@@ -182,7 +182,7 @@ function Projects() {
         <SectionHeader title="En progreso" subtitle="Sesiones del Builder activas" />
         <div className="mt-4 space-y-3">
           {loadingSessions ? (
-            <div className="h-20 animate-pulse rounded-xl bg-zinc-900/60" />
+            <div className="h-20 animate-pulse rounded-xl bg-card" />
           ) : (inProgress ?? []).length === 0 ? (
             <EmptyState text="No tenés implementaciones en curso." />
           ) : (
@@ -191,34 +191,34 @@ function Projects() {
               return (
                 <div
                   key={s.id}
-                  className="group relative flex flex-col gap-3 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-violet-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
+                  className="group relative flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-primary hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <div className="truncate text-sm font-semibold text-zinc-100">
+                      <div className="truncate text-sm font-semibold text-foreground">
                         {s.solutions?.title ?? "Solución"}
                       </div>
                       {s.status === "paused" && (
-                        <span className="rounded-md border border-zinc-700/40 bg-zinc-800/40 px-2 py-0.5 text-[10px] font-medium text-zinc-300">
+                        <span className="rounded-md border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                           Pausada
                         </span>
                       )}
                     </div>
                     <div className="mt-2 flex items-center gap-2">
-                      <div className="whitespace-nowrap text-xs text-zinc-400">
+                      <div className="whitespace-nowrap text-xs text-muted-foreground">
                         Paso {s.current_step ?? 1} de 5
                       </div>
-                      <div className="h-1.5 w-32 overflow-hidden rounded-full bg-zinc-800">
-                        <div className="h-full bg-violet-400" style={{ width: `${pct}%` }} />
+                      <div className="h-1.5 w-32 overflow-hidden rounded-full bg-muted">
+                        <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
-                    <div className="mt-1.5 text-xs text-zinc-600">
+                    <div className="mt-1.5 text-xs text-muted-foreground">
                       Última actividad: {timeAgo(s.updated_at)}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
-                      className="h-9 shrink-0 rounded-xl bg-white text-black hover:bg-zinc-100"
+                      className="h-9 shrink-0 rounded-xl bg-primary text-primary-foreground hover:opacity-90"
                       onClick={() => {
                         try {
                           localStorage.setItem(`builder_session_${s.solution_id}`, s.id);
@@ -239,7 +239,7 @@ function Projects() {
                       }
                       title="Eliminar"
                       aria-label="Eliminar"
-                      className="rounded-lg p-2 text-zinc-400 opacity-0 transition hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
+                      className="rounded-lg p-2 text-muted-foreground opacity-0 transition hover:bg-muted hover:text-muted-foreground group-hover:opacity-100"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -256,7 +256,7 @@ function Projects() {
         <SectionHeader title="Completados" subtitle="Tus proyectos finalizados" />
         <div className="mt-4 space-y-3">
           {loadingProjects ? (
-            <div className="h-20 animate-pulse rounded-xl bg-zinc-900/60" />
+            <div className="h-20 animate-pulse rounded-xl bg-card" />
           ) : (projects ?? []).length === 0 ? (
             <EmptyState text="Todavía no tenés proyectos completados." />
           ) : (
@@ -266,23 +266,23 @@ function Projects() {
               return (
                 <div
                   key={p.id}
-                  className="group relative flex flex-col gap-2 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-violet-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
+                  className="group relative flex flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-primary hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-semibold text-zinc-100">
+                    <div className="truncate text-sm font-semibold text-foreground">
                       {p.solutions?.title ?? p.title}
                     </div>
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       {p.solutions?.category && (
-                        <span className="text-xs capitalize text-zinc-400">
+                        <span className="text-xs capitalize text-muted-foreground">
                           {p.solutions.category}
                         </span>
                       )}
                       <span
                         className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${
                           isImpl
-                            ? "bg-violet-500/15 text-violet-300 border border-violet-500/30"
-                            : "bg-zinc-800/40 text-zinc-300 border border-zinc-700/40"
+                            ? "bg-primary/15 text-primary border border-primary"
+                            : "bg-muted text-muted-foreground border border-border"
                         }`}
                       >
                         {isImpl ? "Implementador" : "DIY"}
@@ -292,7 +292,7 @@ function Projects() {
                       >
                         {st.label}
                       </span>
-                      <span className="text-xs text-zinc-600">
+                      <span className="text-xs text-muted-foreground">
                         {new Date(p.created_at).toLocaleDateString("es", {
                           day: "numeric",
                           month: "short",
@@ -305,7 +305,7 @@ function Projects() {
                     {p.builder_session_id && (
                       <Button
                         variant="outline"
-                        className="h-8 shrink-0 rounded-xl border-zinc-700 bg-transparent text-xs text-zinc-300 hover:border-violet-500 hover:text-violet-400"
+                        className="h-8 shrink-0 rounded-xl border-border bg-transparent text-xs text-muted-foreground hover:border-primary hover:text-primary"
                         onClick={() => openPrompt(p.builder_session_id!)}
                       >
                         <Eye className="mr-1 h-3.5 w-3.5" /> Ver prompt generado
@@ -322,7 +322,7 @@ function Projects() {
                       }
                       title="Eliminar"
                       aria-label="Eliminar"
-                      className="rounded-lg p-2 text-zinc-400 opacity-0 transition hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
+                      className="rounded-lg p-2 text-muted-foreground opacity-0 transition hover:bg-muted hover:text-muted-foreground group-hover:opacity-100"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -335,11 +335,11 @@ function Projects() {
       </section>
 
       <Dialog open={promptModal.open} onOpenChange={(o) => setPromptModal((s) => ({ ...s, open: o }))}>
-        <DialogContent className="max-w-2xl border-zinc-800 bg-zinc-900 text-zinc-100">
+        <DialogContent className="max-w-2xl border-border bg-card text-foreground">
           <DialogHeader>
             <DialogTitle>Prompt generado</DialogTitle>
           </DialogHeader>
-          <div className="max-h-[60vh] overflow-y-auto rounded-lg bg-zinc-900/60 p-4 font-mono text-xs whitespace-pre-wrap text-zinc-200">
+          <div className="max-h-[60vh] overflow-y-auto rounded-lg bg-card p-4 font-mono text-xs whitespace-pre-wrap text-foreground">
             {promptModal.content}
           </div>
         </DialogContent>
@@ -349,20 +349,20 @@ function Projects() {
         open={confirm.open}
         onOpenChange={(o) => !o && setConfirm({ open: false })}
       >
-        <AlertDialogContent className="border-zinc-800 bg-zinc-900 text-zinc-100">
+        <AlertDialogContent className="border-border bg-card text-foreground">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">¿Eliminar proyecto?</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
+            <AlertDialogTitle className="text-foreground">¿Eliminar proyecto?</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
               Esta acción no se puede deshacer. El proyecto y toda su configuración se eliminarán permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100">
+            <AlertDialogCancel className="border-border bg-transparent text-muted-foreground hover:bg-card hover:text-foreground">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
-              className="bg-red-600 text-white hover:bg-red-500"
+              className="bg-muted text-foreground hover:bg-muted"
             >
               Sí, eliminar
             </AlertDialogAction>
@@ -375,12 +375,12 @@ function Projects() {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800/60 bg-zinc-900/40 py-12 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-violet-500/15">
-        <FolderKanban className="h-7 w-7 text-violet-400" />
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card py-12 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/15">
+        <FolderKanban className="h-7 w-7 text-primary" />
       </div>
-      <p className="mt-3 font-medium text-zinc-300">{text}</p>
-      <p className="mt-1 text-sm text-zinc-600">
+      <p className="mt-3 font-medium text-muted-foreground">{text}</p>
+      <p className="mt-1 text-sm text-muted-foreground">
         Cuando inicies una implementación, va a aparecer acá.
       </p>
     </div>

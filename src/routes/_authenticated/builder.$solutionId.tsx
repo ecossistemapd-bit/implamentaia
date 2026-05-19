@@ -517,14 +517,14 @@ function BuilderWizard() {
               </div>
             )}
 
-            <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div className="mt-6 rounded-lg border border-border bg-muted p-4">
               <div className="flex items-start gap-3">
-                <LifeBuoy className="mt-0.5 h-5 w-5 shrink-0 text-gray-400" strokeWidth={1.75} />
+                <LifeBuoy className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" strokeWidth={1.75} />
                 <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-gray-700">
+                  <h4 className="text-sm font-semibold text-muted-foreground">
                     ¿Necesitás ayuda para terminar?
                   </h4>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     Si llegaste hasta acá y preferís que un experto complete la configuración,
                     podemos asignarte uno.
                   </p>
@@ -694,7 +694,7 @@ function Checklist({
       </div>
       <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-muted">
         <div
-          className="h-full bg-green-500 transition-all"
+          className="h-full bg-muted transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -713,7 +713,7 @@ function Checklist({
               <span
                 className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
                   checks[i]
-                    ? "border-emerald-600 bg-emerald-600 text-white"
+                    ? "border-border bg-muted text-foreground"
                     : "border-border bg-background"
                 }`}
               >
@@ -721,7 +721,7 @@ function Checklist({
               </span>
               <span
                 className={`text-[13px] ${
-                  checks[i] ? "line-through text-emerald-700 dark:text-green-400" : "text-foreground"
+                  checks[i] ? "line-through text-muted-foreground dark:text-muted-foreground" : "text-foreground"
                 }`}
               >
                 {item}
