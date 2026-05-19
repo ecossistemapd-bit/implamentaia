@@ -54,14 +54,6 @@ function SolutionsList() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<CategoryKey | "all">("all");
   const [diff, setDiff] = useState<Difficulty | "all">("all");
-  const railRef = useRef<HTMLDivElement>(null);
-  const scrollRail = (dir: number) => {
-    const el = railRef.current;
-    if (!el) return;
-    const first = el.firstElementChild as HTMLElement | null;
-    const step = first ? first.offsetWidth + 16 : 356; // ancho tarjeta + gap
-    el.scrollBy({ left: dir * step, behavior: "smooth" });
-  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["solutions"],
@@ -286,52 +278,18 @@ function SolutionsList() {
         return (
           <>
             {showFeatured && !isLoading && (
-              <section className="mt-6">
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
-                      Más Implementadas
-                    </h2>
-                    <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-400">
-                      {featured.length}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        scrollRail(-1);
-                      }}
-                      aria-label="Anterior"
-                      className="grid h-9 w-9 place-items-center rounded-full text-lg leading-none text-zinc-300 transition hover:bg-[#262f44] hover:text-white"
-                      style={{
-                        backgroundColor: "#1C2333",
-                        border: "1px solid rgba(255,255,255,0.08)",
-                      }}
-                    >
-                      ‹
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        scrollRail(1);
-                      }}
-                      aria-label="Siguiente"
-                      className="grid h-9 w-9 place-items-center rounded-full text-lg leading-none text-zinc-300 transition hover:bg-[#262f44] hover:text-white"
-                      style={{
-                        backgroundColor: "#1C2333",
-                        border: "1px solid rgba(255,255,255,0.08)",
-                      }}
-                    >
-                      ›
-                    </button>
-                  </div>
-                </div>
-                <div
-                  ref={railRef}
-                  className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              <div className="mt-6">
+                <CardRail
+                  header={
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+                        Más Implementadas
+                      </h2>
+                      <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-400">
+                        {featured.length}
+                      </span>
+                    </div>
+                  }
                 >
                   {featured.map((s) => (
                     <div
@@ -341,9 +299,9 @@ function SolutionsList() {
                       {renderCard(s)}
                     </div>
                   ))}
-                </div>
+                </CardRail>
                 <div className="my-8 h-px w-full bg-zinc-800" />
-              </section>
+              </div>
             )}
 
             {isLoading ? (
@@ -366,46 +324,65 @@ function SolutionsList() {
                 {groupedByCat.map(({ cat: c, items }) => {
                   const CIcon = c.icon;
                   return (
-                    <section key={c.key}>
-                      <div className="mb-4 flex items-center gap-3">
-                        <div
-                          className="grid h-9 w-9 place-items-center rounded-lg"
-                          style={{
-                            backgroundColor: "rgba(201,168,76,0.1)",
-                            border: "1px solid rgba(201,168,76,0.25)",
-                          }}
-                        >
-                          <CIcon
-                            className="h-4 w-4"
-                            style={{ color: "#C9A84C" }}
-                            strokeWidth={1.5}
-                          />
+                    <CardRail
+                      key={c.key}
+                      header={
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
+                            style={{
+                              backgroundColor: "rgba(201,168,76,0.1)",
+                              border: "1px solid rgba(201,168,76,0.25)",
+                            }}
+                          >
+                            <CIcon
+                              className="h-4 w-4"
+                              style={{ color: "#C9A84C" }}
+                              strokeWidth={1.5}
+                            />
+                          </div>
+                          <h2 className="text-lg font-semibold text-white">
+                            {c.label}
+                          </h2>
+                          <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-400">
+                            {items.length}
+                          </span>
                         </div>
-                        <h2 className="text-lg font-semibold text-white">
-                          {c.label}
-                        </h2>
-                        <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-400">
-                          {items.length}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {items.map(renderCard)}
-                      </div>
-                    </section>
+                      }
+                    >
+                      {items.map((s) => (
+                        <div
+                          key={s.id}
+                          className="w-[300px] shrink-0 snap-start sm:w-[340px]"
+                        >
+                          {renderCard(s)}
+                        </div>
+                      ))}
+                    </CardRail>
                   );
                 })}
                 {otherItems.length > 0 && (
-                  <section>
-                    <div className="mb-4 flex items-center gap-3">
-                      <h2 className="text-lg font-semibold text-white">Otras</h2>
-                      <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-400">
-                        {otherItems.length}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {otherItems.map(renderCard)}
-                    </div>
-                  </section>
+                  <CardRail
+                    header={
+                      <div className="flex items-center gap-3">
+                        <h2 className="text-lg font-semibold text-white">
+                          Otras
+                        </h2>
+                        <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-400">
+                          {otherItems.length}
+                        </span>
+                      </div>
+                    }
+                  >
+                    {otherItems.map((s) => (
+                      <div
+                        key={s.id}
+                        className="w-[300px] shrink-0 snap-start sm:w-[340px]"
+                      >
+                        {renderCard(s)}
+                      </div>
+                    ))}
+                  </CardRail>
                 )}
               </div>
             )}
@@ -439,6 +416,70 @@ function SolutionsList() {
         </div>
       </section>
     </div>
+  );
+}
+
+// Riel horizontal reutilizable: cada sección (Más Implementadas, cada
+// categoría, Otras) es un carrusel con su propio ref y botones ‹ ›.
+function CardRail({
+  header,
+  children,
+}: {
+  header: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const scroll = (dir: number) => {
+    const el = ref.current;
+    if (!el) return;
+    const first = el.firstElementChild as HTMLElement | null;
+    const step = first ? first.offsetWidth + 16 : 356; // ancho tarjeta + gap
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
+  return (
+    <section>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="min-w-0">{header}</div>
+        <div className="flex shrink-0 gap-2">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              scroll(-1);
+            }}
+            aria-label="Anterior"
+            className="grid h-9 w-9 place-items-center rounded-full text-lg leading-none text-zinc-300 transition hover:bg-[#262f44] hover:text-white"
+            style={{
+              backgroundColor: "#1C2333",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              scroll(1);
+            }}
+            aria-label="Siguiente"
+            className="grid h-9 w-9 place-items-center rounded-full text-lg leading-none text-zinc-300 transition hover:bg-[#262f44] hover:text-white"
+            style={{
+              backgroundColor: "#1C2333",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            ›
+          </button>
+        </div>
+      </div>
+      <div
+        ref={ref}
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {children}
+      </div>
+    </section>
   );
 }
 
