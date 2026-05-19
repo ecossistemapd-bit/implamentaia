@@ -836,7 +836,7 @@ function SolutionInlineEditor({ solution, onCancel }: { solution: SolutionRow; o
             key={key}
             onClick={() => setActiveTab(key)}
             className={`rounded-md px-3 py-1.5 transition ${
-              activeTab === key ? "bg-foreground text-background" : "text-gray-600 hover:bg-white"
+              activeTab === key ? "bg-foreground text-background" : "text-muted-foreground hover:bg-white/[0.08]"
             }`}
           >
             {label}
