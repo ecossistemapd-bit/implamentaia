@@ -140,37 +140,34 @@ function Dashboard() {
         {/* Hero */}
         <section className="grid gap-6 md:grid-cols-[1.4fr_1fr]">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
               <Flame className="h-3.5 w-3.5" /> {streakDays} días consecutivos
             </span>
-            <h1 className="mt-4 text-4xl font-bold tracking-tight text-white">
-              {tod}, <span className="text-white">{greetName}</span>
+            <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground">
+              {tod}, <span className="text-foreground">{greetName}</span>
             </h1>
-            <p className="mt-2 max-w-lg text-sm text-zinc-400">
+            <p className="mt-2 max-w-lg text-sm text-muted-foreground">
               Seguí construyendo tu negocio con IA. Explorá soluciones, avanzá en tus cursos.
             </p>
             <Link
               to="/solutions"
-              className="mt-5 inline-flex items-center gap-2 rounded-md px-6 py-3 font-semibold transition-all duration-200 ease-out hover:shadow-[0_4px_16px_rgba(201,168,76,0.3)]"
-              style={{ backgroundColor: "#C9A84C", color: "#0B0F1A" }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#B8972E")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#C9A84C")}
+              className="mt-5 inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-semibold text-primary-foreground transition-all duration-200 ease-out hover:bg-[#B8972E] hover:shadow-[0_4px_16px_rgba(201,168,76,0.3)]"
             >
               Explorar Soluciones <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+          <div className="rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 <Calendar className="h-4 w-4" /> Próxima Sesión
               </div>
             </div>
             <div className="mt-4 flex flex-col items-center justify-center py-4 text-center">
-              <Calendar className="h-10 w-10 text-zinc-700" strokeWidth={1.5} />
-              <p className="mt-2 text-sm text-zinc-300">Sesiones en vivo próximamente</p>
+              <Calendar className="h-10 w-10 text-muted-foreground" strokeWidth={1.5} />
+              <p className="mt-2 text-sm text-muted-foreground">Sesiones en vivo próximamente</p>
             </div>
-            <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-sm text-zinc-500">
+            <div className="mt-3 rounded-xl border border-border bg-background p-3 text-sm text-muted-foreground">
               Las sesiones se anuncian por email
             </div>
           </div>
@@ -179,30 +176,17 @@ function Dashboard() {
         {/* Stats */}
         <section className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
           {stats.map((s) => (
-            <div
-              key={s.label}
-              className="p-5 transition-all duration-[250ms] ease-out"
-              style={{
-                backgroundColor: "#111827",
-                border: "1px solid rgba(201,168,76,0.12)",
-                borderRadius: "8px",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "rgba(201,168,76,0.35)";
-                e.currentTarget.style.boxShadow = "0 4px 24px rgba(201,168,76,0.06)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "rgba(201,168,76,0.12)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              <s.icon className="h-5 w-5" strokeWidth={1.75} style={{ color: "#C9A84C" }} />
-              <div className="mt-3 font-bold" style={{ fontSize: "2.5rem", color: "#E8EDF5", lineHeight: 1.1 }}>
+            <div key={s.label} className="premium-card p-5">
+              <s.icon className="h-5 w-5 text-primary" strokeWidth={1.75} />
+              <div className="mt-3 text-[2.5rem] font-bold leading-[1.1] text-foreground">
                 {s.value}
               </div>
-              <div className="mt-1" style={{ fontSize: "13px", color: "#6B7A99" }}>{s.label}</div>
-              <div className="mt-3 h-1 w-full overflow-hidden rounded-full" style={{ backgroundColor: "#1C2333" }}>
-                <div className="h-full transition-all" style={{ width: `${Math.min(100, s.value * 20)}%`, backgroundColor: "#C9A84C" }} />
+              <div className="mt-1 text-[13px] text-muted-foreground">{s.label}</div>
+              <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full bg-primary transition-all"
+                  style={{ width: `${Math.min(100, s.value * 20)}%` }}
+                />
               </div>
             </div>
           ))}
@@ -216,21 +200,21 @@ function Dashboard() {
 
         {/* Actividad reciente */}
         <section className="mt-8">
-          <h2 className="mb-4 text-lg font-semibold text-white">Actividad reciente</h2>
-          <div className="rounded-2xl border border-zinc-800/50 bg-zinc-900/30 p-4">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">Actividad reciente</h2>
+          <div className="rounded-2xl border border-border bg-card p-4">
             {(data?.recent.length ?? 0) === 0 ? (
-              <div className="py-8 text-center text-sm text-zinc-600">
+              <div className="py-8 text-center text-sm text-muted-foreground">
                 Tu actividad aparecerá aquí mientras avanzás.
               </div>
             ) : (
-              <ul className="divide-y divide-zinc-800/40">
+              <ul className="divide-y divide-border">
                 {(data?.recent ?? []).map((a, i) => (
                   <li key={i} className="flex items-center gap-3 py-3 text-sm">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/10 text-violet-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <Activity className="h-4 w-4" />
                     </div>
-                    <span className="flex-1 text-zinc-200">{a.label}</span>
-                    <span className="text-xs text-zinc-600">{relativeTime(a.date)}</span>
+                    <span className="flex-1 text-foreground">{a.label}</span>
+                    <span className="text-xs text-muted-foreground">{relativeTime(a.date)}</span>
                   </li>
                 ))}
               </ul>
@@ -245,16 +229,16 @@ function Dashboard() {
 function EnProgreso({ inProgress }: { inProgress: Array<{ id: string; title: string; completed: number }> }) {
   const [tab, setTab] = useState<"sol" | "cur">("sol");
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-      <div className="mb-4 inline-flex items-center gap-1 rounded-full border border-zinc-800 bg-zinc-950 p-1">
+    <div className="rounded-2xl border border-border bg-card p-6">
+      <div className="mb-4 inline-flex items-center gap-1 rounded-full border border-border bg-background p-1">
         {([["sol", "Soluciones"], ["cur", "Cursos"]] as const).map(([k, l]) => (
           <button
             key={k}
             onClick={() => setTab(k)}
             className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${
               tab === k
-                ? "bg-white text-black"
-                : "text-zinc-400 hover:text-zinc-100"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {l}
@@ -273,19 +257,19 @@ function EnProgreso({ inProgress }: { inProgress: Array<{ id: string; title: str
                   key={s.id}
                   to="/solutions/$id"
                   params={{ id: s.id }}
-                  className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-3 transition hover:border-violet-500/50"
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition hover:border-primary/50"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10 text-violet-400">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Sparkles className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium text-zinc-100">{s.title}</div>
-                    <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
-                      <div className="h-full bg-violet-400" style={{ width: `${pct}%` }} />
+                    <div className="truncate text-sm font-medium text-foreground">{s.title}</div>
+                    <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-muted">
+                      <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
                     </div>
-                    <div className="mt-1 text-[11px] text-zinc-600">{s.completed} de 5 pasos</div>
+                    <div className="mt-1 text-[11px] text-muted-foreground">{s.completed} de 5 pasos</div>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-zinc-400" />
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 </Link>
               );
             })}
@@ -300,12 +284,12 @@ function EnProgreso({ inProgress }: { inProgress: Array<{ id: string; title: str
 
 function Empty({ text, cta, to }: { text: string; cta: string; to: "/solutions" | "/cursos" }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800 py-10 text-center">
-      <Sparkles className="h-8 w-8 text-zinc-700" />
-      <p className="mt-2 text-sm text-zinc-400">{text}</p>
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-10 text-center">
+      <Sparkles className="h-8 w-8 text-muted-foreground" />
+      <p className="mt-2 text-sm text-muted-foreground">{text}</p>
       <Link
         to={to}
-        className="mt-3 inline-flex items-center gap-1 rounded-lg border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-400 hover:bg-violet-500/20"
+        className="mt-3 inline-flex items-center gap-1 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20"
       >
         {cta} <ArrowRight className="h-3.5 w-3.5" />
       </Link>
@@ -315,27 +299,27 @@ function Empty({ text, cta, to }: { text: string; cta: string; to: "/solutions" 
 
 function ProximosPasos({ next }: { next: { id: string; title: string; nextStepLabel: string; completed: number } }) {
   return (
-    <div className="rounded-2xl border border-violet-500/20 bg-zinc-900 p-6">
-      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-violet-400">
+    <div className="rounded-2xl border border-primary/20 bg-card p-6">
+      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary">
         <Bot className="h-4 w-4" /> Próximo paso sugerido
       </div>
       <Link
         to="/solutions/$id"
         params={{ id: next.id }}
-        className="mt-4 block rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 transition hover:border-violet-500/50"
+        className="mt-4 block rounded-xl border border-border bg-card p-4 transition hover:border-primary/50"
       >
         <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Sparkles className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate font-semibold text-zinc-100">{next.title}</h3>
-            <p className="mt-1 text-xs text-zinc-400">
-              Continuá en: <span className="text-violet-400">{next.nextStepLabel || "siguiente paso"}</span>
+            <h3 className="truncate font-semibold text-foreground">{next.title}</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Continuá en: <span className="text-primary">{next.nextStepLabel || "siguiente paso"}</span>
             </p>
-            <p className="mt-1 text-[11px] text-zinc-600">{next.completed} de 5 pasos completados</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{next.completed} de 5 pasos completados</p>
           </div>
-          <ArrowRight className="h-5 w-5 shrink-0 text-violet-400" />
+          <ArrowRight className="h-5 w-5 shrink-0 text-primary" />
         </div>
       </Link>
     </div>
