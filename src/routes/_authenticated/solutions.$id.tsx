@@ -577,7 +577,7 @@ function CompleteButton({
     <Button
       onClick={onClick}
       disabled={disabled || saving}
-      className="rounded-lg bg-primary px-6 py-2 text-foreground hover:bg-primary disabled:opacity-40"
+      className="rounded-lg bg-primary px-6 py-2 text-primary-foreground transition-all duration-200 hover:opacity-90 disabled:opacity-40"
     >
       {saving && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
       {disabled && !saving ? disabledLabel ?? label : label}
