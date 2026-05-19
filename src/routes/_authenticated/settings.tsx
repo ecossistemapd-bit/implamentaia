@@ -41,6 +41,15 @@ function SettingsPage() {
     navigate({ to: "/" });
   };
 
+  const replayOnboarding = async () => {
+    if (!user) return;
+    await supabase
+      .from("profiles")
+      .update({ onboarding_completed: false })
+      .eq("id", user.id);
+    navigate({ to: "/dashboard" });
+  };
+
   return (
     <div className="mx-auto max-w-2xl px-6 py-12 lg:py-16">
       <h1 className="border-l-4 border-violet-500 pl-4 text-2xl font-bold text-white">Configuración</h1>
@@ -76,6 +85,19 @@ function SettingsPage() {
           className="mt-4 rounded-xl border border-zinc-700 px-5 py-2 text-sm text-zinc-400 transition hover:border-red-900 hover:text-red-400"
         >
           Cerrar sesión
+        </button>
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
+        <h2 className="text-base font-medium text-white">Tour</h2>
+        <p className="mt-1 text-sm text-zinc-400">
+          Recorré de nuevo la presentación inicial de la plataforma.
+        </p>
+        <button
+          onClick={replayOnboarding}
+          className="mt-4 rounded-xl border border-zinc-700 px-5 py-2 text-sm text-zinc-300 transition hover:border-zinc-500 hover:text-white"
+        >
+          Volver a ver el tour
         </button>
       </div>
     </div>
