@@ -1144,8 +1144,8 @@ function StepComentarios({
                     onClick={() => setRating(n)}
                     className={`h-11 w-11 rounded-lg text-sm font-medium transition ${
                       rating === n
-                        ? "scale-110 bg-primary text-foreground shadow-md shadow-primary/30"
-                        : "bg-muted text-muted-foreground hover:bg-primary hover:text-foreground"
+                        ? "scale-110 bg-primary text-primary-foreground shadow-md shadow-primary/30"
+                        : "bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground"
                     }`}
                   >
                     {n}
