@@ -176,11 +176,11 @@ function SolutionsList() {
                     src={cover}
                     alt={s.title}
                     loading="lazy"
-                    className="h-full w-full object-cover"
+                    className="card-orb-alive h-full w-full object-cover"
                   />
                 ) : (
                   <div
-                    className="relative flex h-full w-full items-center justify-center"
+                    className="card-orb-alive relative flex h-full w-full items-center justify-center"
                     style={{
                       background:
                         "radial-gradient(120% 120% at 50% 30%, var(--secondary) 0%, var(--card) 72%)",
