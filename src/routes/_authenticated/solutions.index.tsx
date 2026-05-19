@@ -1,42 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
-import * as Lucide from "lucide-react";
-import { Search, type LucideIcon } from "lucide-react";
+import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Input } from "@/components/ui/input";
 import { CATEGORIES, DIFFICULTY_LABEL, type CategoryKey, type Difficulty } from "@/lib/categories";
 
-// Icono distintivo por tarjeta: primero el icon_name de la solución (si es
-// un icono lucide válido), si no el icono de su categoría, y como último
-// recurso Sparkles. Así las 90+ tarjetas se diferencian visualmente.
-function resolveCardIcon(iconName: string | null | undefined, category: string): LucideIcon {
-  if (iconName) {
-    const byName = (Lucide as unknown as Record<string, LucideIcon>)[iconName];
-    if (byName) return byName;
-  }
-  const cat = CATEGORIES.find((c) => c.key === category);
-  return cat?.icon ?? Lucide.Sparkles;
-}
-
-// Paleta por categoría — un color por familia para diferenciar de un
-// vistazo (en vez de la misma imagen "planeta" violeta en todas).
-const CAT_COLOR: Record<string, string> = {
-  ventas: "#34D399",
-  marketing: "#FB923C",
-  atencion: "#38BDF8",
-  finanzas: "#2DD4BF",
-  operaciones: "#94A3B8",
-  rrhh: "#F472B6",
-  modelos_ia: "#C9A84C",
-  juridico: "#818CF8",
-  default: "#C9A84C",
-};
-function hexA(hex: string, a: number): string {
-  const n = parseInt(hex.slice(1), 16);
-  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
-}
+// Cards premium estilo Apple: portada (cover_image_url) o placeholder
+// monocromo con el monograma "IA". Cero color por categoría / íconos AI.
 
 type SolutionsSearch = { mode?: "builder" };
 
@@ -121,15 +93,15 @@ function SolutionsList() {
   return (
     <div className="mx-auto max-w-[1100px] px-6 py-10">
       <header>
-        <h1 className="text-xl font-semibold tracking-tight text-white">Soluciones</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">Soluciones</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Implementaciones reales y listas para tu empresa.
         </p>
       </header>
 
       <div className="sticky top-0 z-10 mt-4 space-y-3 bg-background/85 py-3 backdrop-blur">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -159,105 +131,112 @@ function SolutionsList() {
 
       {(() => {
         const renderCard = (s: NonNullable<typeof data>[number]) => {
-          const Icon = resolveCardIcon(s.icon_name, s.category);
-          const cc = CAT_COLOR[s.category] ?? CAT_COLOR.default;
           const linkProps = { to: "/solutions/$id" as const, params: { id: s.id } };
           const completed = progressBySolution[s.id] ?? 0;
           const pct = Math.min(100, (completed / 5) * 100);
           const isDone = completed >= 5;
-          const catColor = CATEGORY_COLOR[s.category as CategoryKey] ?? CATEGORY_COLOR.default;
-          const diffColor = DIFFICULTY_COLOR[s.difficulty as Difficulty];
           const inDev = (s as { status?: string }).status === "en_desarrollo";
           const showProgress = !isDone && !inDev && completed > 0;
-          const ctaLabel = isDone ? null : completed > 0 ? "Continuar →" : "Comenzar →";
+          const cover = (s as { cover_image_url?: string | null }).cover_image_url;
           return (
             <Link
               key={s.id}
               {...linkProps}
-              className={`group relative flex flex-col overflow-hidden transition-all duration-[250ms] ease-out ${inDev ? "opacity-75 hover:opacity-90" : ""}`}
-              style={{
-                backgroundColor: "#111827",
-                border: "1px solid rgba(201,168,76,0.12)",
-                borderRadius: "8px",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "rgba(201,168,76,0.35)";
-                e.currentTarget.style.boxShadow = "0 4px 24px rgba(201,168,76,0.06)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "rgba(201,168,76,0.12)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
+              className={`premium-card group relative flex flex-col overflow-hidden ${
+                inDev ? "opacity-70" : ""
+              }`}
             >
-              <div
-                className="relative flex aspect-video w-full items-center justify-center overflow-hidden"
-                style={{
-                  background: `linear-gradient(135deg, ${hexA(cc, inDev ? 0.06 : 0.13)} 0%, #0B0F19 72%)`,
-                }}
-              >
-                <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-1">
+              <div className="relative aspect-video w-full overflow-hidden">
+                <div className="absolute right-3 top-3 z-10">
                   {isDone && (
-                    <span className="inline-flex items-center gap-1 rounded-md border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-green-400">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground backdrop-blur">
                       ✓ Completada
                     </span>
                   )}
                   {inDev && (
-                    <span className="inline-flex items-center rounded-md bg-zinc-800/60 px-2 py-0.5 text-[10px] font-medium text-zinc-400 backdrop-blur">
+                    <span className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                       Próximamente
                     </span>
                   )}
                 </div>
-                <div
-                  className="flex h-[68px] w-[68px] items-center justify-center rounded-2xl transition-transform duration-300 ease-out group-hover:scale-110"
-                  style={{
-                    backgroundColor: hexA(cc, inDev ? 0.08 : 0.15),
-                    border: `1px solid ${hexA(cc, inDev ? 0.18 : 0.34)}`,
-                  }}
-                >
-                  <Icon
-                    className="h-8 w-8"
-                    strokeWidth={1.5}
-                    style={{ color: inDev ? hexA(cc, 0.55) : cc }}
+                {cover ? (
+                  <img
+                    src={cover}
+                    alt={s.title}
+                    loading="lazy"
+                    className="h-full w-full object-cover"
                   />
-                </div>
-              </div>
-              <div className="flex flex-1 flex-col p-5">
-                <h3 className="line-clamp-1 text-base font-semibold leading-tight text-white">
-                  {s.title}
-                </h3>
-                <p className="mt-2 line-clamp-2 text-sm leading-snug text-zinc-400">
-                  {s.short_description}
-                </p>
-                <div className="mt-auto flex flex-wrap gap-1.5 pt-4">
-                  <span
-                    className={catColor}
+                ) : (
+                  <div
+                    className="relative flex h-full w-full items-center justify-center"
                     style={{
-                      backgroundColor: hexA(cc, 0.1),
-                      color: cc,
-                      border: `1px solid ${hexA(cc, 0.28)}`,
-                      borderRadius: "4px",
+                      background:
+                        "radial-gradient(120% 120% at 50% 30%, var(--secondary) 0%, var(--card) 72%)",
                     }}
                   >
-                    {CATEGORIES.find((c) => c.key === s.category)?.label}
-                  </span>
-                  <span className={diffColor} style={DIFF_TAG_STYLE}>
-                    {DIFFICULTY_LABEL[s.difficulty as Difficulty]}
-                  </span>
-                </div>
-                {showProgress && ctaLabel && (
-                  <div className="mt-3">
-                    <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
-                      <div
-                        className="h-full bg-green-500 transition-all"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                    <div className="mt-1.5 flex items-center justify-between text-[11px] text-zinc-500">
-                      <span>{completed} de 5 pasos</span>
-                      <span className="font-medium text-violet-400">{ctaLabel}</span>
-                    </div>
+                    <div
+                      className="pointer-events-none absolute inset-0"
+                      style={{
+                        background:
+                          "radial-gradient(55% 50% at 50% 42%, rgba(99,108,150,0.10), transparent 70%)",
+                      }}
+                    />
+                    <svg
+                      viewBox="0 0 26 22"
+                      className="h-9 w-auto text-foreground opacity-[0.14]"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M2.8 2 L2.8 20.5" />
+                      <path d="M7.6 20.5 L15.8 2 L24 20.5" />
+                    </svg>
                   </div>
                 )}
+              </div>
+              <div className="flex flex-1 flex-col p-5">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {CATEGORIES.find((c) => c.key === s.category)?.label}
+                </span>
+                <h3 className="mt-2.5 line-clamp-1 text-[15px] font-semibold leading-tight text-foreground">
+                  {s.title}
+                </h3>
+                <p className="mt-2 line-clamp-2 text-[13px] leading-snug text-muted-foreground">
+                  {s.short_description}
+                </p>
+                <div className="mt-auto">
+                  <div className="my-4 h-px w-full bg-border" />
+                  <div className="flex items-center justify-between text-[12px]">
+                    <span className="text-muted-foreground">
+                      {DIFFICULTY_LABEL[s.difficulty as Difficulty]}
+                    </span>
+                    {isDone ? (
+                      <span className="font-medium text-muted-foreground">
+                        Completada
+                      </span>
+                    ) : (
+                      <span className="font-semibold text-foreground">
+                        {completed > 0 ? "Continuar" : "Ver solución"} →
+                      </span>
+                    )}
+                  </div>
+                  {showProgress && (
+                    <div className="mt-3">
+                      <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full bg-foreground transition-all"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <div className="mt-1.5 text-[11px] text-muted-foreground">
+                        {completed} de 5 pasos
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </Link>
           );
@@ -282,10 +261,10 @@ function SolutionsList() {
                 <CardRail
                   header={
                     <div className="flex items-center gap-2">
-                      <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
+                      <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground">
                         Más Implementadas
                       </h2>
-                      <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-400">
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                         {featured.length}
                       </span>
                     </div>
@@ -300,7 +279,7 @@ function SolutionsList() {
                     </div>
                   ))}
                 </CardRail>
-                <div className="my-8 h-px w-full bg-zinc-800" />
+                <div className="my-8 h-px w-full bg-border" />
               </div>
             )}
 
@@ -309,13 +288,13 @@ function SolutionsList() {
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-[200px] animate-pulse rounded-xl bg-zinc-900"
+                    className="h-[200px] animate-pulse rounded-xl bg-muted"
                   />
                 ))}
               </div>
             ) : filtered.length === 0 ? (
-              <div className="mt-8 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/40 p-10 text-center">
-                <p className="text-sm text-zinc-400">
+              <div className="mt-8 rounded-xl border border-dashed border-border bg-card p-10 text-center">
+                <p className="text-sm text-muted-foreground">
                   No encontramos soluciones con esos filtros.
                 </p>
               </div>
@@ -328,23 +307,16 @@ function SolutionsList() {
                       key={c.key}
                       header={
                         <div className="flex items-center gap-3">
-                          <div
-                            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
-                            style={{
-                              backgroundColor: "rgba(201,168,76,0.1)",
-                              border: "1px solid rgba(201,168,76,0.25)",
-                            }}
-                          >
+                          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-border bg-secondary">
                             <CIcon
-                              className="h-4 w-4"
-                              style={{ color: "#C9A84C" }}
+                              className="h-4 w-4 text-muted-foreground"
                               strokeWidth={1.5}
                             />
                           </div>
-                          <h2 className="text-lg font-semibold text-white">
+                          <h2 className="text-lg font-semibold text-foreground">
                             {c.label}
                           </h2>
-                          <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-400">
+                          <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                             {items.length}
                           </span>
                         </div>
@@ -365,10 +337,10 @@ function SolutionsList() {
                   <CardRail
                     header={
                       <div className="flex items-center gap-3">
-                        <h2 className="text-lg font-semibold text-white">
+                        <h2 className="text-lg font-semibold text-foreground">
                           Otras
                         </h2>
-                        <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-400">
+                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                           {otherItems.length}
                         </span>
                       </div>
@@ -394,7 +366,7 @@ function SolutionsList() {
       {/* Coming soon */}
       <section className="mt-12">
         <div className="mb-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             Próximamente
           </h2>
         </div>
@@ -402,13 +374,13 @@ function SolutionsList() {
           {comingSoon.map((c) => (
             <div
               key={c.label}
-              className="flex min-h-[120px] flex-col rounded-xl border border-zinc-800 bg-zinc-900/40 p-4"
+              className="flex min-h-[120px] flex-col rounded-xl border border-border bg-card p-4"
             >
-              <div className="flex items-center gap-2 text-zinc-300">
+              <div className="flex items-center gap-2 text-foreground">
                 <span className="text-base">{c.icon}</span>
                 <h3 className="text-sm font-medium">{c.label}</h3>
               </div>
-              <span className="mt-auto text-[11px] uppercase tracking-wider text-zinc-600">
+              <span className="mt-auto text-[11px] uppercase tracking-wider text-muted-foreground">
                 En desarrollo
               </span>
             </div>
@@ -448,11 +420,7 @@ function CardRail({
               scroll(-1);
             }}
             aria-label="Anterior"
-            className="grid h-9 w-9 place-items-center rounded-full text-lg leading-none text-zinc-300 transition hover:bg-[#262f44] hover:text-white"
-            style={{
-              backgroundColor: "#1C2333",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
+            className="grid h-9 w-9 place-items-center rounded-full border border-border bg-secondary text-lg leading-none text-muted-foreground transition hover:bg-muted hover:text-foreground"
           >
             ‹
           </button>
@@ -463,11 +431,7 @@ function CardRail({
               scroll(1);
             }}
             aria-label="Siguiente"
-            className="grid h-9 w-9 place-items-center rounded-full text-lg leading-none text-zinc-300 transition hover:bg-[#262f44] hover:text-white"
-            style={{
-              backgroundColor: "#1C2333",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
+            className="grid h-9 w-9 place-items-center rounded-full border border-border bg-secondary text-lg leading-none text-muted-foreground transition hover:bg-muted hover:text-foreground"
           >
             ›
           </button>
@@ -483,28 +447,6 @@ function CardRail({
   );
 }
 
-const CAT_TAG = "rounded text-[11px] font-semibold px-2 py-0.5";
-const CATEGORY_COLOR: Record<string, string> = {
-  ventas: CAT_TAG,
-  marketing: CAT_TAG,
-  atencion: CAT_TAG,
-  finanzas: CAT_TAG,
-  operaciones: CAT_TAG,
-  rrhh: CAT_TAG,
-  default: CAT_TAG,
-};
-const DIFF_TAG = "rounded text-[11px] font-semibold px-2 py-0.5";
-const DIFFICULTY_COLOR: Record<Difficulty, string> = {
-  principiante: DIFF_TAG,
-  intermedio: DIFF_TAG,
-  avanzado: DIFF_TAG,
-};
-const DIFF_TAG_STYLE: React.CSSProperties = {
-  backgroundColor: "rgba(59,130,246,0.1)",
-  color: "#3B82F6",
-  border: "1px solid rgba(59,130,246,0.25)",
-  borderRadius: "4px",
-};
 
 function FilterChip({
   children,
@@ -519,13 +461,11 @@ function FilterChip({
   return (
     <button
       onClick={onClick}
-      className="h-8 rounded-full px-3.5 text-xs transition-all duration-200"
-      style={{
-        backgroundColor: active ? "rgba(201,168,76,0.15)" : "#1C2333",
-        border: active ? "1px solid #C9A84C" : "1px solid rgba(255,255,255,0.08)",
-        color: active ? "#C9A84C" : "#A0AABF",
-        fontWeight: active ? 600 : 500,
-      }}
+      className={`h-8 rounded-full border px-3.5 text-xs transition-all duration-200 ${
+        active
+          ? "border-primary bg-primary font-semibold text-primary-foreground"
+          : "border-border bg-secondary font-medium text-muted-foreground hover:text-foreground"
+      }`}
     >
       {children}
     </button>
