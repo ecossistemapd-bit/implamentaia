@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
+/* Tipografía del sistema (SF Pro en dispositivos Apple) — sin Google Fonts. */
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -11,33 +11,34 @@
  */
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  /* Stack tipográfico Apple (SF Pro nativo en Apple vía -apple-system). */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  /* Premium gold remap: las utilidades violet-x y purple-x del código existente
-   * pasan automáticamente al dorado institucional #C9A84C. */
-  --color-violet-50:  #FBF6E4;
-  --color-violet-100: #F5EBC2;
-  --color-violet-200: #EBD891;
-  --color-violet-300: #DDC066;
-  --color-violet-400: #C9A84C;
-  --color-violet-500: #C9A84C;
-  --color-violet-600: #B8972E;
-  --color-violet-700: #8E7322;
-  --color-violet-800: #6A561A;
-  --color-violet-900: #463A12;
-  --color-violet-950: #2A2208;
-  --color-purple-50:  #FBF6E4;
-  --color-purple-100: #F5EBC2;
-  --color-purple-200: #EBD891;
-  --color-purple-300: #DDC066;
-  --color-purple-400: #C9A84C;
-  --color-purple-500: #C9A84C;
-  --color-purple-600: #B8972E;
-  --color-purple-700: #8E7322;
-  --color-purple-800: #6A561A;
-  --color-purple-900: #463A12;
-  --color-purple-950: #2A2208;
+  /* Sin dorado: las utilidades violet-x / purple-x del código existente
+   * (páginas aún no migradas) pasan a una rampa de GRIS Apple. */
+  --color-violet-50:  #F5F5F7;
+  --color-violet-100: #EBEBED;
+  --color-violet-200: #D2D2D7;
+  --color-violet-300: #B0B0B5;
+  --color-violet-400: #86868B;
+  --color-violet-500: #6E6E73;
+  --color-violet-600: #515154;
+  --color-violet-700: #3A3A3C;
+  --color-violet-800: #2A2A2C;
+  --color-violet-900: #1D1D1F;
+  --color-violet-950: #0A0A0A;
+  --color-purple-50:  #F5F5F7;
+  --color-purple-100: #EBEBED;
+  --color-purple-200: #D2D2D7;
+  --color-purple-300: #B0B0B5;
+  --color-purple-400: #86868B;
+  --color-purple-500: #6E6E73;
+  --color-purple-600: #515154;
+  --color-purple-700: #3A3A3C;
+  --color-purple-800: #2A2A2C;
+  --color-purple-900: #1D1D1F;
+  --color-purple-950: #0A0A0A;
   --radius-sm: calc(var(--radius) - 6px);
   --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
@@ -79,110 +80,115 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Sistema premium B/N + dorado #C9A84C — estilo Apple.
- * :root = tema CLARO (blanco / negro / dorado).
- * .dark = tema OSCURO negro mate (no navy) / blanco / dorado.
+/* Sistema premium estilo Apple — blanco/negro/gris, SIN dorado.
+ * :root = CLARO (Apple store: hueso #F5F5F7 + grafito #1D1D1F).
+ * .dark = OSCURO (Apple ipad-pro: negro #000 + gris mate #86868B).
  * El default lo decide el sistema operativo (ver script en __root). */
 :root {
-  /* CLARO — blanco mate por capas (fondo off-white, tarjetas blancas)
-   * y acento GRAFITO/negro estilo Apple (el dorado queda solo en .dark). */
+  /* CLARO — Apple store: fondo hueso #F5F5F7, tarjetas blancas,
+   * texto #1D1D1F / gris #6E6E73, acento grafito. Cero dorado. */
   --radius: 0.625rem;
-  --background: #F7F7F5;
-  --foreground: #0A0A0A;
+  --background: #F5F5F7;
+  --foreground: #1D1D1F;
   --card: #FFFFFF;
-  --card-foreground: #0A0A0A;
+  --card-foreground: #1D1D1F;
   --popover: #FFFFFF;
-  --popover-foreground: #0A0A0A;
-  --primary: #1A1A1A;
+  --popover-foreground: #1D1D1F;
+  --primary: #1D1D1F;
   --primary-foreground: #FFFFFF;
-  --secondary: #F0F0EE;
-  --secondary-foreground: #0A0A0A;
-  --muted: #F0F0EE;
-  --muted-foreground: #6B7280;
-  --accent: #1A1A1A;
+  --secondary: #FFFFFF;
+  --secondary-foreground: #1D1D1F;
+  --muted: #F5F5F7;
+  --muted-foreground: #6E6E73;
+  --accent: #1D1D1F;
   --accent-foreground: #FFFFFF;
   --destructive: oklch(0.6 0.2 25);
   --destructive-foreground: #FFFFFF;
-  --border: #E6E6E3;
-  --input: #E6E6E3;
-  --ring: #1A1A1A;
-  --chart-1: #1A1A1A;
-  --chart-2: #3B82F6;
-  --chart-3: #6B7280;
-  --chart-4: #9CA3AF;
-  --chart-5: #D4D4D4;
+  --border: #D2D2D7;
+  --input: #D2D2D7;
+  --ring: #1D1D1F;
+  --chart-1: #1D1D1F;
+  --chart-2: #6E6E73;
+  --chart-3: #86868B;
+  --chart-4: #AEAEB2;
+  --chart-5: #D2D2D7;
   --sidebar: #FFFFFF;
-  --sidebar-foreground: #0A0A0A;
-  --sidebar-primary: #1A1A1A;
+  --sidebar-foreground: #1D1D1F;
+  --sidebar-primary: #1D1D1F;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F2F2F0;
-  --sidebar-accent-foreground: #0A0A0A;
-  --sidebar-border: #E6E6E3;
-  --sidebar-ring: #1A1A1A;
+  --sidebar-accent: #F5F5F7;
+  --sidebar-accent-foreground: #1D1D1F;
+  --sidebar-border: #D2D2D7;
+  --sidebar-ring: #1D1D1F;
 
   /* Premium tokens (claro — neutro, sin dorado) */
-  --gold: #C9A84C;
-  --gold-hover: #B8972E;
+  --gold: #1D1D1F;
+  --gold-hover: #000000;
   --gold-border: rgba(0, 0, 0, 0.10);
-  --gold-border-hover: rgba(0, 0, 0, 0.18);
-  --accent-blue: #3B82F6;
-  --text-primary: #0A0A0A;
-  --text-secondary: #4B5563;
-  --text-tertiary: #6B7280;
-  --accent-glow: #1A1A1A;
-  --gradient-accent: linear-gradient(135deg, #1A1A1A, #000000);
+  --gold-border-hover: rgba(0, 0, 0, 0.16);
+  --accent-blue: #6E6E73;
+  --text-primary: #1D1D1F;
+  --text-secondary: #6E6E73;
+  --text-tertiary: #86868B;
+  --accent-glow: #1D1D1F;
+  --gradient-accent: linear-gradient(135deg, #1D1D1F, #000000);
 
-  /* Superficie de tarjeta (profundidad Apple en claro) */
-  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
-  --card-border-hover: #D4D4D4;
+  /* Superficie de tarjeta — profundidad Apple (sombra + hover acerca) */
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --card-border-hover: #C7C7CC;
 }
 
 .dark {
-  --background: #0A0A0A;
-  --foreground: #F5F5F5;
-  --card: #141414;
-  --card-foreground: #F5F5F5;
-  --popover: #141414;
-  --popover-foreground: #F5F5F5;
-  --primary: #C9A84C;
-  --primary-foreground: #0A0A0A;
-  --secondary: #1A1A1A;
-  --secondary-foreground: #F5F5F5;
-  --muted: #1A1A1A;
-  --muted-foreground: #A1A1A1;
-  --accent: #C9A84C;
-  --accent-foreground: #0A0A0A;
+  /* OSCURO — Apple ipad-pro: negro puro #000, tarjetas #161617,
+   * texto #F5F5F7 / gris mate #86868B. Cero dorado. */
+  --background: #000000;
+  --foreground: #F5F5F7;
+  --card: #161617;
+  --card-foreground: #F5F5F7;
+  --popover: #161617;
+  --popover-foreground: #F5F5F7;
+  --primary: #F5F5F7;
+  --primary-foreground: #000000;
+  --secondary: #1B1A1C;
+  --secondary-foreground: #F5F5F7;
+  --muted: #1B1A1C;
+  --muted-foreground: #86868B;
+  --accent: #F5F5F7;
+  --accent-foreground: #000000;
   --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: #F5F5F5;
-  --border: #262626;
-  --input: #1A1A1A;
-  --ring: #C9A84C;
-  --chart-1: #C9A84C;
-  --chart-2: #3B82F6;
-  --chart-3: #B8972E;
-  --chart-4: #A1A1A1;
-  --chart-5: #6B7280;
-  --sidebar: #0F0F0F;
-  --sidebar-foreground: #F5F5F5;
-  --sidebar-primary: #C9A84C;
-  --sidebar-primary-foreground: #0A0A0A;
-  --sidebar-accent: #1A1A1A;
-  --sidebar-accent-foreground: #F5F5F5;
-  --sidebar-border: #262626;
-  --sidebar-ring: #C9A84C;
+  --destructive-foreground: #F5F5F7;
+  --border: #2A2A2C;
+  --input: #1B1A1C;
+  --ring: #F5F5F7;
+  --chart-1: #F5F5F7;
+  --chart-2: #AEAEB2;
+  --chart-3: #86868B;
+  --chart-4: #6E6E73;
+  --chart-5: #515154;
+  --sidebar: #000000;
+  --sidebar-foreground: #F5F5F7;
+  --sidebar-primary: #F5F5F7;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #161617;
+  --sidebar-accent-foreground: #F5F5F7;
+  --sidebar-border: #2A2A2C;
+  --sidebar-ring: #F5F5F7;
 
-  /* Premium tokens (oscuro mate) */
-  --gold-border: rgba(201, 168, 76, 0.18);
-  --gold-border-hover: rgba(201, 168, 76, 0.40);
-  --text-primary: #F5F5F5;
-  --text-secondary: #A1A1A1;
-  --text-tertiary: #6B7280;
-  --accent-glow: #C9A84C;
-  --gradient-accent: linear-gradient(135deg, #C9A84C, #B8972E);
+  /* Premium tokens (oscuro mate — gris Apple, sin dorado) */
+  --gold: #F5F5F7;
+  --gold-hover: #FFFFFF;
+  --gold-border: rgba(255, 255, 255, 0.14);
+  --gold-border-hover: rgba(255, 255, 255, 0.26);
+  --accent-blue: #86868B;
+  --text-primary: #F5F5F7;
+  --text-secondary: #86868B;
+  --text-tertiary: #6E6E73;
+  --accent-glow: #F5F5F7;
+  --gradient-accent: linear-gradient(135deg, #F5F5F7, #AEAEB2);
 
-  /* Superficie de tarjeta (oscuro: borde dorado en hover, sin sombra) */
+  /* Superficie de tarjeta (oscuro: sin sombra, borde sutil en hover) */
   --card-shadow: none;
-  --card-border-hover: rgba(201, 168, 76, 0.40);
+  --card-border-hover: rgba(255, 255, 255, 0.26);
 }
 
 @layer base {
@@ -245,13 +251,15 @@
 .premium-card {
   background-color: var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: var(--card-shadow);
-  transition: all 250ms ease;
+  transition: transform 300ms cubic-bezier(0.25, 0.1, 0.25, 1),
+    box-shadow 300ms ease, border-color 200ms ease;
 }
 .premium-card:hover {
+  transform: translateY(-4px) scale(1.02);
   border-color: var(--card-border-hover);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
 }
 
 /* Course card with gradient — gold underline detail */
@@ -268,7 +276,7 @@
   right: 0;
   bottom: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.6), transparent);
+  background: linear-gradient(90deg, transparent, var(--card-border-hover), transparent);
   opacity: 0.7;
 }
 .course-card-gradient:hover::after {
