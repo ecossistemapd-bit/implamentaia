@@ -135,7 +135,8 @@
 
   /* Superficie de tarjeta — profundidad Apple (sombra + hover acerca) */
   --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --card-border-hover: #C7C7CC;
+  --card-shadow-hover: 0 24px 48px -12px rgba(0, 0, 0, 0.22), 0 8px 16px -4px rgba(0, 0, 0, 0.10);
+  --card-border-hover: #86868B;
 }
 
 .dark {
@@ -186,9 +187,10 @@
   --accent-glow: #F5F5F7;
   --gradient-accent: linear-gradient(135deg, #F5F5F7, #AEAEB2);
 
-  /* Superficie de tarjeta (oscuro: sin sombra, borde sutil en hover) */
+  /* Superficie de tarjeta (oscuro: sin sombra, borde + glow sutil en hover) */
   --card-shadow: none;
-  --card-border-hover: rgba(255, 255, 255, 0.26);
+  --card-shadow-hover: 0 0 0 1px rgba(255, 255, 255, 0.10), 0 20px 48px -12px rgba(0, 0, 0, 0.7);
+  --card-border-hover: rgba(255, 255, 255, 0.38);
 }
 
 @layer base {
@@ -259,7 +261,7 @@
 .premium-card:hover {
   transform: translateY(-4px) scale(1.02);
   border-color: var(--card-border-hover);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--card-shadow-hover);
 }
 
 /* Course card with gradient — gold underline detail */
