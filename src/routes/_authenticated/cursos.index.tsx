@@ -118,7 +118,7 @@ function CursosPage() {
   const [filter, setFilter] = useState<Filter>("Todos");
   const [query, setQuery] = useState("");
 
-  const { data: courses } = useQuery({
+  const { data: courses, isLoading } = useQuery({
     queryKey: ["courses"],
     queryFn: async () => {
       const { data, error } = await supabase
