@@ -456,7 +456,7 @@ function SolutionByIdDetail() {
                       isCompleted
                         ? "border-primary bg-primary text-primary-foreground"
                         : isActive
-                        ? "border-primary bg-primary text-foreground"
+                        ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-background text-muted-foreground group-hover:border-border"
                     }`}
                   >
