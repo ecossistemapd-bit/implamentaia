@@ -26,6 +26,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useRole } from "@/hooks/use-role";
 import { FEATURES } from "@/lib/features";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -98,16 +99,8 @@ function AuthenticatedLayout() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Force dark theme inside the authenticated app shell.
-  useEffect(() => {
-    const root = document.documentElement;
-    const had = root.classList.contains("dark");
-    root.classList.add("dark");
-    return () => {
-      if (!had) root.classList.remove("dark");
-    };
-  }, []);
-
+  // El tema (claro/oscuro) lo controla useTheme/ThemeToggle + el script
+  // anti-FOUC de __root (default = sistema operativo). Ya NO se fuerza dark.
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
   }, [loading, user, navigate]);
@@ -121,7 +114,7 @@ function AuthenticatedLayout() {
   }
 
   return (
-    <div className="dark flex min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen bg-background text-foreground">
       <DesktopSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <MobileTopBar />
@@ -136,12 +129,10 @@ function AuthenticatedLayout() {
 
 function DesktopSidebar() {
   return (
-    <aside
-      className="sticky top-0 hidden h-screen w-[220px] shrink-0 lg:flex lg:flex-col"
-      style={{ backgroundColor: "#0F1624", borderRight: "1px solid rgba(201,168,76,0.12)" }}
-    >
-      <div className="px-5" style={{ paddingTop: "20px", paddingBottom: "20px" }}>
+    <aside className="sticky top-0 hidden h-screen w-[220px] shrink-0 border-r border-sidebar-border bg-sidebar lg:flex lg:flex-col">
+      <div className="flex items-center justify-between px-5 py-5">
         <Logo />
+        <ThemeToggle />
       </div>
       <NavList />
       <UserMenu />
@@ -168,7 +159,7 @@ function MobileTopBar() {
         </SheetContent>
       </Sheet>
       <Logo />
-      <div className="w-10" />
+      <ThemeToggle />
     </header>
   );
 }
@@ -207,15 +198,7 @@ function NavList() {
     <nav className="flex-1 overflow-y-auto px-3 pb-4">
       {sections.map((sec) => (
         <div key={sec.label} className="mb-4">
-          <div
-            className="px-3 pb-2 pt-1 uppercase"
-            style={{
-              fontSize: "10px",
-              letterSpacing: "0.15em",
-              fontWeight: 600,
-              color: "#6B7A99",
-            }}
-          >
+          <div className="px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
             {sec.label}
           </div>
           <div className="space-y-1">
@@ -228,39 +211,23 @@ function NavList() {
                 <Link
                   key={item.label}
                   to={item.to}
-                  className="group flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-colors duration-200"
-                  style={{
-                    borderLeft: active ? "2px solid #C9A84C" : "2px solid transparent",
-                    backgroundColor: active ? "rgba(201,168,76,0.07)" : "transparent",
-                    color: active ? "#E8EDF5" : "#A0AABF",
-                    fontWeight: active ? 500 : 400,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (active) return;
-                    e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.04)";
-                    e.currentTarget.style.color = "#C9A84C";
-                  }}
-                  onMouseLeave={(e) => {
-                    if (active) return;
-                    e.currentTarget.style.backgroundColor = "transparent";
-                    e.currentTarget.style.color = "#A0AABF";
-                  }}
+                  className={`group flex items-center gap-2.5 rounded-lg border-l-2 px-3 py-2 text-[13px] transition-colors duration-200 ${
+                    active
+                      ? "border-primary bg-primary/[0.08] font-medium text-foreground"
+                      : "border-transparent font-normal text-muted-foreground hover:bg-primary/[0.05] hover:text-primary"
+                  }`}
                 >
                   <Icon
-                    className="h-[18px] w-[18px] shrink-0"
+                    className={`h-[18px] w-[18px] shrink-0 ${
+                      active
+                        ? "text-primary"
+                        : "text-muted-foreground group-hover:text-primary"
+                    }`}
                     strokeWidth={1.75}
-                    style={{ color: active ? "#C9A84C" : "#6B7A99" }}
                   />
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span
-                      className="ml-auto rounded-md px-1.5 py-0.5 text-[10px] font-medium"
-                      style={{
-                        border: "1px solid rgba(201,168,76,0.4)",
-                        backgroundColor: "rgba(201,168,76,0.1)",
-                        color: "#C9A84C",
-                      }}
-                    >
+                    <span className="ml-auto rounded-md border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
                       {item.badge}
                     </span>
                   )}
@@ -286,26 +253,19 @@ function UserMenu() {
   };
 
   return (
-    <div
-      className="px-3 py-3"
-      style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }}
-    >
+    <div className="border-t border-sidebar-border px-3 py-3">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
-            className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition"
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(201,168,76,0.04)")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-          >
+          <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-primary/[0.05]">
             <Avatar className="h-8 w-8">
               <AvatarImage src={(user?.user_metadata as { avatar_url?: string } | undefined)?.avatar_url} />
-              <AvatarFallback style={{ backgroundColor: "#1C2333", color: "#C9A84C" }}>{initial}</AvatarFallback>
+              <AvatarFallback className="bg-muted text-primary">{initial}</AvatarFallback>
             </Avatar>
             <div className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate text-sm font-medium" style={{ color: "#E8EDF5" }}>{email}</span>
-              <span className="text-xs" style={{ color: "#6B7A99" }}>Mi cuenta</span>
+              <span className="truncate text-sm font-medium text-foreground">{email}</span>
+              <span className="text-xs text-muted-foreground">Mi cuenta</span>
             </div>
-            <ChevronRight className="h-4 w-4" style={{ color: "#6B7A99" }} />
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="top" className="w-56">
