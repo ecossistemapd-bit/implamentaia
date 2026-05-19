@@ -256,7 +256,7 @@ function UserMenu() {
     <div className="border-t border-sidebar-border px-3 py-3">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-primary/[0.05]">
+          <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-white/[0.08]">
             <Avatar className="h-8 w-8">
               <AvatarImage src={(user?.user_metadata as { avatar_url?: string } | undefined)?.avatar_url} />
               <AvatarFallback className="bg-muted text-primary">{initial}</AvatarFallback>
