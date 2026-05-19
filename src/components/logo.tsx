@@ -20,10 +20,10 @@ export function Logo({ className = "" }: { className?: string }) {
         strokeLinejoin="round"
         aria-hidden="true"
       >
-        {/* "A" como pico (sin travesaño) */}
-        <path d="M1.8 20.5 L10 2 L18.2 20.5" />
         {/* "I" como barra */}
-        <path d="M23.2 2 L23.2 20.5" />
+        <path d="M2.8 2 L2.8 20.5" />
+        {/* "A" como pico (sin travesaño) — orden I + A = "IA" */}
+        <path d="M7.6 20.5 L15.8 2 L24 20.5" />
       </svg>
       <span className="text-[13px] font-medium uppercase tracking-[0.2em] leading-none">
         Implementa&nbsp;IA
