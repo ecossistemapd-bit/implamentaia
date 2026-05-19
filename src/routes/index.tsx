@@ -31,12 +31,6 @@ export const Route = createFileRoute("/")({
 const ACCESO_MAIL =
   "mailto:hola@implementa.ai?subject=Solicitar%20acceso%20a%20Implementa%20AI";
 
-// Paleta institucional (alineada a styles.css) — negro obsidiana + dorado.
-const GOLD = "#C9A84C";
-const GOLD_HOVER = "#B8972E";
-const INK = "#0B0F1A";
-const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
-
 const FEATURES = [
   {
     eyebrow: "Catálogo de soluciones",
@@ -72,63 +66,6 @@ const FEATURES = [
   },
 ];
 
-/* ---- Primitivos premium reutilizables ---- */
-
-function PrimaryCTA({
-  children,
-  size = "md",
-}: {
-  children: React.ReactNode;
-  size?: "md" | "lg";
-}) {
-  const pad = size === "lg" ? "px-8 py-4 text-[15px]" : "px-6 py-3 text-sm";
-  return (
-    <a
-      href={ACCESO_MAIL}
-      className={`group inline-flex items-center gap-2 rounded-full font-semibold transition-all duration-300 ${pad}`}
-      style={{ backgroundColor: GOLD, color: INK }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = GOLD_HOVER;
-        e.currentTarget.style.boxShadow = "0 12px 36px rgba(201,168,76,0.30)";
-        e.currentTarget.style.transform = "translateY(-1px)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = GOLD;
-        e.currentTarget.style.boxShadow = "none";
-        e.currentTarget.style.transform = "translateY(0)";
-      }}
-    >
-      {children}
-      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-    </a>
-  );
-}
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <p
-      className="text-[11px] font-semibold uppercase"
-      style={{ letterSpacing: "0.22em", color: GOLD }}
-    >
-      {children}
-    </p>
-  );
-}
-
-function Hairline() {
-  return (
-    <div
-      className="mx-auto h-px max-w-6xl"
-      style={{
-        background:
-          "linear-gradient(90deg, transparent, rgba(201,168,76,0.16), transparent)",
-      }}
-    />
-  );
-}
-
-/* ---- Página ---- */
-
 function LandingPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -137,52 +74,32 @@ function LandingPage() {
   }, [loading, user, navigate]);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: INK, color: "#E8EDF5" }}>
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header
-        className="sticky top-0 z-40 backdrop-blur-xl"
-        style={{
-          backgroundColor: "rgba(11,15,26,0.72)",
-          borderBottom: "1px solid rgba(201,168,76,0.10)",
-        }}
-      >
+      <header className="sticky top-0 z-40 border-b border-gray-800 bg-black/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Logo className="text-white" />
-          <nav
-            className="hidden items-center gap-8 text-sm md:flex"
-            style={{ color: "#A0AABF" }}
-          >
-            <a href="#soluciones" className="transition-colors hover:text-white">
+          <nav className="hidden items-center gap-7 text-sm text-gray-400 md:flex">
+            <a href="#soluciones" className="transition hover:text-white">
               Soluciones
             </a>
-            <a href="#como-funciona" className="transition-colors hover:text-white">
+            <a href="#como-funciona" className="transition hover:text-white">
               Cómo funciona
             </a>
-            <a href="#acceso" className="transition-colors hover:text-white">
+            <a href="#acceso" className="transition hover:text-white">
               Acceso
             </a>
           </nav>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link
               to="/login"
-              className="text-sm transition-colors hover:text-white"
-              style={{ color: "#A0AABF" }}
+              className="text-sm text-gray-300 transition hover:text-white"
             >
               Ingresar
             </Link>
             <a
               href={ACCESO_MAIL}
-              className="rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300"
-              style={{ backgroundColor: GOLD, color: INK }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = GOLD_HOVER;
-                e.currentTarget.style.boxShadow =
-                  "0 8px 24px rgba(201,168,76,0.25)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = GOLD;
-                e.currentTarget.style.boxShadow = "none";
-              }}
+              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-gray-100"
             >
               Solicitar acceso
             </a>
@@ -191,214 +108,106 @@ function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden border-b border-gray-800">
         <div
-          className="pointer-events-none absolute -right-40 -top-48 h-[560px] w-[560px] rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(201,168,76,0.16), transparent 70%)",
-            filter: "blur(40px)",
-          }}
+          className="pointer-events-none absolute -right-32 -top-40 h-[520px] w-[520px] rounded-full bg-violet-500/20 blur-[120px]"
           aria-hidden
         />
-        <div
-          className="pointer-events-none absolute -left-40 bottom-0 h-[420px] w-[420px] rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(201,168,76,0.07), transparent 70%)",
-            filter: "blur(60px)",
-          }}
-          aria-hidden
-        />
-        <div className="mx-auto grid max-w-6xl items-center gap-14 px-6 py-28 lg:grid-cols-2 lg:py-32">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-24 lg:grid-cols-2">
           <motion.div
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: EASE }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <div
-              className="mb-7 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium"
-              style={{
-                border: "1px solid rgba(201,168,76,0.22)",
-                backgroundColor: "rgba(201,168,76,0.06)",
-                color: "#DDC066",
-              }}
-            >
-              <Sparkles className="h-3 w-3" style={{ color: GOLD }} />
-              Plataforma por invitación
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gray-700 bg-gray-900 px-3 py-1 text-xs font-medium text-gray-300">
+              <Sparkles className="h-3 w-3 text-violet-400" /> Plataforma por
+              invitación
             </div>
-            <h1 className="text-5xl leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
+            <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
               La plataforma de las empresas que crecen con IA.
             </h1>
-            <p
-              className="mt-7 max-w-xl text-lg leading-relaxed"
-              style={{ color: "#A0AABF" }}
-            >
+            <p className="mt-6 max-w-xl text-lg text-gray-300">
               Más de 60 soluciones de Inteligencia Artificial listas para
               implementar en ventas, marketing, atención, finanzas, operaciones
               y recursos humanos. Sin programar desde cero.
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-5">
-              <PrimaryCTA size="lg">Solicitar acceso</PrimaryCTA>
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <a
+                href={ACCESO_MAIL}
+                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-gray-100"
+              >
+                Solicitar acceso <ArrowRight className="h-4 w-4" />
+              </a>
               <Link
                 to="/login"
-                className="text-sm transition-colors"
-                style={{ color: "#A0AABF" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#A0AABF")}
+                className="text-sm text-gray-300 underline-offset-4 transition hover:text-white hover:underline"
               >
                 Ya tengo cuenta
               </Link>
             </div>
-            <p className="mt-6 text-xs" style={{ color: "#6B7A99" }}>
+            <p className="mt-5 text-xs text-gray-500">
               Sin tarjeta de crédito · Acceso en 24 hs · Plataforma por
               invitación
             </p>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: EASE, delay: 0.15 }}
-            className="relative hidden h-[400px] lg:block"
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
+            className="relative hidden h-[360px] lg:block"
           >
-            {/* Panel principal */}
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute left-0 top-6 w-64 rounded-2xl p-5"
-              style={{
-                backgroundColor: "#111827",
-                border: "1px solid rgba(201,168,76,0.18)",
-                boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
-              }}
-            >
-              <div
-                className="flex h-9 w-9 items-center justify-center rounded-xl"
-                style={{
-                  backgroundColor: "rgba(201,168,76,0.14)",
-                  border: "1px solid rgba(201,168,76,0.30)",
-                }}
-              >
-                <Sparkles className="h-4 w-4" style={{ color: GOLD }} />
-              </div>
-              <div
-                className="mt-4 h-2.5 w-20 rounded-full"
-                style={{ backgroundColor: GOLD }}
-              />
-              <div className="mt-3 space-y-2">
-                <div className="h-2 w-full rounded-full bg-[#1C2333]" />
-                <div className="h-2 w-3/4 rounded-full bg-[#1C2333]" />
-              </div>
-              <div
-                className="mt-4 inline-block rounded-md px-2.5 py-1 text-[10px] font-medium"
-                style={{
-                  backgroundColor: "rgba(201,168,76,0.12)",
-                  color: "#DDC066",
-                }}
-              >
+            <div className="absolute left-2 top-4 w-56 rounded-xl border border-gray-700 bg-gray-900 p-4 shadow-2xl">
+              <div className="h-2 w-16 rounded-full bg-violet-500" />
+              <div className="mt-3 h-2 w-full rounded-full bg-gray-700" />
+              <div className="mt-2 h-2 w-3/4 rounded-full bg-gray-700" />
+              <div className="mt-4 inline-block rounded-md bg-violet-500/15 px-2 py-1 text-[10px] text-violet-300">
                 Disponible
               </div>
-            </motion.div>
-
-            {/* Panel secundario */}
-            <motion.div
-              animate={{ y: [0, 12, 0] }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.4,
-              }}
-              className="absolute right-0 top-28 w-60 rounded-2xl p-5"
-              style={{
-                backgroundColor: "#0F1624",
-                border: "1px solid rgba(201,168,76,0.14)",
-                boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
-              }}
-            >
+            </div>
+            <div className="absolute right-0 top-24 w-60 rounded-xl border border-gray-700 bg-gray-950 p-4 shadow-2xl">
               <div className="flex items-center gap-2">
-                <div
-                  className="h-6 w-6 rounded-md"
-                  style={{ backgroundColor: GOLD }}
-                />
-                <div className="h-2 w-24 rounded-full bg-[#1C2333]" />
+                <div className="h-6 w-6 rounded-md bg-violet-500" />
+                <div className="h-2 w-24 rounded-full bg-gray-700" />
               </div>
               <div className="mt-4 grid grid-cols-3 gap-2">
-                {[0, 1, 2, 3, 4, 5].map((k) => (
-                  <div
-                    key={k}
-                    className="h-9 rounded-lg"
-                    style={{
-                      backgroundColor: "#1C2333",
-                      border: "1px solid rgba(201,168,76,0.08)",
-                    }}
-                  />
-                ))}
+                <div className="h-10 rounded-md bg-gray-800" />
+                <div className="h-10 rounded-md bg-gray-800" />
+                <div className="h-10 rounded-md bg-gray-800" />
               </div>
-            </motion.div>
-
-            {/* Panel inferior */}
-            <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{
-                duration: 9,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.8,
-              }}
-              className="absolute bottom-2 left-12 w-56 rounded-2xl p-5"
-              style={{
-                backgroundColor: "#111827",
-                border: "1px solid rgba(201,168,76,0.14)",
-                boxShadow: "0 24px 60px rgba(0,0,0,0.5)",
-              }}
-            >
-              <div
-                className="h-2.5 w-14 rounded-full"
-                style={{ backgroundColor: GOLD }}
-              />
-              <div className="mt-4 space-y-2">
-                <div className="h-2 w-full rounded-full bg-[#1C2333]" />
-                <div className="h-2 w-2/3 rounded-full bg-[#1C2333]" />
+            </div>
+            <div className="absolute bottom-2 left-10 w-52 rounded-xl border border-gray-700 bg-gray-900 p-4 shadow-2xl">
+              <div className="h-2 w-12 rounded-full bg-violet-500" />
+              <div className="mt-3 space-y-2">
+                <div className="h-2 w-full rounded-full bg-gray-700" />
+                <div className="h-2 w-2/3 rounded-full bg-gray-700" />
               </div>
-              <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-[#1C2333]">
-                <div
-                  className="h-full w-2/3 rounded-full"
-                  style={{ backgroundColor: GOLD }}
-                />
-              </div>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      <Hairline />
-
       {/* Franja institucional (sin logos inventados) */}
-      <section style={{ backgroundColor: "#0D111C" }}>
-        <div className="mx-auto max-w-6xl px-6 py-12 text-center">
-          <p
-            className="text-xs uppercase"
-            style={{ letterSpacing: "0.22em", color: "#6B7A99" }}
-          >
+      <section className="border-b border-gray-800 bg-gray-950">
+        <div className="mx-auto max-w-6xl px-6 py-10 text-center">
+          <p className="text-xs uppercase tracking-widest text-gray-500">
             Soluciones aplicadas en ventas, marketing, atención, finanzas,
             operaciones y recursos humanos
           </p>
         </div>
       </section>
 
-      <Hairline />
-
       {/* Soluciones por área */}
-      <section id="soluciones" className="scroll-mt-24">
-        <div className="mx-auto max-w-6xl px-6 py-28">
-          <div className="mb-16 max-w-2xl">
-            <Eyebrow>Catálogo</Eyebrow>
-            <h2 className="mt-4 text-4xl tracking-tight sm:text-5xl">
+      <section id="soluciones" className="border-b border-gray-800">
+        <div className="mx-auto max-w-6xl px-6 py-24">
+          <div className="mb-14 max-w-2xl">
+            <p className="text-sm font-medium uppercase tracking-widest text-violet-400">
+              Catálogo
+            </p>
+            <h2 className="mt-3 text-4xl font-semibold tracking-tight">
               Un catálogo que cubre toda tu operación.
             </h2>
-            <p className="mt-5 text-lg leading-relaxed" style={{ color: "#A0AABF" }}>
+            <p className="mt-4 text-gray-400">
               Cada solución incluye guía paso a paso, prompts probados,
               integraciones recomendadas y assets para arrancar hoy mismo.
             </p>
@@ -409,159 +218,100 @@ function LandingPage() {
               return (
                 <motion.div
                   key={cat.key}
-                  initial={{ opacity: 0, y: 14 }}
+                  initial={{ opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.05, ease: EASE }}
-                  className="group rounded-2xl p-6 transition-all duration-300"
-                  style={{
-                    backgroundColor: "#111827",
-                    border: "1px solid rgba(201,168,76,0.12)",
+                  transition={{
+                    duration: 0.35,
+                    delay: i * 0.04,
+                    ease: "easeOut",
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "rgba(201,168,76,0.35)";
-                    e.currentTarget.style.boxShadow =
-                      "0 8px 30px rgba(201,168,76,0.07)";
-                    e.currentTarget.style.transform = "translateY(-3px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "rgba(201,168,76,0.12)";
-                    e.currentTarget.style.boxShadow = "none";
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
+                  className="rounded-xl border border-gray-800 bg-gray-900 p-6 transition hover:border-violet-500/50"
                 >
-                  <div
-                    className="flex h-11 w-11 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105"
-                    style={{
-                      backgroundColor: "rgba(201,168,76,0.10)",
-                      border: "1px solid rgba(201,168,76,0.22)",
-                    }}
-                  >
-                    <Icon
-                      className="h-5 w-5"
-                      style={{ color: GOLD }}
-                      strokeWidth={1.5}
-                    />
-                  </div>
+                  <Icon
+                    className="h-6 w-6 text-violet-400"
+                    strokeWidth={1.5}
+                  />
                   <h3 className="mt-5 text-base font-semibold text-white">
                     {cat.label}
                   </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed" style={{ color: "#A0AABF" }}>
+                  <p className="mt-1 text-sm text-gray-400">
                     {cat.description}
                   </p>
                 </motion.div>
               );
             })}
           </div>
-          <div className="mt-12">
+          <div className="mt-10">
             <Link
               to="/login"
-              className="group inline-flex items-center gap-2 text-sm font-semibold transition-colors"
-              style={{ color: GOLD }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#DDC066")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = GOLD)}
+              className="inline-flex items-center gap-2 text-sm font-medium text-violet-400 transition hover:text-violet-300"
             >
-              Explorá el catálogo completo
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+              Explorá el catálogo completo <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
       </section>
 
-      <Hairline />
-
       {/* Features alternadas */}
-      <section style={{ backgroundColor: "#0D111C" }}>
-        <div className="mx-auto max-w-6xl space-y-28 px-6 py-28">
+      <section className="border-b border-gray-800 bg-gray-950">
+        <div className="mx-auto max-w-6xl space-y-24 px-6 py-24">
           {FEATURES.map((f, i) => {
             const Icon = f.icon;
             const reversed = i % 2 === 1;
             return (
               <motion.div
                 key={f.eyebrow}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, ease: EASE }}
-                className="grid items-center gap-14 lg:grid-cols-2"
+                transition={{ duration: 0.45, ease: "easeOut" }}
+                className="grid items-center gap-12 lg:grid-cols-2"
               >
                 <div className={reversed ? "lg:order-2" : ""}>
-                  <Eyebrow>{f.eyebrow}</Eyebrow>
-                  <h3
-                    className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-                    style={{ letterSpacing: "-0.02em" }}
-                  >
+                  <p className="text-xs font-semibold uppercase tracking-widest text-violet-400">
+                    {f.eyebrow}
+                  </p>
+                  <h3 className="mt-3 text-3xl font-semibold tracking-tight">
                     {f.title}
                   </h3>
-                  <p
-                    className="mt-5 text-lg leading-relaxed"
-                    style={{ color: "#A0AABF" }}
-                  >
-                    {f.body}
-                  </p>
-                  <ul className="mt-7 space-y-3 text-sm" style={{ color: "#A0AABF" }}>
+                  <p className="mt-4 text-gray-400">{f.body}</p>
+                  <ul className="mt-5 space-y-2 text-sm text-gray-400">
                     {f.points.map((p) => (
-                      <li key={p} className="flex items-center gap-3">
-                        <span
-                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
-                          style={{
-                            backgroundColor: "rgba(201,168,76,0.12)",
-                            border: "1px solid rgba(201,168,76,0.28)",
-                          }}
-                        >
-                          <Check className="h-3 w-3" style={{ color: GOLD }} />
-                        </span>
+                      <li key={p} className="flex items-center gap-2">
+                        <Check className="h-4 w-4 shrink-0 text-violet-400" />
                         {p}
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div
-                  className={`rounded-3xl p-7 ${reversed ? "lg:order-1" : ""}`}
-                  style={{
-                    backgroundColor: "#111827",
-                    border: "1px solid rgba(201,168,76,0.14)",
-                    boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
-                  }}
+                  className={`rounded-2xl border border-gray-800 bg-gray-900 p-6 ${
+                    reversed ? "lg:order-1" : ""
+                  }`}
                 >
-                  <div
-                    className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl"
-                    style={{
-                      backgroundColor: "rgba(201,168,76,0.12)",
-                      border: "1px solid rgba(201,168,76,0.26)",
-                    }}
-                  >
-                    <Icon className="h-5 w-5" style={{ color: GOLD }} />
+                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/15">
+                    <Icon className="h-5 w-5 text-violet-400" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { w: "w-full", w2: "w-2/3", accent: true },
-                      { w: "w-full", w2: "w-1/2", accent: true },
-                      { w: "w-3/4", w2: "", accent: false },
-                      { w: "w-full", w2: "", accent: true },
-                    ].map((tile, k) => (
-                      <div
-                        key={k}
-                        className="rounded-xl p-4"
-                        style={{
-                          backgroundColor: "#0F1624",
-                          border: "1px solid rgba(201,168,76,0.08)",
-                        }}
-                      >
-                        <div
-                          className="h-2 w-12 rounded-full"
-                          style={{
-                            backgroundColor: tile.accent ? GOLD : "#1C2333",
-                          }}
-                        />
-                        <div className={`mt-3 h-2 rounded-full bg-[#1C2333] ${tile.w}`} />
-                        {tile.w2 && (
-                          <div
-                            className={`mt-2 h-2 rounded-full bg-[#1C2333] ${tile.w2}`}
-                          />
-                        )}
-                      </div>
-                    ))}
+                    <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                      <div className="h-2 w-12 rounded-full bg-violet-500" />
+                      <div className="mt-3 h-2 w-full rounded-full bg-gray-700" />
+                      <div className="mt-2 h-2 w-2/3 rounded-full bg-gray-700" />
+                    </div>
+                    <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                      <div className="h-2 w-12 rounded-full bg-violet-500" />
+                      <div className="mt-3 h-2 w-full rounded-full bg-gray-700" />
+                      <div className="mt-2 h-2 w-1/2 rounded-full bg-gray-700" />
+                    </div>
+                    <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                      <div className="h-2 w-10 rounded-full bg-gray-700" />
+                      <div className="mt-3 h-2 w-3/4 rounded-full bg-gray-700" />
+                    </div>
+                    <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+                      <div className="h-2 w-14 rounded-full bg-violet-500" />
+                      <div className="mt-3 h-2 w-full rounded-full bg-gray-700" />
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -570,53 +320,33 @@ function LandingPage() {
         </div>
       </section>
 
-      <Hairline />
-
       {/* Impacto (cifras honestas, sin inventar ROI) */}
-      <section>
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-y-12 px-6 py-24 text-center md:grid-cols-4">
+      <section className="border-b border-gray-800">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-20 text-center md:grid-cols-4">
           {[
             { v: "60+", l: "soluciones" },
             { v: "8", l: "áreas de negocio" },
             { v: "24 hs", l: "para el acceso" },
             { v: "100%", l: "en español" },
-          ].map((s, i) => (
-            <motion.div
-              key={s.l}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.08, ease: EASE }}
-              className={
-                i > 0 ? "md:border-l md:border-[rgba(201,168,76,0.10)]" : ""
-              }
-            >
-              <div
-                className="text-5xl font-semibold sm:text-6xl"
-                style={{
-                  fontFamily: '"Playfair Display", serif',
-                  color: GOLD,
-                  letterSpacing: "-0.02em",
-                }}
-              >
+          ].map((s) => (
+            <div key={s.l}>
+              <div className="text-4xl font-semibold text-violet-400">
                 {s.v}
               </div>
-              <div className="mt-3 text-sm" style={{ color: "#A0AABF" }}>
-                {s.l}
-              </div>
-            </motion.div>
+              <div className="mt-2 text-sm text-gray-400">{s.l}</div>
+            </div>
           ))}
         </div>
       </section>
 
-      <Hairline />
-
       {/* Cómo funciona */}
-      <section id="como-funciona" className="scroll-mt-24" style={{ backgroundColor: "#0D111C" }}>
-        <div className="mx-auto max-w-6xl px-6 py-28">
-          <div className="mb-16 max-w-2xl">
-            <Eyebrow>Cómo funciona</Eyebrow>
-            <h2 className="mt-4 text-4xl tracking-tight sm:text-5xl">
+      <section id="como-funciona" className="border-b border-gray-800 bg-gray-950">
+        <div className="mx-auto max-w-6xl px-6 py-24">
+          <div className="mb-14 max-w-2xl">
+            <p className="text-sm font-medium uppercase tracking-widest text-violet-400">
+              Cómo funciona
+            </p>
+            <h2 className="mt-3 text-4xl font-semibold tracking-tight">
               De idea a implementación, en tres pasos.
             </h2>
           </div>
@@ -637,141 +367,108 @@ function LandingPage() {
                 t: "Implementá",
                 d: "Plan paso a paso, prompts, integraciones y assets listos para usar.",
               },
-            ].map((s, i) => (
-              <motion.div
+            ].map((s) => (
+              <div
                 key={s.n}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08, ease: EASE }}
-                className="group rounded-2xl p-8 transition-all duration-300"
-                style={{
-                  backgroundColor: "#111827",
-                  border: "1px solid rgba(201,168,76,0.12)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(201,168,76,0.32)";
-                  e.currentTarget.style.boxShadow =
-                    "0 8px 30px rgba(201,168,76,0.06)";
-                  e.currentTarget.style.transform = "translateY(-3px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(201,168,76,0.12)";
-                  e.currentTarget.style.boxShadow = "none";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
+                className="rounded-xl border border-gray-800 bg-gray-900 p-7"
               >
-                <div
-                  className="text-4xl font-semibold"
-                  style={{
-                    fontFamily: '"Playfair Display", serif',
-                    color: GOLD,
-                  }}
-                >
+                <div className="text-3xl font-semibold text-violet-400">
                   {s.n}
                 </div>
-                <h3 className="mt-5 text-lg font-semibold text-white">
+                <h3 className="mt-4 text-lg font-semibold text-white">
                   {s.t}
                 </h3>
-                <p
-                  className="mt-2.5 text-sm leading-relaxed"
-                  style={{ color: "#A0AABF" }}
-                >
+                <p className="mt-2 text-sm leading-relaxed text-gray-400">
                   {s.d}
                 </p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <Hairline />
-
       {/* Acceso */}
-      <section id="acceso" className="scroll-mt-24">
-        <div className="mx-auto max-w-3xl px-6 py-28 text-center">
-          <Eyebrow>Acceso</Eyebrow>
-          <h2 className="mt-4 text-4xl tracking-tight sm:text-5xl">
+      <section id="acceso" className="border-b border-gray-800">
+        <div className="mx-auto max-w-3xl px-6 py-24 text-center">
+          <p className="text-sm font-medium uppercase tracking-widest text-violet-400">
+            Acceso
+          </p>
+          <h2 className="mt-3 text-4xl font-semibold tracking-tight">
             Acceso por invitación.
           </h2>
-          <p
-            className="mx-auto mt-5 max-w-xl text-lg leading-relaxed"
-            style={{ color: "#A0AABF" }}
-          >
+          <p className="mt-4 text-gray-400">
             Plataforma para empresas. Solicitá tu acceso y coordinamos el
             onboarding esta semana.
           </p>
-          <div className="mt-9 flex justify-center">
-            <PrimaryCTA size="lg">Solicitar acceso</PrimaryCTA>
-          </div>
+          <a
+            href={ACCESO_MAIL}
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-black transition hover:bg-gray-100"
+          >
+            Solicitar acceso <ArrowRight className="h-4 w-4" />
+          </a>
         </div>
       </section>
 
       {/* CTA final */}
       <section className="relative overflow-hidden">
         <div
-          className="pointer-events-none absolute bottom-[-220px] left-1/2 h-[360px] w-[680px] -translate-x-1/2 rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(201,168,76,0.14), transparent 70%)",
-            filter: "blur(50px)",
-          }}
+          className="pointer-events-none absolute bottom-[-180px] left-1/2 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-violet-500/15 blur-[120px]"
           aria-hidden
         />
-        <div className="mx-auto max-w-3xl px-6 py-28 text-center">
-          <h2 className="text-4xl tracking-tight sm:text-5xl">
+        <div className="mx-auto max-w-3xl px-6 py-24 text-center">
+          <h2 className="text-4xl font-semibold tracking-tight">
             ¿Listo para implementar IA en tu empresa?
           </h2>
-          <p
-            className="mx-auto mt-5 max-w-xl text-lg leading-relaxed"
-            style={{ color: "#A0AABF" }}
-          >
+          <p className="mt-4 text-gray-400">
             Plataforma por invitación. Solicitá tu acceso y empezamos esta
             semana.
           </p>
-          <div className="mt-9 flex justify-center">
-            <PrimaryCTA size="lg">Solicitar acceso</PrimaryCTA>
-          </div>
-          <p className="mt-6 text-xs" style={{ color: "#6B7A99" }}>
+          <a
+            href={ACCESO_MAIL}
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-black transition hover:bg-gray-100"
+          >
+            Solicitar acceso <ArrowRight className="h-4 w-4" />
+          </a>
+          <p className="mt-4 text-xs text-gray-500">
             Sin tarjeta de crédito · Acceso en 24 hs · Cancelá cuando quieras
           </p>
         </div>
       </section>
 
-      <footer style={{ borderTop: "1px solid rgba(201,168,76,0.10)" }}>
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-4">
+      <footer className="border-t border-gray-800">
+        <div className="mx-auto grid max-w-6xl gap-8 px-6 py-12 sm:grid-cols-4">
           <div>
             <Logo className="text-white" />
-            <p className="mt-4 text-sm" style={{ color: "#6B7A99" }}>
+            <p className="mt-3 text-sm text-gray-500">
               Hecho para empresas que crecen.
             </p>
           </div>
           <div>
             <div className="text-sm font-semibold text-white">Plataforma</div>
-            <div className="mt-4 space-y-2.5 text-sm" style={{ color: "#6B7A99" }}>
-              <a href="#soluciones" className="block transition-colors hover:text-white">
+            <div className="mt-3 space-y-2 text-sm text-gray-500">
+              <a href="#soluciones" className="block transition hover:text-gray-300">
                 Soluciones
               </a>
               <a
                 href="#como-funciona"
-                className="block transition-colors hover:text-white"
+                className="block transition hover:text-gray-300"
               >
                 Cómo funciona
               </a>
-              <a href="#acceso" className="block transition-colors hover:text-white">
+              <a href="#acceso" className="block transition hover:text-gray-300">
                 Acceso
               </a>
             </div>
           </div>
           <div>
             <div className="text-sm font-semibold text-white">Cuenta</div>
-            <div className="mt-4 space-y-2.5 text-sm" style={{ color: "#6B7A99" }}>
-              <Link to="/login" className="block transition-colors hover:text-white">
+            <div className="mt-3 space-y-2 text-sm text-gray-500">
+              <Link to="/login" className="block transition hover:text-gray-300">
                 Ingresar
               </Link>
               <a
                 href={ACCESO_MAIL}
-                className="block transition-colors hover:text-white"
+                className="block transition hover:text-gray-300"
               >
                 Solicitar acceso
               </a>
@@ -779,20 +476,17 @@ function LandingPage() {
           </div>
           <div>
             <div className="text-sm font-semibold text-white">Contacto</div>
-            <div className="mt-4 space-y-2.5 text-sm" style={{ color: "#6B7A99" }}>
+            <div className="mt-3 space-y-2 text-sm text-gray-500">
               <a
                 href="mailto:hola@implementa.ai"
-                className="block transition-colors hover:text-white"
+                className="block transition hover:text-gray-300"
               >
                 hola@implementa.ai
               </a>
             </div>
           </div>
         </div>
-        <div
-          className="mx-auto max-w-6xl px-6 pb-10 text-xs"
-          style={{ color: "#5A6478" }}
-        >
+        <div className="mx-auto max-w-6xl px-6 pb-10 text-xs text-gray-600">
           © {new Date().getFullYear()} Implementa AI · Hecho para empresas que
           crecen.
         </div>
