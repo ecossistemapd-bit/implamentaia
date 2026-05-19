@@ -201,7 +201,7 @@ function MiProgreso() {
         </div>
       )}
 
-      {!isLoading && (<>
+
 
 
       {/* Soluciones en progreso */}
