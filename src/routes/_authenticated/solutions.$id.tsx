@@ -1165,7 +1165,7 @@ function StepComentarios({
               <Button
                 onClick={submit}
                 disabled={submitting}
-                className="mt-4 h-11 w-full rounded-lg bg-primary text-foreground hover:bg-primary"
+                className="mt-4 h-11 w-full rounded-lg bg-primary text-primary-foreground transition-all duration-200 hover:opacity-90"
               >
                 {submitting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
                 Enviar evaluación
