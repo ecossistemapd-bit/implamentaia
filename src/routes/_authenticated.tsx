@@ -19,6 +19,8 @@ import {
   ChevronRight,
   TrendingUp,
   HeartHandshake,
+  Wand2,
+  Compass,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -50,7 +52,9 @@ type RoutePath =
   | "/mi-progreso"
   | "/implementador"
   | "/projects"
+  | "/builder"
   | "/contratar-experto"
+  | "/mentoria"
   | "/settings"
   | "/admin";
 
@@ -84,7 +88,9 @@ const SECTIONS: NavSection[] = [
     label: "Herramientas",
     items: [
       { to: "/projects", label: "Mis Proyectos", icon: FolderKanban },
+      { to: "/builder", label: "Builder", icon: Wand2, badge: "NUEVO" },
       { to: "/contratar-experto", label: "Contratar Experto", icon: HeartHandshake },
+      { to: "/mentoria", label: "Mentoría", icon: Compass, badge: "PRÓXIMAMENTE" },
       { to: "/implementador", label: "Panel Impl.", icon: LayoutDashboard, implOnly: true },
       { to: "/admin", label: "Admin", icon: Settings2, adminOnly: true },
     ],
