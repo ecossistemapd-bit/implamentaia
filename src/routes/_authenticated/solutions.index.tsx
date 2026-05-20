@@ -311,13 +311,65 @@ function SolutionsList() {
                 </p>
               </div>
             ) : viewMode === "grid" ? (
-              <div className="mt-8">
-                <div className="mb-4 text-xs uppercase tracking-wider text-muted-foreground">
-                  {filtered.length} solución{filtered.length === 1 ? "" : "es"}
-                </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {filtered.map((s) => renderCard(s))}
-                </div>
+              <div className="mt-8 space-y-12">
+                {/* Más Implementadas — siempre arriba si no hay filtros activos */}
+                {showFeatured && (
+                  <section>
+                    <div className="mb-4 flex items-center gap-2">
+                      <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground">
+                        Más Implementadas
+                      </h2>
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                        {featured.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {featured.map((s) => renderCard(s))}
+                    </div>
+                    <div className="mt-12 h-px w-full bg-border" />
+                  </section>
+                )}
+                {/* Cada categoría con header + grid de 3 cols */}
+                {groupedByCat.map(({ cat: c, items }) => {
+                  const CIcon = c.icon;
+                  return (
+                    <section key={c.key}>
+                      <div className="mb-4 flex items-center gap-3">
+                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-border bg-secondary">
+                          <CIcon
+                            className="h-4 w-4 text-muted-foreground"
+                            strokeWidth={1.5}
+                          />
+                        </div>
+                        <h2 className="text-lg font-semibold text-foreground">
+                          {c.label}
+                        </h2>
+                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                          {items.length}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {items.map((s) => renderCard(s))}
+                      </div>
+                    </section>
+                  );
+                })}
+                {/* Otras (categorías huérfanas) */}
+                {otherItems.length > 0 && (
+                  <section>
+                    <div className="mb-4 flex items-center gap-3">
+                      <h2 className="text-lg font-semibold text-foreground">
+                        Otras
+                      </h2>
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                        {otherItems.length}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {otherItems.map((s) => renderCard(s))}
+                    </div>
+                  </section>
+                )}
               </div>
             ) : (
               <div className="mt-8 space-y-12">
