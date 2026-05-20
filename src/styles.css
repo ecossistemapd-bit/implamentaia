@@ -286,37 +286,49 @@
 }
 
 /* ============================================================
-   Card orb alive — animación universal para los 93 covers de
-   /solutions. Sutil por default (breathing + brightness pulse),
-   se acelera en hover. Cero JS, todo GPU-accelerated.
+   Card orb alive — animación universal para todas las covers de
+   /solutions (catálogo) + el hero del detalle. 3 capas:
+     · breathing scale (visible: 1.0 → 1.10)
+     · brightness/saturation pulse
+     · slow rotation (360° en 30s)
+   Hover acelera todo + spin 10s. Cero JS, todo GPU-accelerated.
    ============================================================ */
 .card-orb-alive {
-  --orb-breathe-dur: 6s;
-  --orb-glow-dur: 5s;
+  --orb-breathe-dur: 5s;
+  --orb-glow-dur: 4s;
+  --orb-spin-dur: 30s;
   scale: 1;
+  rotate: 0deg;
   animation:
     card-orb-breathe var(--orb-breathe-dur) ease-in-out infinite,
-    card-orb-glow-img var(--orb-glow-dur) ease-in-out infinite;
+    card-orb-glow-img var(--orb-glow-dur) ease-in-out infinite,
+    card-orb-spin var(--orb-spin-dur) linear infinite;
 }
-/* Al hover del card, se aceleran las duraciones a la mitad. */
+/* Al hover del card, todo se acelera notablemente. */
 .premium-card:hover .card-orb-alive {
-  --orb-breathe-dur: 3s;
-  --orb-glow-dur: 2.5s;
-  will-change: scale, filter;
+  --orb-breathe-dur: 2s;
+  --orb-glow-dur: 1.6s;
+  --orb-spin-dur: 10s;
+  will-change: scale, filter, rotate;
 }
 @keyframes card-orb-breathe {
   0%, 100% { scale: 1; }
-  50%      { scale: 1.06; }
+  50%      { scale: 1.10; }
 }
 @keyframes card-orb-glow-img {
   0%, 100% { filter: brightness(1) saturate(1); }
-  50%      { filter: brightness(1.14) saturate(1.20); }
+  50%      { filter: brightness(1.25) saturate(1.35); }
+}
+@keyframes card-orb-spin {
+  from { rotate: 0deg; }
+  to   { rotate: 360deg; }
 }
 /* Accesibilidad: usuarios con reduced-motion no ven movimiento. */
 @media (prefers-reduced-motion: reduce) {
   .card-orb-alive {
     animation: none !important;
     scale: 1 !important;
+    rotate: 0deg !important;
     filter: none !important;
   }
 }
