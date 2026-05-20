@@ -286,38 +286,42 @@
 }
 
 /* ============================================================
-   Card orb alive — animación universal para los 93 covers de
-   /solutions. Sutil por default (breathing + brightness pulse),
-   se acelera en hover. Cero JS, todo GPU-accelerated.
+   Card orb alive — el orb queda QUIETO por default.
+   Solo al hacer hover sobre el card aparece un movimiento sutil:
+   breathing scale + brightness pulse en loop. Sin rotación.
+   Cero JS, GPU-accelerated.
    ============================================================ */
 .card-orb-alive {
-  --orb-breathe-dur: 6s;
-  --orb-glow-dur: 5s;
+  /* Default: completamente estático. Solo declaro scale/filter para
+     que la transición de entrada al hover sea suave. */
   scale: 1;
-  animation:
-    card-orb-breathe var(--orb-breathe-dur) ease-in-out infinite,
-    card-orb-glow-img var(--orb-glow-dur) ease-in-out infinite;
+  filter: brightness(1) saturate(1);
+  transition: scale 400ms cubic-bezier(0.25, 0.1, 0.25, 1),
+              filter 400ms cubic-bezier(0.25, 0.1, 0.25, 1);
 }
-/* Al hover del card, se aceleran las duraciones a la mitad. */
+/* En hover del card, arranca un loop sutil. */
 .premium-card:hover .card-orb-alive {
-  --orb-breathe-dur: 3s;
-  --orb-glow-dur: 2.5s;
+  animation:
+    card-orb-hover-breathe 2.5s ease-in-out infinite,
+    card-orb-hover-glow 2s ease-in-out infinite;
   will-change: scale, filter;
 }
-@keyframes card-orb-breathe {
-  0%, 100% { scale: 1; }
+@keyframes card-orb-hover-breathe {
+  0%, 100% { scale: 1.02; }
   50%      { scale: 1.06; }
 }
-@keyframes card-orb-glow-img {
-  0%, 100% { filter: brightness(1) saturate(1); }
-  50%      { filter: brightness(1.14) saturate(1.20); }
+@keyframes card-orb-hover-glow {
+  0%, 100% { filter: brightness(1.06) saturate(1.10); }
+  50%      { filter: brightness(1.18) saturate(1.22); }
 }
 /* Accesibilidad: usuarios con reduced-motion no ven movimiento. */
 @media (prefers-reduced-motion: reduce) {
-  .card-orb-alive {
+  .card-orb-alive,
+  .premium-card:hover .card-orb-alive {
     animation: none !important;
     scale: 1 !important;
     filter: none !important;
+    transition: none !important;
   }
 }
 
