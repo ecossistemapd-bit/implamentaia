@@ -290,15 +290,15 @@ function SolutionByIdDetail() {
             )}
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
             {s.cover_image_url ? (
               <img
                 src={s.cover_image_url}
                 alt={s.title}
-                className="h-full max-h-[260px] w-full object-cover"
+                className="card-orb-alive h-full max-h-[260px] w-full object-cover"
               />
             ) : (
-              <div className="flex h-[220px] w-full items-center justify-center bg-gradient-to-br from-card to-background">
+              <div className="card-orb-alive flex h-[220px] w-full items-center justify-center bg-gradient-to-br from-card to-background">
                 <CategoryIcon className="h-20 w-20 text-muted-foreground" strokeWidth={1.2} />
               </div>
             )}
@@ -587,7 +587,7 @@ function CompleteButton({
 
 function StatCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow duration-200 hover:shadow-md">
       <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">{label}</div>
       <div className="mt-1 text-lg font-semibold text-foreground">{value}</div>
       {hint && <div className="mt-1.5 text-xs text-muted-foreground">{hint}</div>}
