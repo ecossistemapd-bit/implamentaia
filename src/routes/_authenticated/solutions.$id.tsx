@@ -290,7 +290,7 @@ function SolutionByIdDetail() {
             )}
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-md">
             {s.cover_image_url ? (
               <img
                 src={s.cover_image_url}
@@ -587,7 +587,7 @@ function CompleteButton({
 
 function StatCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="rounded-xl border border-border bg-card p-4 shadow-md transition-shadow duration-200 hover:shadow-lg">
       <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">{label}</div>
       <div className="mt-1 text-lg font-semibold text-foreground">{value}</div>
       {hint && <div className="mt-1.5 text-xs text-muted-foreground">{hint}</div>}
