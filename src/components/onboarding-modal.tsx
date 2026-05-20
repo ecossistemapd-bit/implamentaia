@@ -1,10 +1,8 @@
 import "./onboarding-modal.css";
 import {
   useEffect,
-  useRef,
   useState,
   type Dispatch,
-  type RefObject,
   type SetStateAction,
 } from "react";
 import { useNavigate } from "@tanstack/react-router";
@@ -13,27 +11,59 @@ import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES } from "@/lib/categories";
 
 // ============================================================
-// Implementa AI · Onboarding Premium
-// 4 pasos con orb planetario animado · theme-aware · Supabase.
-// El render solo se monta si profiles.onboarding_completed = false.
-// Animaciones declarativas en onboarding-modal.css, lógica acá.
+// Implementa AI · Onboarding v6 LUNA
+//
+// 5 pasos · voz B2B (audiencia: dueño/decisor de empresa)
+//   1. Bienvenida + perfil (nombre, empresa, rol)
+//   2. Catálogo de soluciones (counter real X/93)
+//   3. Herramientas para tu equipo (cursos)
+//   4. Builder (placeholder Próximamente)
+//   5. ¿Por dónde arrancás? (4 paths)
+//
+// Visual: orb estático "Luna" plateado sobre velvet negro.
+// Branded como Luna (la IA de la plataforma) con caption visible.
 // ============================================================
 
-type StepIndex = 1 | 2 | 3 | 4;
+type StepIndex = 1 | 2 | 3 | 4 | 5;
 type Status = "loading" | "active" | "closing" | "done";
 
 interface Stats {
-  available: number;
-  total: number;
+  solutionsAvailable: number;
+  solutionsTotal: number;
   categories: number;
+  cursos: number;
+  modules: number;
 }
 
 interface Counters {
-  available: number;
+  solutionsAvailable: number;
   categories: number;
+  cursos: number;
+  modules: number;
 }
 
-const FALLBACK_STATS: Stats = { available: 10, total: 93, categories: 8 };
+const FALLBACK_STATS: Stats = {
+  solutionsAvailable: 10,
+  solutionsTotal: 93,
+  categories: 8,
+  cursos: 12,
+  modules: 47,
+};
+
+const ROLE_OPTIONS = [
+  "CEO / Founder",
+  "CTO / Tech Lead",
+  "COO / Operaciones",
+  "CMO / Marketing",
+  "CFO / Finanzas",
+  "Director / Gerente",
+  "Product Manager",
+  "Desarrollador / Ingeniero",
+  "Marketing / Growth",
+  "Sales / Comercial",
+  "RRHH / People",
+  "Otro",
+];
 
 export function OnboardingModal() {
   const { user } = useAuth();
@@ -43,23 +73,25 @@ export function OnboardingModal() {
   const [prevStep, setPrevStep] = useState<StepIndex | null>(null);
   const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [role, setRole] = useState("");
   const [saving, setSaving] = useState(false);
   const [stats, setStats] = useState<Stats>(FALLBACK_STATS);
-  const [counters, setCounters] = useState<Counters>({ available: 0, categories: 0 });
+  const [counters, setCounters] = useState<Counters>({
+    solutionsAvailable: 0,
+    categories: 0,
+    cursos: 0,
+    modules: 0,
+  });
 
-  const visualPaneRef = useRef<HTMLDivElement>(null);
-  const orbWrapperRef = useRef<HTMLDivElement>(null);
-  const sparklesRef = useRef<HTMLDivElement>(null);
-
-  // Chequea si el user necesita onboarding + carga stats reales del catálogo
+  // Carga profile + stats (solutions, cursos)
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const [profileRes, totalRes, availRes] = await Promise.all([
+      const [profileRes, totalRes, availRes, coursesRes] = await Promise.all([
         supabase
           .from("profiles")
-          .select("onboarding_completed, full_name, company_name")
+          .select("onboarding_completed, full_name, company_name, role")
           .eq("id", user.id)
           .maybeSingle(),
         supabase.from("solutions").select("id", { count: "exact", head: true }),
@@ -67,16 +99,31 @@ export function OnboardingModal() {
           .from("solutions")
           .select("id", { count: "exact", head: true })
           .neq("status", "en_desarrollo"),
+        (supabase as never as typeof supabase)
+          .from("courses" as never)
+          .select("id", { count: "exact", head: true }),
       ]);
       if (cancelled) return;
       setStats({
-        total: totalRes.count ?? FALLBACK_STATS.total,
-        available: availRes.count ?? FALLBACK_STATS.available,
+        solutionsTotal: totalRes.count ?? FALLBACK_STATS.solutionsTotal,
+        solutionsAvailable: availRes.count ?? FALLBACK_STATS.solutionsAvailable,
         categories: CATEGORIES.length,
+        cursos:
+          (coursesRes as { count?: number | null }).count ??
+          FALLBACK_STATS.cursos,
+        modules: FALLBACK_STATS.modules,
       });
-      const profile = profileRes.data;
+      const profile = profileRes.data as
+        | {
+            onboarding_completed: boolean | null;
+            full_name: string | null;
+            company_name: string | null;
+            role: string | null;
+          }
+        | null;
       if (profile?.full_name) setFullName(profile.full_name);
       if (profile?.company_name) setCompanyName(profile.company_name);
+      if (profile?.role) setRole(profile.role);
       if (!profile || profile.onboarding_completed) {
         setStatus("done");
       } else {
@@ -88,84 +135,45 @@ export function OnboardingModal() {
     };
   }, [user]);
 
-  // Counter animation cuando entra al paso 2
+  // Counters: cuando entrás al paso 2 o 3, los números cuentan desde 0
   useEffect(() => {
-    if (status !== "active" || step !== 2) return;
+    if (status !== "active") return;
+    if (step !== 2 && step !== 3) return;
+
     const startTime = performance.now();
     const duration = 1400;
     let raf = 0;
+
+    // Reset al entrar
+    setCounters((c) => ({
+      ...c,
+      ...(step === 2
+        ? { solutionsAvailable: 0, categories: 0 }
+        : { cursos: 0, modules: 0 }),
+    }));
+
     const tick = (now: number) => {
       const t = Math.min(1, (now - startTime) / duration);
-      const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
-      setCounters({
-        available: Math.round(eased * stats.available),
-        categories: Math.round(eased * stats.categories),
-      });
+      const eased = 1 - Math.pow(1 - t, 3);
+      setCounters((c) => ({
+        ...c,
+        ...(step === 2
+          ? {
+              solutionsAvailable: Math.round(eased * stats.solutionsAvailable),
+              categories: Math.round(eased * stats.categories),
+            }
+          : {
+              cursos: Math.round(eased * stats.cursos),
+              modules: Math.round(eased * stats.modules),
+            }),
+      }));
       if (t < 1) raf = requestAnimationFrame(tick);
     };
-    setCounters({ available: 0, categories: 0 });
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [status, step, stats]);
 
-  // Mouse parallax sobre el orb (max 10px de drift en x/y)
-  useEffect(() => {
-    if (status !== "active") return;
-    const pane = visualPaneRef.current;
-    const wrapper = orbWrapperRef.current;
-    if (!pane || !wrapper) return;
-    const onMove = (e: MouseEvent) => {
-      const rect = pane.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-      const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-      wrapper.style.transform = `translate(${x * 10}px, ${y * 10}px)`;
-    };
-    const onLeave = () => {
-      wrapper.style.transform = "";
-    };
-    pane.addEventListener("mousemove", onMove);
-    pane.addEventListener("mouseleave", onLeave);
-    return () => {
-      pane.removeEventListener("mousemove", onMove);
-      pane.removeEventListener("mouseleave", onLeave);
-    };
-  }, [status]);
-
-  // Spawneador de sparkles random alrededor del orb
-  useEffect(() => {
-    if (status !== "active") return;
-    const container = sparklesRef.current;
-    if (!container) return;
-    let alive = true;
-    const spawn = () => {
-      if (!alive || !container) return;
-      const sparkle = document.createElement("div");
-      sparkle.className = "iai-onb-sparkle";
-      const angle = Math.random() * Math.PI * 2;
-      const radius = 110 + Math.random() * 90;
-      const x = 50 + (Math.cos(angle) * radius) / 4;
-      const y = 50 + (Math.sin(angle) * radius) / 4;
-      sparkle.style.left = `${x}%`;
-      sparkle.style.top = `${y}%`;
-      const size = 2 + Math.random() * 4;
-      sparkle.style.width = `${size}px`;
-      sparkle.style.height = `${size}px`;
-      sparkle.style.animationDuration = `${1.4 + Math.random() * 1.6}s`;
-      container.appendChild(sparkle);
-      window.setTimeout(() => sparkle.remove(), 2200);
-    };
-    const interval = window.setInterval(() => {
-      const burst = 1 + Math.floor(Math.random() * 3);
-      for (let i = 0; i < burst; i++) window.setTimeout(spawn, i * 80);
-    }, 700);
-    for (let i = 0; i < 5; i++) window.setTimeout(spawn, i * 200);
-    return () => {
-      alive = false;
-      window.clearInterval(interval);
-    };
-  }, [status]);
-
-  // ESC para skip rápido
+  // ESC para skip
   useEffect(() => {
     if (status !== "active") return;
     const onKey = (e: KeyboardEvent) => {
@@ -184,11 +192,15 @@ export function OnboardingModal() {
       setSaving(true);
       await supabase
         .from("profiles")
-        .update({ full_name: fullName.trim(), company_name: companyName.trim() })
+        .update({
+          full_name: fullName.trim(),
+          company_name: companyName.trim(),
+          role: role || null,
+        })
         .eq("id", user.id);
       setSaving(false);
       transitionTo(2);
-    } else if (step < 4) {
+    } else if (step < 5) {
       transitionTo((step + 1) as StepIndex);
     } else {
       finish("/solutions");
@@ -218,7 +230,12 @@ export function OnboardingModal() {
   };
 
   const skip = () => {
-    if (!window.confirm("¿Querés saltar el tour? Podés volver a verlo desde Configuración.")) return;
+    if (
+      !window.confirm(
+        "¿Querés saltar el tour? Podés volver a verlo desde Configuración.",
+      )
+    )
+      return;
     finish();
   };
 
@@ -230,18 +247,27 @@ export function OnboardingModal() {
     return "iai-onb-step";
   };
 
-  const isLast = step === 4;
-  const canAdvanceStep1 = fullName.trim().length > 0 && companyName.trim().length > 0;
+  const isLast = step === 5;
+  const canAdvanceStep1 =
+    fullName.trim().length > 0 && companyName.trim().length > 0;
 
   return (
     <>
       <div className="iai-onb-backdrop" aria-hidden="true" />
-      <div className="iai-onb-container" role="dialog" aria-modal="true" aria-labelledby="iai-onb-title">
-        <div className={`iai-onb-modal ${status === "closing" ? "iai-onb-modal--exit" : ""}`}>
+      <div
+        className="iai-onb-container"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="iai-onb-title"
+      >
+        <div
+          className={`iai-onb-modal ${status === "closing" ? "iai-onb-modal--exit" : ""}`}
+        >
           <div className="iai-onb-grid">
-            {/* === VISUAL PANE === */}
-            <div className="iai-onb-visual" ref={visualPaneRef}>
-              <OrbVisual orbWrapperRef={orbWrapperRef} sparklesRef={sparklesRef} />
+            {/* === VISUAL PANE: Luna === */}
+            <div className="iai-onb-visual">
+              <LunaOrb />
+              <LunaCaption />
             </div>
 
             {/* === CONTENT PANE === */}
@@ -253,19 +279,24 @@ export function OnboardingModal() {
                     setFullName={setFullName}
                     companyName={companyName}
                     setCompanyName={setCompanyName}
+                    role={role}
+                    setRole={setRole}
                   />
                 </div>
                 <div className={stepClass(2)}>
-                  <StepCatalog stats={stats} counters={counters} />
+                  <StepSoluciones stats={stats} counters={counters} />
                 </div>
                 <div className={stepClass(3)}>
-                  <StepJourney />
+                  <StepCursos stats={stats} counters={counters} />
                 </div>
                 <div className={stepClass(4)}>
+                  <StepBuilder />
+                </div>
+                <div className={stepClass(5)}>
                   <StepPaths
                     onPath={(p) => finish(p)}
-                    availableCount={stats.available}
-                    totalCount={stats.total}
+                    availableCount={stats.solutionsAvailable}
+                    totalCount={stats.solutionsTotal}
                   />
                 </div>
               </div>
@@ -277,12 +308,20 @@ export function OnboardingModal() {
             <ProgressDots step={step} />
             <div className="iai-onb-actions">
               {!isLast && (
-                <button onClick={skip} className="iai-onb-btn iai-onb-btn--ghost" type="button">
+                <button
+                  onClick={skip}
+                  className="iai-onb-btn iai-onb-btn--ghost"
+                  type="button"
+                >
                   Saltar tour
                 </button>
               )}
               {step > 1 && (
-                <button onClick={goBack} className="iai-onb-btn iai-onb-btn--secondary" type="button">
+                <button
+                  onClick={goBack}
+                  className="iai-onb-btn iai-onb-btn--secondary"
+                  type="button"
+                >
                   ← Atrás
                 </button>
               )}
@@ -292,7 +331,7 @@ export function OnboardingModal() {
                 className="iai-onb-btn iai-onb-btn--primary"
                 type="button"
               >
-                {saving ? "Guardando…" : isLast ? "Comenzar mi journey →" : "Continuar →"}
+                {saving ? "Guardando…" : isLast ? "Comenzar →" : "Continuar →"}
               </button>
             </div>
           </div>
@@ -303,73 +342,57 @@ export function OnboardingModal() {
 }
 
 // ============================================================
-// SUB-COMPONENTS
+// LUNA · orb estático plateado premium
 // ============================================================
-
-function OrbVisual({
-  orbWrapperRef,
-  sparklesRef,
-}: {
-  orbWrapperRef: RefObject<HTMLDivElement | null>;
-  sparklesRef: RefObject<HTMLDivElement | null>;
-}) {
+function LunaOrb() {
   return (
-    <div className="iai-onb-orb-wrap" ref={orbWrapperRef}>
-      {/* Sonar pulse waves */}
-      <div className="iai-onb-pulse" />
-      <div className="iai-onb-pulse" />
-      <div className="iai-onb-pulse" />
-
-      {/* Orbits with orbiting lights */}
-      <div className="iai-onb-orbit iai-onb-orbit-3">
-        <div className="iai-onb-light iai-onb-light--small" />
-        <div className="iai-onb-light iai-onb-light--small iai-onb-light--br" />
-      </div>
-      <div className="iai-onb-orbit iai-onb-orbit-2">
-        <div className="iai-onb-light" />
-        <div className="iai-onb-light iai-onb-light--bottom" />
-      </div>
-      <div className="iai-onb-orbit iai-onb-orbit-1">
-        <div className="iai-onb-light" />
-        <div className="iai-onb-light iai-onb-light--right" />
-        <div className="iai-onb-light iai-onb-light--tl" />
-      </div>
-
-      {/* Orb with internal layers */}
+    <div className="iai-onb-orb-static">
       <div className="iai-onb-orb">
-        <div className="iai-onb-aurora" />
-        <div className="iai-onb-surface" />
-        <div className="iai-onb-clouds" />
-        <div className="iai-onb-mesh" />
-        <div className="iai-onb-shine" />
-        <div className="iai-onb-flare" />
+        <div className="iai-onb-orb-craters" />
+        <div className="iai-onb-orb-shine-1" />
+        <div className="iai-onb-orb-shine-2" />
       </div>
-
-      {/* Sparkles container — JS inyecta sparkles efímeros acá */}
-      <div className="iai-onb-sparkles" ref={sparklesRef} />
     </div>
   );
 }
+
+function LunaCaption() {
+  return (
+    <div className="iai-onb-caption">
+      <div className="iai-onb-caption-label">Tu IA</div>
+      <div className="iai-onb-caption-name">LUNA</div>
+      <div className="iai-onb-caption-tag">Implementa AI</div>
+    </div>
+  );
+}
+
+// ============================================================
+// STEP COMPONENTS
+// ============================================================
 
 function StepWelcome({
   fullName,
   setFullName,
   companyName,
   setCompanyName,
+  role,
+  setRole,
 }: {
   fullName: string;
   setFullName: Dispatch<SetStateAction<string>>;
   companyName: string;
   setCompanyName: Dispatch<SetStateAction<string>>;
+  role: string;
+  setRole: Dispatch<SetStateAction<string>>;
 }) {
   return (
     <>
-      <div className="iai-onb-label">Bienvenida · Paso 1 de 4</div>
+      <div className="iai-onb-label">Bienvenida · Paso 1 de 5</div>
       <h1 id="iai-onb-title" className="iai-onb-title">
         Bienvenido a Implementa AI
       </h1>
       <p className="iai-onb-sub">
-        El marketplace de soluciones de IA reales para tu empresa. Te ayudamos a implementar, no solo a probar.
+        La plataforma de IA para empresas que quieren resultados, no demos.
       </p>
       <div className="iai-onb-field">
         <label htmlFor="iai-onb-name">Tu nombre completo</label>
@@ -393,23 +416,46 @@ function StepWelcome({
           autoComplete="organization"
         />
       </div>
+      <div className="iai-onb-field">
+        <label htmlFor="iai-onb-role">Tu rol en la empresa</label>
+        <select
+          id="iai-onb-role"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <option value="">Seleccioná…</option>
+          {ROLE_OPTIONS.map((r) => (
+            <option key={r} value={r}>
+              {r}
+            </option>
+          ))}
+        </select>
+      </div>
     </>
   );
 }
 
-function StepCatalog({ stats, counters }: { stats: Stats; counters: Counters }) {
+function StepSoluciones({
+  stats,
+  counters,
+}: {
+  stats: Stats;
+  counters: Counters;
+}) {
   return (
     <>
-      <div className="iai-onb-label">Catálogo · Paso 2 de 4</div>
-      <h1 className="iai-onb-title">+{stats.total - 3} soluciones reales, no demos</h1>
+      <div className="iai-onb-label">Catálogo · Paso 2 de 5</div>
+      <h1 className="iai-onb-title">
+        +{stats.solutionsTotal - 3} soluciones de IA listas para activar en tu empresa
+      </h1>
       <p className="iai-onb-sub">
-        Construidas y probadas en empresas reales. Disponibles ahora, el resto van llegando.
+        Cada una probada en empresas reales. Activación en minutos, no meses.
       </p>
       <div className="iai-onb-stats">
         <div className="iai-onb-stat">
           <div className="iai-onb-stat-num">
-            {counters.available}
-            <span className="iai-onb-stat-total">/{stats.total}</span>
+            {counters.solutionsAvailable}
+            <span className="iai-onb-stat-total">/{stats.solutionsTotal}</span>
           </div>
           <div className="iai-onb-stat-label">Disponibles ahora</div>
         </div>
@@ -439,39 +485,84 @@ function StepCatalog({ stats, counters }: { stats: Stats; counters: Counters }) 
   );
 }
 
-function StepJourney() {
+function StepCursos({
+  stats,
+  counters,
+}: {
+  stats: Stats;
+  counters: Counters;
+}) {
   return (
     <>
-      <div className="iai-onb-label">Implementación · Paso 3 de 4</div>
-      <h1 className="iai-onb-title">Tu camino paso a paso</h1>
+      <div className="iai-onb-label">Herramientas para tu equipo · Paso 3 de 5</div>
+      <h1 className="iai-onb-title">Que tu equipo no dependa de externos</h1>
       <p className="iai-onb-sub">
-        Cada solución te guía desde las herramientas hasta tener algo funcionando, sin perderte en la teoría.
+        Cursos prácticos sobre las herramientas que tu equipo va a usar para
+        implementar y mantener las soluciones.
       </p>
-      <div className="iai-onb-journey">
-        <div className="iai-onb-jstep iai-onb-jstep--done">
-          <div className="iai-onb-jicon">🔧</div>
-          <div className="iai-onb-jlabel">Herramientas</div>
+      <div className="iai-onb-stats">
+        <div className="iai-onb-stat">
+          <div className="iai-onb-stat-num">{counters.cursos}</div>
+          <div className="iai-onb-stat-label">Cursos</div>
         </div>
-        <div className="iai-onb-jstep iai-onb-jstep--active">
-          <div className="iai-onb-jicon">📁</div>
-          <div className="iai-onb-jlabel">Archivos</div>
-        </div>
-        <div className="iai-onb-jstep">
-          <div className="iai-onb-jicon">▶</div>
-          <div className="iai-onb-jlabel">Video</div>
-        </div>
-        <div className="iai-onb-jstep">
-          <div className="iai-onb-jicon">💬</div>
-          <div className="iai-onb-jlabel">Comentarios</div>
-        </div>
-        <div className="iai-onb-jstep">
-          <div className="iai-onb-jicon">🏆</div>
-          <div className="iai-onb-jlabel">Conclusión</div>
+        <div className="iai-onb-stat">
+          <div className="iai-onb-stat-num">{counters.modules}</div>
+          <div className="iai-onb-stat-label">Módulos</div>
         </div>
       </div>
-      <p className="iai-onb-sub" style={{ fontSize: "13px" }}>
-        La plataforma guarda tu progreso y te lleva donde lo dejaste, hasta en otro dispositivo.
+      <div className="iai-onb-mini-cards">
+        <div className="iai-onb-mini">
+          <div className="iai-onb-mini-orb iai-onb-mini-orb--lovable" />
+          <div className="iai-onb-mini-cat">Formación</div>
+          <div className="iai-onb-mini-title">Lovable</div>
+        </div>
+        <div className="iai-onb-mini">
+          <div className="iai-onb-mini-orb iai-onb-mini-orb--claude" />
+          <div className="iai-onb-mini-cat">Formación</div>
+          <div className="iai-onb-mini-title">Claude</div>
+        </div>
+        <div className="iai-onb-mini">
+          <div className="iai-onb-mini-orb iai-onb-mini-orb--n8n" />
+          <div className="iai-onb-mini-cat">Formación</div>
+          <div className="iai-onb-mini-title">n8n</div>
+        </div>
+      </div>
+      <p className="iai-onb-sub-sm">Acceso compartido para todo tu equipo.</p>
+    </>
+  );
+}
+
+function StepBuilder() {
+  return (
+    <>
+      <div className="iai-onb-label">Construcción a medida · Paso 4 de 5</div>
+      <h1 className="iai-onb-title">
+        Cuando ninguna solución encaja, tu equipo la construye
+      </h1>
+      <p className="iai-onb-sub">
+        El Builder reemplaza la necesidad de contratar agencias externas. Tu
+        equipo arma soluciones a medida sin código.
       </p>
+      <div className="iai-onb-builder-mock">
+        <div className="iai-onb-bline iai-onb-bline-1" />
+        <div className="iai-onb-bline iai-onb-bline-2" />
+        <div className="iai-onb-bline iai-onb-bline-3" />
+        <div className="iai-onb-bnode iai-onb-bnode-1">Input</div>
+        <div className="iai-onb-bnode iai-onb-bnode-2">IA</div>
+        <div className="iai-onb-bnode iai-onb-bnode-3">Output</div>
+        <div className="iai-onb-bnode iai-onb-bnode-4">CRM</div>
+        <div className="iai-onb-bnode iai-onb-bnode-5">WhatsApp</div>
+        <div className="iai-onb-bdot" />
+        <div className="iai-onb-bdot iai-onb-bdot--2" />
+      </div>
+      <div className="iai-onb-brow">
+        <span className="iai-onb-bbadge">Próximamente</span>
+        <div className="iai-onb-bfeatures">
+          <span>Sin código</span>
+          <span>Visual</span>
+          <span>Reemplaza agencias</span>
+        </div>
+      </div>
     </>
   );
 }
@@ -487,42 +578,75 @@ function StepPaths({
 }) {
   return (
     <>
-      <div className="iai-onb-label">Empezá ahora · Paso 4 de 4</div>
+      <div className="iai-onb-label">Empezá ahora · Paso 5 de 5</div>
       <h1 className="iai-onb-title">¿Por dónde arrancás?</h1>
       <p className="iai-onb-sub">
-        Elegí cómo querés explorar la plataforma. Podés cambiar de camino cuando quieras.
+        Elegí tu primera acción. Podés cambiar el camino cuando quieras.
       </p>
       <div className="iai-onb-paths">
-        <button type="button" className="iai-onb-path" onClick={() => onPath("/solutions")}>
+        <button
+          type="button"
+          className="iai-onb-path"
+          onClick={() => onPath("/solutions")}
+        >
           <div className="iai-onb-pico">⭐</div>
           <div className="iai-onb-pt">
-            <div className="iai-onb-pt-title">Ver las Más Implementadas</div>
+            <div className="iai-onb-pt-title">Activar mi primera solución</div>
             <div className="iai-onb-pt-sub">
-              {availableCount} soluciones ya disponibles que más empresas pusieron en producción
+              Las {availableCount} más implementadas, ROI rápido
             </div>
           </div>
           <div className="iai-onb-parrow">→</div>
         </button>
-        <button type="button" className="iai-onb-path" onClick={() => onPath("/solutions")}>
+        <button
+          type="button"
+          className="iai-onb-path"
+          onClick={() => onPath("/solutions")}
+        >
           <div className="iai-onb-pico">📂</div>
           <div className="iai-onb-pt">
-            <div className="iai-onb-pt-title">Explorar las {totalCount} por categoría</div>
-            <div className="iai-onb-pt-sub">Ventas, Marketing, RRHH, Finanzas, Operaciones, Atención…</div>
+            <div className="iai-onb-pt-title">
+              Explorar las {totalCount} por categoría
+            </div>
+            <div className="iai-onb-pt-sub">
+              Ventas, Marketing, RRHH, Finanzas, Operaciones, Atención…
+            </div>
           </div>
           <div className="iai-onb-parrow">→</div>
         </button>
-        <button type="button" className="iai-onb-path" onClick={() => onPath("/cursos")}>
+        <button
+          type="button"
+          className="iai-onb-path"
+          onClick={() => onPath("/cursos")}
+        >
           <div className="iai-onb-pico">🎓</div>
           <div className="iai-onb-pt">
-            <div className="iai-onb-pt-title">Aprender primero con cursos</div>
-            <div className="iai-onb-pt-sub">Lovable, Claude, n8n — bases antes de implementar</div>
+            <div className="iai-onb-pt-title">Ver los cursos para mi equipo</div>
+            <div className="iai-onb-pt-sub">
+              Lovable, Claude, n8n y más — acceso compartido
+            </div>
+          </div>
+          <div className="iai-onb-parrow">→</div>
+        </button>
+        <button
+          type="button"
+          className="iai-onb-path"
+          onClick={() => onPath("/solutions")}
+          aria-disabled="true"
+        >
+          <div className="iai-onb-pico">🛠️</div>
+          <div className="iai-onb-pt">
+            <div className="iai-onb-pt-title">
+              Abrir el Builder
+              <span className="iai-onb-pt-badge">Próximamente</span>
+            </div>
+            <div className="iai-onb-pt-sub">
+              Para soluciones a medida sin código
+            </div>
           </div>
           <div className="iai-onb-parrow">→</div>
         </button>
       </div>
-      <p className="iai-onb-disclaimer">
-        {availableCount} disponibles ahora · {totalCount - availableCount} llegando · cero downtime al activarse.
-      </p>
     </>
   );
 }
@@ -530,7 +654,7 @@ function StepPaths({
 function ProgressDots({ step }: { step: StepIndex }) {
   return (
     <div className="iai-onb-dots">
-      {[1, 2, 3, 4].map((n) => (
+      {[1, 2, 3, 4, 5].map((n) => (
         <div
           key={n}
           className={`iai-onb-dot ${n === step ? "iai-onb-dot--active" : ""}`}
