@@ -24,21 +24,39 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
 
 // ============================================================
-// Implementa AI · Builder (Fase 1: UX + mock generation)
+// Implementa AI · Builder (Fase 2a: AI generation real)
 //
 // Flow:
 //   1. landing    → Hero + textarea + 3 cards de inspiración
 //   2. analyzing  → Loading "Analizando tu idea" (mock 2.5s)
 //   3. wizard     → 5 preguntas obligatorias + opcional 5 premium
 //   4. confirm    → "¿Listo para generar?" — Generar / Responder más
-//   5. generating → Loading "Diseñando tu solución" (mock 2.5s)
-//   6. result     → Mock blueprint con 8 secciones (placeholder hasta AI)
+//   5. generating → Llama a la edge function builder-generate (Anthropic)
+//   6. result     → Blueprint REAL: título + descripción + tags + 8 secciones
 //
-// Cuando integremos AI (Fase 2 con Anthropic key) reemplazamos los
-// mocks de loading + result por llamadas reales. La UX queda igual.
+// El blueprint lo genera Claude (Opus 4.7) vía la edge function
+// builder-generate, que lee ANTHROPIC_API_KEY de los secrets.
 // ============================================================
+
+// Blueprint generado por la edge function builder-generate
+interface Blueprint {
+  titulo: string;
+  descripcion: string;
+  tags: string[];
+  secciones: {
+    base_conocimientos: string;
+    estructura: string;
+    arquitectura: string;
+    herramientas: string;
+    plan_accion: string;
+    rapido_adorable: string;
+    contenido: string;
+    economia: string;
+  };
+}
 
 export const Route = createFileRoute("/_authenticated/builder/")({
   component: BuilderPage,
@@ -167,6 +185,8 @@ function BuilderPage() {
   const [premiumAnswers, setPremiumAnswers] = useState<Record<string, string>>({});
   const [includePremium, setIncludePremium] = useState(false);
   const [currentQ, setCurrentQ] = useState(0);
+  const [blueprint, setBlueprint] = useState<Blueprint | null>(null);
+  const [genError, setGenError] = useState<string | null>(null);
 
   const questions = includePremium
     ? [...ESSENTIAL_QUESTIONS, ...PREMIUM_QUESTIONS]
@@ -184,6 +204,8 @@ function BuilderPage() {
     setPremiumAnswers({});
     setIncludePremium(false);
     setCurrentQ(0);
+    setBlueprint(null);
+    setGenError(null);
   };
 
   // Auto-progress de analyzing → wizard (mock 2.5s)
@@ -193,12 +215,43 @@ function BuilderPage() {
     return () => clearTimeout(t);
   }, [step]);
 
-  // Auto-progress de generating → result (mock 2.5s)
+  // Generación REAL: llama a la edge function builder-generate (Anthropic).
   useEffect(() => {
     if (step !== "generating") return;
-    const t = setTimeout(() => setStep("result"), 2500);
-    return () => clearTimeout(t);
-  }, [step]);
+    let cancelled = false;
+    (async () => {
+      setGenError(null);
+      try {
+        const { data, error } = await supabase.functions.invoke("builder-generate", {
+          body: { idea, answers: { ...essentialAnswers, ...premiumAnswers } },
+        });
+        if (cancelled) return;
+        if (error) {
+          // Supabase devuelve el body del error en error.context cuando hay non-2xx
+          let msg = "No pudimos generar el blueprint. Probá de nuevo.";
+          try {
+            const ctx = (error as { context?: Response }).context;
+            if (ctx && typeof ctx.json === "function") {
+              const body = await ctx.json();
+              if (body?.error) msg = body.error;
+            }
+          } catch { /* noop */ }
+          throw new Error(msg);
+        }
+        const bp = (data as { blueprint?: Blueprint })?.blueprint;
+        if (!bp) throw new Error("La IA no devolvió un blueprint válido.");
+        setBlueprint(bp);
+        setStep("result");
+      } catch (e) {
+        if (cancelled) return;
+        setGenError(e instanceof Error ? e.message : "Error generando el blueprint.");
+        setStep("result");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [step, idea, essentialAnswers, premiumAnswers]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -258,7 +311,13 @@ function BuilderPage() {
       )}
 
       {step === "result" && (
-        <ResultMockView idea={idea} answers={{ ...essentialAnswers, ...premiumAnswers }} onRestart={restart} />
+        <ResultView
+          idea={idea}
+          blueprint={blueprint}
+          error={genError}
+          onRestart={restart}
+          onRetry={() => setStep("generating")}
+        />
       )}
     </div>
   );
@@ -681,28 +740,69 @@ function ConfirmView({
 }
 
 // ============================================================
-// Vista 5: Result Mock (placeholder hasta integración AI)
+// Vista 5: Result (blueprint REAL generado por Claude)
 // ============================================================
-const BLUEPRINT_SECTIONS = [
-  { num: "01", title: "Base de conocimientos", icon: Sparkles, desc: "Diagnóstico del problema, usuarios y contexto", accent: "from-emerald-500/20 to-emerald-500/5", color: "text-emerald-500" },
-  { num: "02", title: "Estructura", icon: Database, desc: "5 pilares de la implementación", accent: "from-purple-500/20 to-purple-500/5", color: "text-purple-500" },
-  { num: "03", title: "Arquitectura y flujos", icon: Network, desc: "Mapa mental para tu MVP", accent: "from-blue-500/20 to-blue-500/5", color: "text-blue-500" },
-  { num: "04", title: "Herramientas", icon: Wrench, desc: "Stack recomendado · esenciales + alternativas", accent: "from-amber-500/20 to-amber-500/5", color: "text-amber-500" },
-  { num: "05", title: "Plan de acción", icon: ListChecks, desc: "Kanban con tareas, sprints y prioridades", accent: "from-cyan-500/20 to-cyan-500/5", color: "text-cyan-500" },
-  { num: "06", title: "Rápido y adorable", icon: Rocket, desc: "Prompts listos para pegar en Lovable", accent: "from-pink-500/20 to-pink-500/5", color: "text-pink-500" },
-  { num: "07", title: "Contenido", icon: BookOpen, desc: "Lecciones recomendadas por IA", accent: "from-orange-500/20 to-orange-500/5", color: "text-orange-500" },
-  { num: "08", title: "Economía", icon: PiggyBank, desc: "ROI vs contratar profesionales", accent: "from-teal-500/20 to-teal-500/5", color: "text-teal-500" },
+type SectionKey = keyof Blueprint["secciones"];
+
+const BLUEPRINT_SECTIONS: {
+  key: SectionKey;
+  num: string;
+  title: string;
+  icon: typeof Sparkles;
+  fallback: string;
+  accent: string;
+  color: string;
+}[] = [
+  { key: "base_conocimientos", num: "01", title: "Base de conocimientos", icon: Sparkles, fallback: "Diagnóstico del problema, usuarios y contexto", accent: "from-emerald-500/20 to-emerald-500/5", color: "text-emerald-500" },
+  { key: "estructura", num: "02", title: "Estructura", icon: Database, fallback: "5 pilares de la implementación", accent: "from-purple-500/20 to-purple-500/5", color: "text-purple-500" },
+  { key: "arquitectura", num: "03", title: "Arquitectura y flujos", icon: Network, fallback: "Mapa mental para tu MVP", accent: "from-blue-500/20 to-blue-500/5", color: "text-blue-500" },
+  { key: "herramientas", num: "04", title: "Herramientas", icon: Wrench, fallback: "Stack recomendado · esenciales + alternativas", accent: "from-amber-500/20 to-amber-500/5", color: "text-amber-500" },
+  { key: "plan_accion", num: "05", title: "Plan de acción", icon: ListChecks, fallback: "Kanban con tareas, sprints y prioridades", accent: "from-cyan-500/20 to-cyan-500/5", color: "text-cyan-500" },
+  { key: "rapido_adorable", num: "06", title: "Rápido y adorable", icon: Rocket, fallback: "Prompts listos para pegar en Lovable", accent: "from-pink-500/20 to-pink-500/5", color: "text-pink-500" },
+  { key: "contenido", num: "07", title: "Contenido", icon: BookOpen, fallback: "Lecciones recomendadas por IA", accent: "from-orange-500/20 to-orange-500/5", color: "text-orange-500" },
+  { key: "economia", num: "08", title: "Economía", icon: PiggyBank, fallback: "ROI vs contratar profesionales", accent: "from-teal-500/20 to-teal-500/5", color: "text-teal-500" },
 ];
 
-function ResultMockView({
+function ResultView({
   idea,
-  answers,
+  blueprint,
+  error,
   onRestart,
+  onRetry,
 }: {
   idea: string;
-  answers: Record<string, string>;
+  blueprint: Blueprint | null;
+  error: string | null;
   onRestart: () => void;
+  onRetry: () => void;
 }) {
+  // --- Estado de error ---
+  if (error) {
+    return (
+      <div className="mx-auto max-w-2xl px-6 py-20 text-center">
+        <div className="mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+          <X className="h-8 w-8" />
+        </div>
+        <h2 className="text-2xl font-bold text-foreground mb-3">
+          No pudimos generar tu blueprint
+        </h2>
+        <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto">{error}</p>
+        <div className="flex items-center justify-center gap-3">
+          <Button onClick={onRetry} className="gap-1.5">
+            <Zap className="h-3.5 w-3.5" />
+            Reintentar
+          </Button>
+          <Button variant="ghost" onClick={onRestart} className="gap-1.5">
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Volver al inicio
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!blueprint) return null;
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       {/* Header */}
@@ -715,58 +815,54 @@ function ResultMockView({
           <ArrowLeft className="h-3.5 w-3.5" />
           Volver al inicio
         </button>
-        <span className="rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 text-xs font-medium">
-          🚧 Preview · sin AI todavía
+        <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium">
+          ✨ Generado con IA
         </span>
       </div>
 
-      {/* Aviso mock */}
-      <div className="mb-10 rounded-xl border border-dashed border-amber-500/40 bg-amber-500/5 p-5">
-        <h3 className="text-sm font-semibold text-amber-700 dark:text-amber-400 mb-1.5">
-          Esto es una vista previa
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Cuando conectemos Anthropic Claude (Fase 2), acá vas a ver tu blueprint
-          completo generado dinámicamente. Por ahora te mostramos el esqueleto
-          con las 8 secciones que vas a recibir.
-        </p>
-      </div>
-
-      {/* Recap de la idea */}
+      {/* Título + descripción + tags (AI-generated) */}
       <div className="mb-10">
         <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
-          Tu idea
+          Tu solución
         </div>
-        <p className="text-lg text-foreground italic">
-          "{idea}"
+        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+          {blueprint.titulo}
+        </h1>
+        <p className="text-base text-muted-foreground max-w-3xl">
+          {blueprint.descripcion}
         </p>
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {Object.values(answers)
-            .filter(Boolean)
-            .slice(0, 5)
-            .map((a, i) => (
+        {blueprint.tags?.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {blueprint.tags.map((tag, i) => (
               <span
                 key={i}
-                className="rounded-full border border-border bg-card px-3 py-1 text-[11px] text-muted-foreground line-clamp-1 max-w-[200px]"
-                title={a}
+                className="rounded-full border border-border bg-card px-3 py-1 text-[11px] text-muted-foreground"
               >
-                {a.substring(0, 30)}{a.length > 30 ? "…" : ""}
+                {tag}
               </span>
             ))}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Grid de 8 secciones */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* Recap de la idea original */}
+      <div className="mb-8 rounded-lg border border-border bg-card/50 px-4 py-3">
+        <span className="text-xs text-muted-foreground">Tu idea: </span>
+        <span className="text-xs text-foreground italic">"{idea}"</span>
+      </div>
+
+      {/* Grid de 8 secciones con resúmenes reales */}
+      <div className="grid gap-4 md:grid-cols-2">
         {BLUEPRINT_SECTIONS.map((s) => {
           const Icon = s.icon;
+          const summary = blueprint.secciones?.[s.key] || s.fallback;
           return (
             <div
-              key={s.num}
-              className="group rounded-2xl border border-border bg-card p-5 opacity-60 cursor-not-allowed relative overflow-hidden"
+              key={s.key}
+              className="group rounded-2xl border border-border bg-card p-5 relative overflow-hidden hover:border-primary/40 transition"
             >
               <div
-                className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-50`}
+                className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-40`}
                 aria-hidden
               />
               <div className="relative">
@@ -776,16 +872,18 @@ function ResultMockView({
                   </span>
                   <Icon className={`h-5 w-5 ${s.color}`} />
                 </div>
-                <h3 className="font-semibold text-foreground mb-1">{s.title}</h3>
-                <p className="text-xs text-muted-foreground">{s.desc}</p>
-                <span className="mt-3 inline-block text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Próximamente
-                </span>
+                <h3 className="font-semibold text-foreground mb-1.5">{s.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{summary}</p>
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Nota: detalle de cada sección viene en próxima fase */}
+      <p className="mt-8 text-center text-xs text-muted-foreground">
+        El detalle completo de cada sección (Kanban, prompts, ROI, etc.) llega en la próxima actualización.
+      </p>
     </div>
   );
 }
