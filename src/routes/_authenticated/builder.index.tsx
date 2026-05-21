@@ -24,21 +24,39 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
 
 // ============================================================
-// Implementa AI · Builder (Fase 1: UX + mock generation)
+// Implementa AI · Builder (Fase 2a: AI generation real)
 //
 // Flow:
 //   1. landing    → Hero + textarea + 3 cards de inspiración
 //   2. analyzing  → Loading "Analizando tu idea" (mock 2.5s)
 //   3. wizard     → 5 preguntas obligatorias + opcional 5 premium
 //   4. confirm    → "¿Listo para generar?" — Generar / Responder más
-//   5. generating → Loading "Diseñando tu solución" (mock 2.5s)
-//   6. result     → Mock blueprint con 8 secciones (placeholder hasta AI)
+//   5. generating → Llama a la edge function builder-generate (Anthropic)
+//   6. result     → Blueprint REAL: título + descripción + tags + 8 secciones
 //
-// Cuando integremos AI (Fase 2 con Anthropic key) reemplazamos los
-// mocks de loading + result por llamadas reales. La UX queda igual.
+// El blueprint lo genera Claude (Opus 4.7) vía la edge function
+// builder-generate, que lee ANTHROPIC_API_KEY de los secrets.
 // ============================================================
+
+// Blueprint generado por la edge function builder-generate
+interface Blueprint {
+  titulo: string;
+  descripcion: string;
+  tags: string[];
+  secciones: {
+    base_conocimientos: string;
+    estructura: string;
+    arquitectura: string;
+    herramientas: string;
+    plan_accion: string;
+    rapido_adorable: string;
+    contenido: string;
+    economia: string;
+  };
+}
 
 export const Route = createFileRoute("/_authenticated/builder/")({
   component: BuilderPage,
@@ -167,6 +185,8 @@ function BuilderPage() {
   const [premiumAnswers, setPremiumAnswers] = useState<Record<string, string>>({});
   const [includePremium, setIncludePremium] = useState(false);
   const [currentQ, setCurrentQ] = useState(0);
+  const [blueprint, setBlueprint] = useState<Blueprint | null>(null);
+  const [genError, setGenError] = useState<string | null>(null);
 
   const questions = includePremium
     ? [...ESSENTIAL_QUESTIONS, ...PREMIUM_QUESTIONS]
@@ -184,6 +204,8 @@ function BuilderPage() {
     setPremiumAnswers({});
     setIncludePremium(false);
     setCurrentQ(0);
+    setBlueprint(null);
+    setGenError(null);
   };
 
   // Auto-progress de analyzing → wizard (mock 2.5s)
@@ -193,12 +215,43 @@ function BuilderPage() {
     return () => clearTimeout(t);
   }, [step]);
 
-  // Auto-progress de generating → result (mock 2.5s)
+  // Generación REAL: llama a la edge function builder-generate (Anthropic).
   useEffect(() => {
     if (step !== "generating") return;
-    const t = setTimeout(() => setStep("result"), 2500);
-    return () => clearTimeout(t);
-  }, [step]);
+    let cancelled = false;
+    (async () => {
+      setGenError(null);
+      try {
+        const { data, error } = await supabase.functions.invoke("builder-generate", {
+          body: { idea, answers: { ...essentialAnswers, ...premiumAnswers } },
+        });
+        if (cancelled) return;
+        if (error) {
+          // Supabase devuelve el body del error en error.context cuando hay non-2xx
+          let msg = "No pudimos generar el blueprint. Probá de nuevo.";
+          try {
+            const ctx = (error as { context?: Response }).context;
+            if (ctx && typeof ctx.json === "function") {
+              const body = await ctx.json();
+              if (body?.error) msg = body.error;
+            }
+          } catch { /* noop */ }
+          throw new Error(msg);
+        }
+        const bp = (data as { blueprint?: Blueprint })?.blueprint;
+        if (!bp) throw new Error("La IA no devolvió un blueprint válido.");
+        setBlueprint(bp);
+        setStep("result");
+      } catch (e) {
+        if (cancelled) return;
+        setGenError(e instanceof Error ? e.message : "Error generando el blueprint.");
+        setStep("result");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [step, idea, essentialAnswers, premiumAnswers]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -258,7 +311,13 @@ function BuilderPage() {
       )}
 
       {step === "result" && (
-        <ResultMockView idea={idea} answers={{ ...essentialAnswers, ...premiumAnswers }} onRestart={restart} />
+        <ResultView
+          idea={idea}
+          blueprint={blueprint}
+          error={genError}
+          onRestart={restart}
+          onRetry={() => setStep("generating")}
+        />
       )}
     </div>
   );
@@ -270,9 +329,9 @@ function BuilderPage() {
 function BuilderHeader() {
   return (
     <div className="border-b border-border bg-card/30 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Wand2 className="h-4 w-4" />
+          <Wand2 className="h-4 w-4 shrink-0" />
           <span className="font-medium text-foreground">Builder</span>
         </div>
         <div className="flex items-center gap-2">
@@ -281,15 +340,23 @@ function BuilderHeader() {
             size="sm"
             disabled
             className="gap-1.5 cursor-not-allowed opacity-50"
-            title="Próximamente"
+            title="Próximamente (Histórico)"
+            aria-label="Histórico (próximamente)"
           >
-            <History className="h-3.5 w-3.5" />
-            Histórico
-            <Lock className="h-3 w-3 ml-1" />
+            <History className="h-3.5 w-3.5 shrink-0" />
+            <span className="hidden sm:inline">Histórico</span>
+            <Lock className="h-3 w-3 ml-1 hidden sm:inline" />
           </Button>
-          <Button variant="outline" size="sm" disabled className="gap-1.5 cursor-not-allowed opacity-50" title="Próximamente">
-            <Users2 className="h-3.5 w-3.5" />
-            Soluciones del Equipo
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            className="gap-1.5 cursor-not-allowed opacity-50"
+            title="Próximamente (Soluciones del Equipo)"
+            aria-label="Soluciones del Equipo (próximamente)"
+          >
+            <Users2 className="h-3.5 w-3.5 shrink-0" />
+            <span className="hidden sm:inline">Soluciones del Equipo</span>
           </Button>
         </div>
       </div>
@@ -324,16 +391,16 @@ function LandingView({
   const canContinue = idea.trim().length >= 20;
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-16">
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
       {/* Hero */}
-      <div className="text-center mb-12">
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-3 bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
+      <div className="text-center mb-8 sm:mb-12">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-3 bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
           BUILDER
         </h1>
-        <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground mb-3 sm:mb-4">
           ¿Qué vamos a <span className="text-primary">construir</span>?
         </h2>
-        <p className="text-base text-muted-foreground max-w-xl mx-auto">
+        <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
           Describí tu problema o proceso y la IA va a diseñar la solución completa.
         </p>
       </div>
@@ -345,7 +412,7 @@ function LandingView({
           value={idea}
           onChange={(e) => setIdea(e.target.value)}
           placeholder="Ej: Quiero automatizar la calificación de leads que llegan por Instagram y enviar propuestas por WhatsApp…"
-          className="min-h-[140px] resize-none border-0 bg-transparent text-base p-6 pr-20 focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="min-h-[120px] sm:min-h-[140px] resize-none border-0 bg-transparent text-base p-4 sm:p-6 focus-visible:ring-0 focus-visible:ring-offset-0"
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && canContinue) {
               e.preventDefault();
@@ -353,15 +420,16 @@ function LandingView({
             }
           }}
         />
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-muted/30">
-          <span className="text-[11px] text-muted-foreground">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 border-t border-border bg-muted/30">
+          <span className="text-[11px] text-muted-foreground hidden sm:inline">
             ⌘ + Enter
           </span>
+          <span className="text-[11px] text-muted-foreground sm:hidden" aria-hidden />
           <Button
             size="sm"
             disabled={!canContinue}
             onClick={onContinue}
-            className="gap-1.5"
+            className="gap-1.5 ml-auto"
           >
             <ArrowUp className="h-3.5 w-3.5" />
             Continuar
@@ -370,9 +438,9 @@ function LandingView({
       </div>
 
       {/* Inspiraciones */}
-      <div className="mt-10">
+      <div className="mt-8 sm:mt-10">
         <p className="text-sm text-muted-foreground mb-4">O empezá con una inspiración</p>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {INSPIRATIONS.map((insp) => {
             const Icon = insp.icon;
             return (
@@ -408,11 +476,11 @@ function LoadingView({
   stage: string;
 }) {
   return (
-    <div className="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center px-6">
-      {/* Orb central tipo LUNA — gold pulse */}
-      <div className="relative mb-10">
+    <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-16 text-center sm:px-6">
+      {/* Orb central pulsante */}
+      <div className="relative mb-8 sm:mb-10">
         <div
-          className="h-32 w-32 rounded-full bg-gradient-to-br from-primary/80 via-primary to-primary/60 shadow-[0_0_60px_-10px_var(--primary)] animate-pulse"
+          className="h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-gradient-to-br from-primary/80 via-primary to-primary/60 shadow-[0_0_60px_-10px_var(--primary)] animate-pulse"
           aria-hidden
         />
         <div
@@ -421,7 +489,7 @@ function LoadingView({
         />
       </div>
 
-      <h2 className="text-2xl font-semibold text-foreground mb-2">{title}</h2>
+      <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-2">{title}</h2>
       <p className="text-sm text-muted-foreground mb-8">{subtitle}</p>
 
       {/* Progress bar simulado */}
@@ -486,9 +554,9 @@ function WizardView({
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-10">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
       {/* Header con progress + close */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 text-sm">
             <Wand2 className="h-4 w-4 text-primary" />
@@ -496,10 +564,10 @@ function WizardView({
           </div>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition"
+            className="text-muted-foreground hover:text-foreground transition p-1 -m-1"
             aria-label="Cerrar"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
@@ -518,22 +586,22 @@ function WizardView({
       </div>
 
       {/* "Tu idea" sticky banner */}
-      <div className="mb-8 rounded-lg border border-border bg-card/50 px-4 py-2.5">
+      <div className="mb-6 sm:mb-8 rounded-lg border border-border bg-card/50 px-3 sm:px-4 py-2.5">
         <span className="text-xs text-muted-foreground">Tu idea: </span>
         <span className="text-xs text-foreground line-clamp-1">{idea}</span>
       </div>
 
       {/* Pregunta */}
-      <div className="mb-8">
-        <div className="flex items-baseline gap-3 mb-4">
-          <span className="text-5xl font-bold text-muted-foreground/30 tabular-nums">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-baseline gap-3 mb-3 sm:mb-4">
+          <span className="text-4xl sm:text-5xl font-bold text-muted-foreground/30 tabular-nums">
             {String(currentQ + 1).padStart(2, "0")}
           </span>
           <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium">
             {q.category}
           </span>
         </div>
-        <h2 className="text-2xl md:text-3xl font-semibold text-foreground leading-snug mb-6">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-foreground leading-snug mb-5 sm:mb-6">
           {q.text}
         </h2>
 
@@ -612,21 +680,21 @@ function ConfirmView({
   premiumAdded: boolean;
 }) {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-      <div className="mx-auto mb-8 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-        <Wand2 className="h-8 w-8" />
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-20 text-center">
+      <div className="mx-auto mb-6 sm:mb-8 inline-flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+        <Wand2 className="h-7 w-7 sm:h-8 sm:w-8" />
       </div>
 
-      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
         ¿Listo para generar?
       </h2>
-      <p className="text-muted-foreground max-w-xl mx-auto mb-12">
+      <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto mb-8 sm:mb-12">
         {premiumAdded
           ? "Ya respondiste todas las preguntas. Tu blueprint va a tener máxima precisión."
           : "Ya respondiste las 5 preguntas esenciales. Podés generar ahora o sumar 5 preguntas más para un blueprint más detallado."}
       </p>
 
-      <div className="grid gap-4 md:grid-cols-2 max-w-2xl mx-auto mb-8">
+      <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 max-w-2xl mx-auto mb-8">
         {/* Generar ahora */}
         <button
           onClick={onGenerate}
@@ -681,92 +749,130 @@ function ConfirmView({
 }
 
 // ============================================================
-// Vista 5: Result Mock (placeholder hasta integración AI)
+// Vista 5: Result (blueprint REAL generado por Claude)
 // ============================================================
-const BLUEPRINT_SECTIONS = [
-  { num: "01", title: "Base de conocimientos", icon: Sparkles, desc: "Diagnóstico del problema, usuarios y contexto", accent: "from-emerald-500/20 to-emerald-500/5", color: "text-emerald-500" },
-  { num: "02", title: "Estructura", icon: Database, desc: "5 pilares de la implementación", accent: "from-purple-500/20 to-purple-500/5", color: "text-purple-500" },
-  { num: "03", title: "Arquitectura y flujos", icon: Network, desc: "Mapa mental para tu MVP", accent: "from-blue-500/20 to-blue-500/5", color: "text-blue-500" },
-  { num: "04", title: "Herramientas", icon: Wrench, desc: "Stack recomendado · esenciales + alternativas", accent: "from-amber-500/20 to-amber-500/5", color: "text-amber-500" },
-  { num: "05", title: "Plan de acción", icon: ListChecks, desc: "Kanban con tareas, sprints y prioridades", accent: "from-cyan-500/20 to-cyan-500/5", color: "text-cyan-500" },
-  { num: "06", title: "Rápido y adorable", icon: Rocket, desc: "Prompts listos para pegar en Lovable", accent: "from-pink-500/20 to-pink-500/5", color: "text-pink-500" },
-  { num: "07", title: "Contenido", icon: BookOpen, desc: "Lecciones recomendadas por IA", accent: "from-orange-500/20 to-orange-500/5", color: "text-orange-500" },
-  { num: "08", title: "Economía", icon: PiggyBank, desc: "ROI vs contratar profesionales", accent: "from-teal-500/20 to-teal-500/5", color: "text-teal-500" },
+type SectionKey = keyof Blueprint["secciones"];
+
+const BLUEPRINT_SECTIONS: {
+  key: SectionKey;
+  num: string;
+  title: string;
+  icon: typeof Sparkles;
+  fallback: string;
+  accent: string;
+  color: string;
+}[] = [
+  { key: "base_conocimientos", num: "01", title: "Base de conocimientos", icon: Sparkles, fallback: "Diagnóstico del problema, usuarios y contexto", accent: "from-emerald-500/20 to-emerald-500/5", color: "text-emerald-500" },
+  { key: "estructura", num: "02", title: "Estructura", icon: Database, fallback: "5 pilares de la implementación", accent: "from-purple-500/20 to-purple-500/5", color: "text-purple-500" },
+  { key: "arquitectura", num: "03", title: "Arquitectura y flujos", icon: Network, fallback: "Mapa mental para tu MVP", accent: "from-blue-500/20 to-blue-500/5", color: "text-blue-500" },
+  { key: "herramientas", num: "04", title: "Herramientas", icon: Wrench, fallback: "Stack recomendado · esenciales + alternativas", accent: "from-amber-500/20 to-amber-500/5", color: "text-amber-500" },
+  { key: "plan_accion", num: "05", title: "Plan de acción", icon: ListChecks, fallback: "Kanban con tareas, sprints y prioridades", accent: "from-cyan-500/20 to-cyan-500/5", color: "text-cyan-500" },
+  { key: "rapido_adorable", num: "06", title: "Rápido y adorable", icon: Rocket, fallback: "Prompts listos para pegar en Lovable", accent: "from-pink-500/20 to-pink-500/5", color: "text-pink-500" },
+  { key: "contenido", num: "07", title: "Contenido", icon: BookOpen, fallback: "Lecciones recomendadas por IA", accent: "from-orange-500/20 to-orange-500/5", color: "text-orange-500" },
+  { key: "economia", num: "08", title: "Economía", icon: PiggyBank, fallback: "ROI vs contratar profesionales", accent: "from-teal-500/20 to-teal-500/5", color: "text-teal-500" },
 ];
 
-function ResultMockView({
+function ResultView({
   idea,
-  answers,
+  blueprint,
+  error,
   onRestart,
+  onRetry,
 }: {
   idea: string;
-  answers: Record<string, string>;
+  blueprint: Blueprint | null;
+  error: string | null;
   onRestart: () => void;
+  onRetry: () => void;
 }) {
+  // --- Estado de error ---
+  if (error) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-20 text-center">
+        <div className="mx-auto mb-6 inline-flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+          <X className="h-7 w-7 sm:h-8 sm:w-8" />
+        </div>
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
+          No pudimos generar tu blueprint
+        </h2>
+        <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto">{error}</p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button onClick={onRetry} className="gap-1.5">
+            <Zap className="h-3.5 w-3.5" />
+            Reintentar
+          </Button>
+          <Button variant="ghost" onClick={onRestart} className="gap-1.5">
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Volver al inicio
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!blueprint) return null;
+
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 sm:mb-8 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={onRestart}
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition shrink-0"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Volver al inicio
+          <span className="hidden sm:inline">Volver al inicio</span>
+          <span className="sm:hidden">Volver</span>
         </button>
-        <span className="rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 text-xs font-medium">
-          🚧 Preview · sin AI todavía
+        <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium shrink-0">
+          ✨ Generado con IA
         </span>
       </div>
 
-      {/* Aviso mock */}
-      <div className="mb-10 rounded-xl border border-dashed border-amber-500/40 bg-amber-500/5 p-5">
-        <h3 className="text-sm font-semibold text-amber-700 dark:text-amber-400 mb-1.5">
-          Esto es una vista previa
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Cuando conectemos Anthropic Claude (Fase 2), acá vas a ver tu blueprint
-          completo generado dinámicamente. Por ahora te mostramos el esqueleto
-          con las 8 secciones que vas a recibir.
-        </p>
-      </div>
-
-      {/* Recap de la idea */}
-      <div className="mb-10">
+      {/* Título + descripción + tags (AI-generated) */}
+      <div className="mb-8 sm:mb-10">
         <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
-          Tu idea
+          Tu solución
         </div>
-        <p className="text-lg text-foreground italic">
-          "{idea}"
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
+          {blueprint.titulo}
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground max-w-3xl">
+          {blueprint.descripcion}
         </p>
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {Object.values(answers)
-            .filter(Boolean)
-            .slice(0, 5)
-            .map((a, i) => (
+        {blueprint.tags?.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {blueprint.tags.map((tag, i) => (
               <span
                 key={i}
-                className="rounded-full border border-border bg-card px-3 py-1 text-[11px] text-muted-foreground line-clamp-1 max-w-[200px]"
-                title={a}
+                className="rounded-full border border-border bg-card px-3 py-1 text-[11px] text-muted-foreground"
               >
-                {a.substring(0, 30)}{a.length > 30 ? "…" : ""}
+                {tag}
               </span>
             ))}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Grid de 8 secciones */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* Recap de la idea original */}
+      <div className="mb-6 sm:mb-8 rounded-lg border border-border bg-card/50 px-3 sm:px-4 py-3">
+        <span className="text-xs text-muted-foreground">Tu idea: </span>
+        <span className="text-xs text-foreground italic">"{idea}"</span>
+      </div>
+
+      {/* Grid de 8 secciones con resúmenes reales */}
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
         {BLUEPRINT_SECTIONS.map((s) => {
           const Icon = s.icon;
+          const summary = blueprint.secciones?.[s.key] || s.fallback;
           return (
             <div
-              key={s.num}
-              className="group rounded-2xl border border-border bg-card p-5 opacity-60 cursor-not-allowed relative overflow-hidden"
+              key={s.key}
+              className="group rounded-2xl border border-border bg-card p-4 sm:p-5 relative overflow-hidden hover:border-primary/40 transition"
             >
               <div
-                className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-50`}
+                className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-40`}
                 aria-hidden
               />
               <div className="relative">
@@ -776,16 +882,18 @@ function ResultMockView({
                   </span>
                   <Icon className={`h-5 w-5 ${s.color}`} />
                 </div>
-                <h3 className="font-semibold text-foreground mb-1">{s.title}</h3>
-                <p className="text-xs text-muted-foreground">{s.desc}</p>
-                <span className="mt-3 inline-block text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Próximamente
-                </span>
+                <h3 className="font-semibold text-foreground mb-1.5">{s.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{summary}</p>
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Nota: detalle de cada sección viene en próxima fase */}
+      <p className="mt-8 text-center text-xs text-muted-foreground">
+        El detalle completo de cada sección (Kanban, prompts, ROI, etc.) llega en la próxima actualización.
+      </p>
     </div>
   );
 }
