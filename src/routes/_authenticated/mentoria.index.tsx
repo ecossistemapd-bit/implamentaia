@@ -16,10 +16,10 @@ export const Route = createFileRoute("/_authenticated/mentoria/")({
 
 function MentoriaComingSoon() {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-20 text-center">
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-20 text-center">
       {/* Icono central */}
-      <div className="mx-auto mb-8 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 ring-1 ring-primary/20">
-        <Compass className="h-10 w-10 text-primary" />
+      <div className="mx-auto mb-6 sm:mb-8 inline-flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 ring-1 ring-primary/20">
+        <Compass className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
       </div>
 
       {/* Eyebrow */}
@@ -29,19 +29,19 @@ function MentoriaComingSoon() {
       </div>
 
       {/* Title */}
-      <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
         Mentoría 1-a-1
       </h1>
 
       {/* Subtitle */}
-      <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed">
+      <p className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto mb-8 sm:mb-10 leading-relaxed">
         Conectá con mentores que ya implementaron IA en empresas LatAm.
         Sesiones recurrentes, feedback personalizado y acompañamiento desde
         la idea hasta el deploy.
       </p>
 
       {/* Highlights */}
-      <div className="grid gap-3 md:grid-cols-3 max-w-2xl mx-auto mb-12">
+      <div className="grid gap-3 sm:grid-cols-3 max-w-2xl mx-auto mb-10 sm:mb-12">
         {[
           { title: "Mentores curados", desc: "Implementadores reales, no teóricos" },
           { title: "Cada 15 días", desc: "Sesiones de 60 min vía video" },

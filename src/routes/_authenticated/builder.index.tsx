@@ -329,9 +329,9 @@ function BuilderPage() {
 function BuilderHeader() {
   return (
     <div className="border-b border-border bg-card/30 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Wand2 className="h-4 w-4" />
+          <Wand2 className="h-4 w-4 shrink-0" />
           <span className="font-medium text-foreground">Builder</span>
         </div>
         <div className="flex items-center gap-2">
@@ -340,15 +340,23 @@ function BuilderHeader() {
             size="sm"
             disabled
             className="gap-1.5 cursor-not-allowed opacity-50"
-            title="Próximamente"
+            title="Próximamente (Histórico)"
+            aria-label="Histórico (próximamente)"
           >
-            <History className="h-3.5 w-3.5" />
-            Histórico
-            <Lock className="h-3 w-3 ml-1" />
+            <History className="h-3.5 w-3.5 shrink-0" />
+            <span className="hidden sm:inline">Histórico</span>
+            <Lock className="h-3 w-3 ml-1 hidden sm:inline" />
           </Button>
-          <Button variant="outline" size="sm" disabled className="gap-1.5 cursor-not-allowed opacity-50" title="Próximamente">
-            <Users2 className="h-3.5 w-3.5" />
-            Soluciones del Equipo
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            className="gap-1.5 cursor-not-allowed opacity-50"
+            title="Próximamente (Soluciones del Equipo)"
+            aria-label="Soluciones del Equipo (próximamente)"
+          >
+            <Users2 className="h-3.5 w-3.5 shrink-0" />
+            <span className="hidden sm:inline">Soluciones del Equipo</span>
           </Button>
         </div>
       </div>
@@ -383,16 +391,16 @@ function LandingView({
   const canContinue = idea.trim().length >= 20;
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-16">
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
       {/* Hero */}
-      <div className="text-center mb-12">
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-3 bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
+      <div className="text-center mb-8 sm:mb-12">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-3 bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
           BUILDER
         </h1>
-        <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground mb-3 sm:mb-4">
           ¿Qué vamos a <span className="text-primary">construir</span>?
         </h2>
-        <p className="text-base text-muted-foreground max-w-xl mx-auto">
+        <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
           Describí tu problema o proceso y la IA va a diseñar la solución completa.
         </p>
       </div>
@@ -404,7 +412,7 @@ function LandingView({
           value={idea}
           onChange={(e) => setIdea(e.target.value)}
           placeholder="Ej: Quiero automatizar la calificación de leads que llegan por Instagram y enviar propuestas por WhatsApp…"
-          className="min-h-[140px] resize-none border-0 bg-transparent text-base p-6 pr-20 focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="min-h-[120px] sm:min-h-[140px] resize-none border-0 bg-transparent text-base p-4 sm:p-6 focus-visible:ring-0 focus-visible:ring-offset-0"
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && canContinue) {
               e.preventDefault();
@@ -412,15 +420,16 @@ function LandingView({
             }
           }}
         />
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-muted/30">
-          <span className="text-[11px] text-muted-foreground">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 border-t border-border bg-muted/30">
+          <span className="text-[11px] text-muted-foreground hidden sm:inline">
             ⌘ + Enter
           </span>
+          <span className="text-[11px] text-muted-foreground sm:hidden" aria-hidden />
           <Button
             size="sm"
             disabled={!canContinue}
             onClick={onContinue}
-            className="gap-1.5"
+            className="gap-1.5 ml-auto"
           >
             <ArrowUp className="h-3.5 w-3.5" />
             Continuar
@@ -429,9 +438,9 @@ function LandingView({
       </div>
 
       {/* Inspiraciones */}
-      <div className="mt-10">
+      <div className="mt-8 sm:mt-10">
         <p className="text-sm text-muted-foreground mb-4">O empezá con una inspiración</p>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {INSPIRATIONS.map((insp) => {
             const Icon = insp.icon;
             return (
@@ -467,11 +476,11 @@ function LoadingView({
   stage: string;
 }) {
   return (
-    <div className="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center px-6">
-      {/* Orb central tipo LUNA — gold pulse */}
-      <div className="relative mb-10">
+    <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-16 text-center sm:px-6">
+      {/* Orb central pulsante */}
+      <div className="relative mb-8 sm:mb-10">
         <div
-          className="h-32 w-32 rounded-full bg-gradient-to-br from-primary/80 via-primary to-primary/60 shadow-[0_0_60px_-10px_var(--primary)] animate-pulse"
+          className="h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-gradient-to-br from-primary/80 via-primary to-primary/60 shadow-[0_0_60px_-10px_var(--primary)] animate-pulse"
           aria-hidden
         />
         <div
@@ -480,7 +489,7 @@ function LoadingView({
         />
       </div>
 
-      <h2 className="text-2xl font-semibold text-foreground mb-2">{title}</h2>
+      <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-2">{title}</h2>
       <p className="text-sm text-muted-foreground mb-8">{subtitle}</p>
 
       {/* Progress bar simulado */}
@@ -545,9 +554,9 @@ function WizardView({
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-10">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
       {/* Header con progress + close */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 text-sm">
             <Wand2 className="h-4 w-4 text-primary" />
@@ -555,10 +564,10 @@ function WizardView({
           </div>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition"
+            className="text-muted-foreground hover:text-foreground transition p-1 -m-1"
             aria-label="Cerrar"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
@@ -577,22 +586,22 @@ function WizardView({
       </div>
 
       {/* "Tu idea" sticky banner */}
-      <div className="mb-8 rounded-lg border border-border bg-card/50 px-4 py-2.5">
+      <div className="mb-6 sm:mb-8 rounded-lg border border-border bg-card/50 px-3 sm:px-4 py-2.5">
         <span className="text-xs text-muted-foreground">Tu idea: </span>
         <span className="text-xs text-foreground line-clamp-1">{idea}</span>
       </div>
 
       {/* Pregunta */}
-      <div className="mb-8">
-        <div className="flex items-baseline gap-3 mb-4">
-          <span className="text-5xl font-bold text-muted-foreground/30 tabular-nums">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-baseline gap-3 mb-3 sm:mb-4">
+          <span className="text-4xl sm:text-5xl font-bold text-muted-foreground/30 tabular-nums">
             {String(currentQ + 1).padStart(2, "0")}
           </span>
           <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium">
             {q.category}
           </span>
         </div>
-        <h2 className="text-2xl md:text-3xl font-semibold text-foreground leading-snug mb-6">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-foreground leading-snug mb-5 sm:mb-6">
           {q.text}
         </h2>
 
@@ -671,21 +680,21 @@ function ConfirmView({
   premiumAdded: boolean;
 }) {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-      <div className="mx-auto mb-8 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-        <Wand2 className="h-8 w-8" />
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-20 text-center">
+      <div className="mx-auto mb-6 sm:mb-8 inline-flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+        <Wand2 className="h-7 w-7 sm:h-8 sm:w-8" />
       </div>
 
-      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
         ¿Listo para generar?
       </h2>
-      <p className="text-muted-foreground max-w-xl mx-auto mb-12">
+      <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto mb-8 sm:mb-12">
         {premiumAdded
           ? "Ya respondiste todas las preguntas. Tu blueprint va a tener máxima precisión."
           : "Ya respondiste las 5 preguntas esenciales. Podés generar ahora o sumar 5 preguntas más para un blueprint más detallado."}
       </p>
 
-      <div className="grid gap-4 md:grid-cols-2 max-w-2xl mx-auto mb-8">
+      <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 max-w-2xl mx-auto mb-8">
         {/* Generar ahora */}
         <button
           onClick={onGenerate}
@@ -779,15 +788,15 @@ function ResultView({
   // --- Estado de error ---
   if (error) {
     return (
-      <div className="mx-auto max-w-2xl px-6 py-20 text-center">
-        <div className="mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
-          <X className="h-8 w-8" />
+      <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-20 text-center">
+        <div className="mx-auto mb-6 inline-flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+          <X className="h-7 w-7 sm:h-8 sm:w-8" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground mb-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
           No pudimos generar tu blueprint
         </h2>
         <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto">{error}</p>
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button onClick={onRetry} className="gap-1.5">
             <Zap className="h-3.5 w-3.5" />
             Reintentar
@@ -804,31 +813,32 @@ function ResultView({
   if (!blueprint) return null;
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 sm:mb-8 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={onRestart}
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition shrink-0"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Volver al inicio
+          <span className="hidden sm:inline">Volver al inicio</span>
+          <span className="sm:hidden">Volver</span>
         </button>
-        <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium">
+        <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium shrink-0">
           ✨ Generado con IA
         </span>
       </div>
 
       {/* Título + descripción + tags (AI-generated) */}
-      <div className="mb-10">
+      <div className="mb-8 sm:mb-10">
         <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
           Tu solución
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
           {blueprint.titulo}
         </h1>
-        <p className="text-base text-muted-foreground max-w-3xl">
+        <p className="text-sm sm:text-base text-muted-foreground max-w-3xl">
           {blueprint.descripcion}
         </p>
         {blueprint.tags?.length > 0 && (
@@ -846,20 +856,20 @@ function ResultView({
       </div>
 
       {/* Recap de la idea original */}
-      <div className="mb-8 rounded-lg border border-border bg-card/50 px-4 py-3">
+      <div className="mb-6 sm:mb-8 rounded-lg border border-border bg-card/50 px-3 sm:px-4 py-3">
         <span className="text-xs text-muted-foreground">Tu idea: </span>
         <span className="text-xs text-foreground italic">"{idea}"</span>
       </div>
 
       {/* Grid de 8 secciones con resúmenes reales */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
         {BLUEPRINT_SECTIONS.map((s) => {
           const Icon = s.icon;
           const summary = blueprint.secciones?.[s.key] || s.fallback;
           return (
             <div
               key={s.key}
-              className="group rounded-2xl border border-border bg-card p-5 relative overflow-hidden hover:border-primary/40 transition"
+              className="group rounded-2xl border border-border bg-card p-4 sm:p-5 relative overflow-hidden hover:border-primary/40 transition"
             >
               <div
                 className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-40`}
