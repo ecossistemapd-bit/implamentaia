@@ -70,8 +70,18 @@ function LandingPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/dashboard" });
+    if (!loading && user) navigate({ to: "/dashboard", replace: true });
   }, [loading, user, navigate]);
+
+  // Mientras se resuelve el estado de auth, mostrar pantalla neutra para
+  // evitar el flash del landing a usuarios ya autenticados.
+  if (loading || user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <div className="h-2 w-24 animate-pulse rounded-full bg-gray-700" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
