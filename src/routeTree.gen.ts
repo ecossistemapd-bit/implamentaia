@@ -20,8 +20,10 @@ import { Route as AuthenticatedMiProgresoRouteImport } from './routes/_authentic
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedContratarExpertoRouteImport } from './routes/_authenticated/contratar-experto'
 import { Route as AuthenticatedSolutionsIndexRouteImport } from './routes/_authenticated/solutions.index'
+import { Route as AuthenticatedMentoriaIndexRouteImport } from './routes/_authenticated/mentoria.index'
 import { Route as AuthenticatedImplementadorIndexRouteImport } from './routes/_authenticated/implementador.index'
 import { Route as AuthenticatedCursosIndexRouteImport } from './routes/_authenticated/cursos.index'
+import { Route as AuthenticatedBuilderIndexRouteImport } from './routes/_authenticated/builder.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as SolutionsIdContratarRouteImport } from './routes/solutions.$id.contratar'
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
@@ -85,6 +87,12 @@ const AuthenticatedSolutionsIndexRoute =
     path: '/solutions/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedMentoriaIndexRoute =
+  AuthenticatedMentoriaIndexRouteImport.update({
+    id: '/mentoria/',
+    path: '/mentoria/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedImplementadorIndexRoute =
   AuthenticatedImplementadorIndexRouteImport.update({
     id: '/implementador/',
@@ -95,6 +103,12 @@ const AuthenticatedCursosIndexRoute =
   AuthenticatedCursosIndexRouteImport.update({
     id: '/cursos/',
     path: '/cursos/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBuilderIndexRoute =
+  AuthenticatedBuilderIndexRouteImport.update({
+    id: '/builder/',
+    path: '/builder/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -147,8 +161,10 @@ export interface FileRoutesByFullPath {
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/builder/': typeof AuthenticatedBuilderIndexRoute
   '/cursos/': typeof AuthenticatedCursosIndexRoute
   '/implementador/': typeof AuthenticatedImplementadorIndexRoute
+  '/mentoria/': typeof AuthenticatedMentoriaIndexRoute
   '/solutions/': typeof AuthenticatedSolutionsIndexRoute
   '/implementador/proyecto/$projectId': typeof AuthenticatedImplementadorProyectoProjectIdRoute
 }
@@ -167,8 +183,10 @@ export interface FileRoutesByTo {
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/builder': typeof AuthenticatedBuilderIndexRoute
   '/cursos': typeof AuthenticatedCursosIndexRoute
   '/implementador': typeof AuthenticatedImplementadorIndexRoute
+  '/mentoria': typeof AuthenticatedMentoriaIndexRoute
   '/solutions': typeof AuthenticatedSolutionsIndexRoute
   '/implementador/proyecto/$projectId': typeof AuthenticatedImplementadorProyectoProjectIdRoute
 }
@@ -189,8 +207,10 @@ export interface FileRoutesById {
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/builder/': typeof AuthenticatedBuilderIndexRoute
   '/_authenticated/cursos/': typeof AuthenticatedCursosIndexRoute
   '/_authenticated/implementador/': typeof AuthenticatedImplementadorIndexRoute
+  '/_authenticated/mentoria/': typeof AuthenticatedMentoriaIndexRoute
   '/_authenticated/solutions/': typeof AuthenticatedSolutionsIndexRoute
   '/_authenticated/implementador/proyecto/$projectId': typeof AuthenticatedImplementadorProyectoProjectIdRoute
 }
@@ -211,8 +231,10 @@ export interface FileRouteTypes {
     | '/solutions/$slug'
     | '/solutions/$id/contratar'
     | '/admin/'
+    | '/builder/'
     | '/cursos/'
     | '/implementador/'
+    | '/mentoria/'
     | '/solutions/'
     | '/implementador/proyecto/$projectId'
   fileRoutesByTo: FileRoutesByTo
@@ -231,8 +253,10 @@ export interface FileRouteTypes {
     | '/solutions/$slug'
     | '/solutions/$id/contratar'
     | '/admin'
+    | '/builder'
     | '/cursos'
     | '/implementador'
+    | '/mentoria'
     | '/solutions'
     | '/implementador/proyecto/$projectId'
   id:
@@ -252,8 +276,10 @@ export interface FileRouteTypes {
     | '/_authenticated/solutions/$slug'
     | '/solutions/$id/contratar'
     | '/_authenticated/admin/'
+    | '/_authenticated/builder/'
     | '/_authenticated/cursos/'
     | '/_authenticated/implementador/'
+    | '/_authenticated/mentoria/'
     | '/_authenticated/solutions/'
     | '/_authenticated/implementador/proyecto/$projectId'
   fileRoutesById: FileRoutesById
@@ -346,6 +372,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSolutionsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/mentoria/': {
+      id: '/_authenticated/mentoria/'
+      path: '/mentoria'
+      fullPath: '/mentoria/'
+      preLoaderRoute: typeof AuthenticatedMentoriaIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/implementador/': {
       id: '/_authenticated/implementador/'
       path: '/implementador'
@@ -358,6 +391,13 @@ declare module '@tanstack/react-router' {
       path: '/cursos'
       fullPath: '/cursos/'
       preLoaderRoute: typeof AuthenticatedCursosIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/builder/': {
+      id: '/_authenticated/builder/'
+      path: '/builder'
+      fullPath: '/builder/'
+      preLoaderRoute: typeof AuthenticatedBuilderIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/': {
@@ -415,8 +455,10 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRoute
   AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedBuilderIndexRoute: typeof AuthenticatedBuilderIndexRoute
   AuthenticatedCursosIndexRoute: typeof AuthenticatedCursosIndexRoute
   AuthenticatedImplementadorIndexRoute: typeof AuthenticatedImplementadorIndexRoute
+  AuthenticatedMentoriaIndexRoute: typeof AuthenticatedMentoriaIndexRoute
   AuthenticatedSolutionsIndexRoute: typeof AuthenticatedSolutionsIndexRoute
   AuthenticatedImplementadorProyectoProjectIdRoute: typeof AuthenticatedImplementadorProyectoProjectIdRoute
 }
@@ -431,8 +473,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRoute,
   AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedBuilderIndexRoute: AuthenticatedBuilderIndexRoute,
   AuthenticatedCursosIndexRoute: AuthenticatedCursosIndexRoute,
   AuthenticatedImplementadorIndexRoute: AuthenticatedImplementadorIndexRoute,
+  AuthenticatedMentoriaIndexRoute: AuthenticatedMentoriaIndexRoute,
   AuthenticatedSolutionsIndexRoute: AuthenticatedSolutionsIndexRoute,
   AuthenticatedImplementadorProyectoProjectIdRoute:
     AuthenticatedImplementadorProyectoProjectIdRoute,
