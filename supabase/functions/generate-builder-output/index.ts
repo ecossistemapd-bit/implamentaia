@@ -117,12 +117,26 @@ Generá una implementación detallada usando la herramienta proveída.`;
     const msg = e instanceof Error ? e.message : "Unknown error";
     console.error("generate-builder-output error:", msg);
     try {
+      const authHeader = req.headers.get("Authorization");
       const { builder_project_id } = await req.clone().json();
-      if (builder_project_id) {
-        const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-        await admin.from("builder_projects").update({ status: "error", error_message: msg }).eq("id", builder_project_id);
+      if (builder_project_id && authHeader) {
+        const userClient = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY")!,
+          { global: { headers: { Authorization: authHeader } } },
+        );
+        // Ownership re-check via RLS before privileged write
+        const { data: owned } = await userClient
+          .from("builder_projects")
+          .select("id")
+          .eq("id", builder_project_id)
+          .maybeSingle();
+        if (owned) {
+          const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+          await admin.from("builder_projects").update({ status: "error", error_message: "Generation failed" }).eq("id", builder_project_id);
+        }
       }
     } catch { /* noop */ }
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: "Generation failed" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
