@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
 function SettingsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState({ full_name: "", company_name: "", role: "", industry: "", team_size: "" });
+  const [profile, setProfile] = useState({ full_name: "", company_name: "", industry: "", team_size: "" });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -20,7 +20,6 @@ function SettingsPage() {
       if (data) setProfile({
         full_name: data.full_name ?? "",
         company_name: data.company_name ?? "",
-        role: data.role ?? "",
         industry: data.industry ?? "",
         team_size: data.team_size ?? "",
       });
@@ -30,7 +29,7 @@ function SettingsPage() {
   const save = async () => {
     if (!user) return;
     setSaving(true);
-    const { error } = await supabase.from("profiles").upsert({ id: user.id, ...profile });
+    const { error } = await supabase.from("profiles").update(profile).eq("id", user.id);
     setSaving(false);
     if (error) toast.error(error.message, { duration: 4000 });
     else toast.success("Guardado", { duration: 4000 });
@@ -57,7 +56,7 @@ function SettingsPage() {
       <div className="mt-10 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
         <h2 className="text-base font-medium text-white">Perfil</h2>
         <Field label="Nombre completo" value={profile.full_name} onChange={(v) => setProfile({ ...profile, full_name: v })} />
-        <Field label="Rol" value={profile.role} onChange={(v) => setProfile({ ...profile, role: v })} />
+        
       </div>
 
       <div className="mt-6 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
