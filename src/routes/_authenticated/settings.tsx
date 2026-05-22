@@ -56,7 +56,7 @@ function SettingsPage() {
       <div className="mt-10 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
         <h2 className="text-base font-medium text-white">Perfil</h2>
         <Field label="Nombre completo" value={profile.full_name} onChange={(v) => setProfile({ ...profile, full_name: v })} />
-        <Field label="Rol" value={profile.role} onChange={(v) => setProfile({ ...profile, role: v })} />
+        
       </div>
 
       <div className="mt-6 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
