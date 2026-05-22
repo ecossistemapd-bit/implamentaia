@@ -1,0 +1,47 @@
+name: 🗄️ Backup diario base de datos
+
+on:
+  schedule:
+    - cron: '0 4 * * *'   # 4am UTC = 1am ARG todos los días
+  workflow_dispatch:        # También se puede ejecutar manualmente desde GitHub
+
+jobs:
+  backup:
+    name: pg_dump → GitHub Artifact (90 días)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Instalar cliente PostgreSQL
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+
+      - name: Crear backup comprimido
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          TIMESTAMP=$(date +%Y-%m-%d_%H-%M)
+          FILENAME="implementa-ai_${TIMESTAMP}.sql.gz"
+          pg_dump "$DATABASE_URL" \
+            --no-owner \
+            --no-acl \
+            --format=plain \
+            | gzip > "$FILENAME"
+          SIZE=$(du -sh "$FILENAME" | cut -f1)
+          echo "BACKUP_FILE=$FILENAME" >> $GITHUB_ENV
+          echo "✅ Backup: $FILENAME ($SIZE)"
+
+      - name: Subir como artifact (retención 90 días)
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: ${{ env.BACKUP_FILE }}
+          retention-days: 90
+
+      - name: Resumen
+        run: |
+          echo "### 🗄️ Backup completado" >> $GITHUB_STEP_SUMMARY
+          echo "- **Archivo:** \`$BACKUP_FILE\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Fecha:** $(date '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Retención:** 90 días" >> $GITHUB_STEP_SUMMARY
+          echo "- **Restaurar:** \`gunzip backup.sql.gz && psql \$DB_URL < backup.sql\`" >> $GITHUB_STEP_SUMMARY
