@@ -21,6 +21,7 @@ import {
   HeartHandshake,
   Wand2,
   Compass,
+  Target,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -53,6 +54,7 @@ type RoutePath =
   | "/implementador"
   | "/projects"
   | "/builder"
+  | "/asistente-ventas"
   | "/contratar-experto"
   | "/mentoria"
   | "/settings"
@@ -89,6 +91,7 @@ const SECTIONS: NavSection[] = [
     items: [
       { to: "/projects", label: "Mis Proyectos", icon: FolderKanban },
       { to: "/builder", label: "Builder", icon: Wand2, badge: "NUEVO" },
+      { to: "/asistente-ventas", label: "Asistente de Ventas", icon: Target, badge: "NUEVO" },
       { to: "/contratar-experto", label: "Contratar Experto", icon: HeartHandshake },
       { to: "/mentoria", label: "Mentoría", icon: Compass, badge: "PRÓXIMAMENTE" },
       { to: "/implementador", label: "Panel Impl.", icon: LayoutDashboard, implOnly: true },

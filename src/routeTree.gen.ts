@@ -24,6 +24,7 @@ import { Route as AuthenticatedMentoriaIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedImplementadorIndexRouteImport } from './routes/_authenticated/implementador.index'
 import { Route as AuthenticatedCursosIndexRouteImport } from './routes/_authenticated/cursos.index'
 import { Route as AuthenticatedBuilderIndexRouteImport } from './routes/_authenticated/builder.index'
+import { Route as AuthenticatedAsistenteVentasIndexRouteImport } from './routes/_authenticated/asistente-ventas.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as SolutionsIdContratarRouteImport } from './routes/solutions.$id.contratar'
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
@@ -111,6 +112,12 @@ const AuthenticatedBuilderIndexRoute =
     path: '/builder/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAsistenteVentasIndexRoute =
+  AuthenticatedAsistenteVentasIndexRouteImport.update({
+    id: '/asistente-ventas/',
+    path: '/asistente-ventas/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -161,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/asistente-ventas/': typeof AuthenticatedAsistenteVentasIndexRoute
   '/builder/': typeof AuthenticatedBuilderIndexRoute
   '/cursos/': typeof AuthenticatedCursosIndexRoute
   '/implementador/': typeof AuthenticatedImplementadorIndexRoute
@@ -183,6 +191,7 @@ export interface FileRoutesByTo {
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/asistente-ventas': typeof AuthenticatedAsistenteVentasIndexRoute
   '/builder': typeof AuthenticatedBuilderIndexRoute
   '/cursos': typeof AuthenticatedCursosIndexRoute
   '/implementador': typeof AuthenticatedImplementadorIndexRoute
@@ -207,6 +216,7 @@ export interface FileRoutesById {
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/asistente-ventas/': typeof AuthenticatedAsistenteVentasIndexRoute
   '/_authenticated/builder/': typeof AuthenticatedBuilderIndexRoute
   '/_authenticated/cursos/': typeof AuthenticatedCursosIndexRoute
   '/_authenticated/implementador/': typeof AuthenticatedImplementadorIndexRoute
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/solutions/$slug'
     | '/solutions/$id/contratar'
     | '/admin/'
+    | '/asistente-ventas/'
     | '/builder/'
     | '/cursos/'
     | '/implementador/'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/solutions/$slug'
     | '/solutions/$id/contratar'
     | '/admin'
+    | '/asistente-ventas'
     | '/builder'
     | '/cursos'
     | '/implementador'
@@ -276,6 +288,7 @@ export interface FileRouteTypes {
     | '/_authenticated/solutions/$slug'
     | '/solutions/$id/contratar'
     | '/_authenticated/admin/'
+    | '/_authenticated/asistente-ventas/'
     | '/_authenticated/builder/'
     | '/_authenticated/cursos/'
     | '/_authenticated/implementador/'
@@ -400,6 +413,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBuilderIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/asistente-ventas/': {
+      id: '/_authenticated/asistente-ventas/'
+      path: '/asistente-ventas'
+      fullPath: '/asistente-ventas/'
+      preLoaderRoute: typeof AuthenticatedAsistenteVentasIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/admin'
@@ -455,6 +475,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRoute
   AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAsistenteVentasIndexRoute: typeof AuthenticatedAsistenteVentasIndexRoute
   AuthenticatedBuilderIndexRoute: typeof AuthenticatedBuilderIndexRoute
   AuthenticatedCursosIndexRoute: typeof AuthenticatedCursosIndexRoute
   AuthenticatedImplementadorIndexRoute: typeof AuthenticatedImplementadorIndexRoute
@@ -473,6 +494,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRoute,
   AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAsistenteVentasIndexRoute:
+    AuthenticatedAsistenteVentasIndexRoute,
   AuthenticatedBuilderIndexRoute: AuthenticatedBuilderIndexRoute,
   AuthenticatedCursosIndexRoute: AuthenticatedCursosIndexRoute,
   AuthenticatedImplementadorIndexRoute: AuthenticatedImplementadorIndexRoute,
@@ -497,3 +520,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

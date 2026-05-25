@@ -273,6 +273,57 @@ export type Database = {
         }
         Relationships: []
       }
+      sales_prospects: {
+        Row: {
+          analysis: Json
+          company_name: string
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string
+          documents: Json
+          id: string
+          industry: string | null
+          notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          website: string | null
+          what_sells: string | null
+        }
+        Insert: {
+          analysis?: Json
+          company_name: string
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          documents?: Json
+          id?: string
+          industry?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          website?: string | null
+          what_sells?: string | null
+        }
+        Update: {
+          analysis?: Json
+          company_name?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          documents?: Json
+          id?: string
+          industry?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+          what_sells?: string | null
+        }
+        Relationships: []
+      }
       saved_solutions: {
         Row: {
           id: string
