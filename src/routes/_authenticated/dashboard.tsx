@@ -3,14 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
-  Check,
   Clock,
   Flame,
   RefreshCw,
   Play,
   Command,
-  Users,
-  UserCheck,
+  Bell,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -108,7 +106,18 @@ function Dashboard() {
 
   const hour = new Date().getHours();
   const tod = hour < 12 ? "Buen día" : hour < 19 ? "Buenas tardes" : "Buenas noches";
-  const greetName = fullName?.split(" ")[0] || "bienvenido";
+  // Fallback chain: profiles.full_name → user_metadata.full_name → user_metadata.name → email prefix
+  const metaName =
+    (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
+    (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.name ??
+    null;
+  const emailLocal = user?.email?.split("@")[0] ?? null;
+  const rawName = fullName ?? metaName ?? emailLocal ?? "bienvenido";
+  // Si el "nombre" parece un email/slug (sin espacios y todo minúscula), capitalizamos
+  // el primer caracter para que se vea humano. Si tiene espacios, tomamos la primera palabra.
+  const greetName = rawName.includes(" ")
+    ? rawName.split(" ")[0]
+    : rawName.charAt(0).toUpperCase() + rawName.slice(1);
   const streakDays = memberSince
     ? Math.max(1, Math.floor((Date.now() - memberSince.getTime()) / (1000 * 60 * 60 * 24)) + 1)
     : 1;
@@ -131,7 +140,7 @@ function Dashboard() {
       {/* Wash violeta fijo detrás del área del dashboard. No reacciona al hover. */}
       <div className="dashboard-violet-wash" aria-hidden />
 
-      <div className="relative z-[1] mx-auto max-w-[1340px] px-8 py-8">
+      <div className="relative z-[2] mx-auto max-w-[1340px] px-8 py-8">
         {/* HEADER COMPACTO */}
         <header className="mb-6">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
@@ -300,67 +309,59 @@ function HeroRutaIA({
 
 // =============================================================================
 // Próxima Mentoría — placeholder hasta que esté la tabla `mentorias`
-// Layout: estilo Viver (Próxima Mentoría → FALTAN → HOY · hora → título →
-// con [mentor] → Hacer Check-in → asistencias + cupos).
+// Layout: Próxima Mentoría grupal → FALTAN → HOY · hora → título → Q&A abierto →
+// Anotarme · te avisamos antes → HOY YA HUBO 09:00/10:30/14:00 + Grabaciones →
+// 4 mentorías por día · entrá a todas.
 // =============================================================================
 function NextMentoria() {
-  // TODO(mentorías): leer próxima mentoría de tabla `mentorias` cuando esté lista.
-  // 4 slots por día (9:00 / 10:30 / 14:00 / 15:30 ART).
-  const nextSlot = {
-    hora: "15:30",
-    faltan: "1h 30min",
-    titulo: "Mentoría de IA",
-    mentor: "Gino Altamirano", // TODO: campo `mentor` o relación con `profiles` cuando exista
-    asistencias: 8, // TODO: count de asistencias del user a mentorías
-    cuposTomados: 3, // TODO: count de anotados al próximo slot
-    cuposTotal: 8, // TODO: capacidad del slot (si aplica)
-  };
+  // TODO(mentorías): leer próxima mentoría + slots pasados de tabla `mentorias`.
+  // 4 slots por día: 09:00 / 10:30 / 14:00 / 15:30 ART.
+  const nextSlot = { hora: "15:30", faltan: "1h 30min", titulo: "Mentoría grupal de IA" };
+  const pastSlotsHoy = ["09:00", "10:30", "14:00"];
 
   return (
     <div
       className="col-span-12 rounded-2xl border border-border bg-card p-5 transition-shadow duration-500 lg:col-span-4"
       style={{ boxShadow: "0 0 60px -10px rgba(139,92,246,0.14)" }}
-      onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 0 100px -10px rgba(139,92,246,0.32)")}
-      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 0 60px -10px rgba(139,92,246,0.14)")}
     >
-      <div>
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
-            PRÓXIMA MENTORÍA
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
+          PRÓXIMA MENTORÍA
+        </span>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+          <Clock className="h-3 w-3" /> FALTAN {nextSlot.faltan}
+        </span>
+      </div>
+      <div className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold tracking-wide text-muted-foreground">
+        <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#8B5CF6" }} />
+        HOY · {nextSlot.hora} ART
+      </div>
+      <h3 className="mt-1 text-[22px] font-bold leading-tight">{nextSlot.titulo}</h3>
+      <p className="mt-1 text-[13px] text-muted-foreground">Q&amp;A abierto · entrá cuando quieras</p>
+      <Link
+        to="/mentoria"
+        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-white px-4 py-[11px] text-[14px] font-semibold text-[#060608] transition hover:bg-zinc-200"
+      >
+        <Bell className="h-4 w-4" /> Anotarme · te avisamos antes
+      </Link>
+      <div className="my-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
+        HOY YA HUBO
+      </div>
+      <div className="mt-2 flex items-center gap-2 text-[12px] text-muted-foreground">
+        {pastSlotsHoy.map((s, i) => (
+          <span key={s} className="inline-flex items-center gap-2">
+            <span className="tabular-nums">{s}</span>
+            {i < pastSlotsHoy.length - 1 && <span className="text-muted-foreground/40">·</span>}
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-            <Clock className="h-3 w-3" /> FALTAN {nextSlot.faltan}
-          </span>
-        </div>
-        <div className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold tracking-wide text-muted-foreground">
-          <span
-            className="h-1.5 w-1.5 rounded-full"
-            style={{ background: "#8B5CF6" }}
-          />
-          HOY · {nextSlot.hora} ART
-        </div>
-        <h3 className="mt-1 text-[22px] font-bold leading-tight">{nextSlot.titulo}</h3>
-        <p className="mt-1 text-[13px] text-muted-foreground">con {nextSlot.mentor}</p>
-        <Link
-          to="/mentoria"
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-white px-4 py-[11px] text-[14px] font-semibold text-[#060608] transition hover:bg-zinc-200"
-        >
-          <Check className="h-4 w-4" /> Hacer Check-in
+        ))}
+        <Link to="/mentoria" className="ml-auto inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground transition hover:text-foreground">
+          Grabaciones <ArrowRight className="h-3 w-3" />
         </Link>
-        <div className="my-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-        <div className="flex items-center justify-between text-[12px] text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5">
-            <Users className="h-3.5 w-3.5" />
-            <span className="tabular-nums">{nextSlot.asistencias}</span> asistencias
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <UserCheck className="h-3.5 w-3.5" />
-            <span className="tabular-nums">
-              {nextSlot.cuposTomados}/{nextSlot.cuposTotal}
-            </span>{" "}
-            cupos
-          </span>
-        </div>
+      </div>
+      <div className="my-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="text-[11px] text-muted-foreground">
+        4 mentorías por día · entrá a todas las que quieras
       </div>
     </div>
   );
