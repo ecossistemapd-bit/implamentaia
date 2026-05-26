@@ -42,7 +42,7 @@ Las 8 secciones del blueprint son:
 3. arquitectura — El flujo completo del MVP paso a paso: actores, eventos, decisiones, APIs y datos que se mueven entre cada componente.
 4. herramientas — Stack completo con justificación: herramienta esencial → para qué → alternativa gratuita. Incluir precios estimados.
 5. plan_accion — Kanban con 3 sprints: Sprint 1 (fundación), Sprint 2 (MVP funcional), Sprint 3 (lanzamiento). Cada sprint con 4-6 tareas concretas.
-6. rapido_adorable — 3 prompts listos para pegar en Lovable o en el LLM, específicos a esta solución. Incluir el system prompt del agente con variables tipo {{variable}}.
+6. rapido_adorable — 6-8 prompts SECUENCIALES para pegar en Lovable y construir el MVP paso a paso. El primero crea la estructura base (BD + auth + pantalla principal), los siguientes agregan pantallas, integraciones y funcionalidades. Cada prompt menciona tablas/componentes del anterior. Formato OBLIGATORIO:\n### [Nombre del componente o pantalla]\n\`\`\`\n[prompt completo y accionable, mínimo 80 palabras]\n\`\`\`
 7. contenido — 5-7 temas/recursos específicos que el usuario necesita aprender para implementar esta solución, con descripción de por qué cada uno importa.
 8. economia — ROI calculado: horas ahorradas/mes × valor hora, costo mensual del stack vs costo de contratar. Número concreto de ROI en meses de payback.
 
@@ -101,7 +101,7 @@ const BLUEPRINT_TOOL = {
           rapido_adorable: {
             type: "string",
             description:
-              "Markdown completo (mín 200 palabras): 3 prompts listos para pegar — el system prompt del agente con variables {{variable}}, un prompt de onboarding y uno de manejo de errores. En bloques de código.",
+              "Markdown con 6-8 prompts secuenciales para construir el MVP en Lovable. Formato OBLIGATORIO por cada prompt:\n### [Nombre del componente]\n```\n[prompt detallado mínimo 80 palabras]\n```\nEl primero crea MVP base (BD + auth + UI principal), los siguientes agregan funcionalidades, integraciones y pantallas. Terminar con un tip: 'Seguí las indicaciones en orden. Cada indicación hace referencia a tablas y componentes creados en las anteriores.'",
           },
           contenido: {
             type: "string",

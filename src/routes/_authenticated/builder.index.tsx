@@ -25,10 +25,13 @@ import {
   ChevronRight,
   Trash2,
   Clock,
+  Copy,
+  Check,
+  TrendingUp,
+  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -69,6 +72,83 @@ interface SavedBlueprint {
   idea: string;
   blueprint: Blueprint;
   created_at: string;
+}
+
+// ============================================================
+// Helpers para parsear el contenido de las secciones
+// ============================================================
+
+/** Extrae prompts de la sección rapido_adorable.
+ *  Soporta formato ### Título\n```\ncontenido\n``` (nuevo)
+ *  y ## Título\n```\ncontenido\n``` (legacy)
+ */
+function parsePrompts(markdown: string): { title: string; content: string }[] {
+  const results: { title: string; content: string }[] = [];
+  const headingRegex = /^#{2,3}\s+(.+)$/gm;
+  const matches: { title: string; index: number; length: number }[] = [];
+  let m;
+  while ((m = headingRegex.exec(markdown)) !== null) {
+    matches.push({ title: m[1].trim(), index: m.index, length: m[0].length });
+  }
+  if (matches.length === 0) return [];
+  for (let i = 0; i < matches.length; i++) {
+    const start = matches[i].index + matches[i].length;
+    const end = i < matches.length - 1 ? matches[i + 1].index : markdown.length;
+    const section = markdown.slice(start, end).trim();
+    const code = section.match(/```(?:\w+)?\n?([\s\S]*?)```/);
+    const content = code
+      ? code[1].trim()
+      : section.replace(/\*\*[^*]+\*\*:?\s*/g, "").trim();
+    if (content.length > 30) results.push({ title: matches[i].title, content });
+  }
+  return results;
+}
+
+/** Extrae los 3 sprints del plan de acción */
+function parseSprints(markdown: string): { title: string; color: string; tasks: string[] }[] {
+  const sprintRegex = /^#{1,3}\s*(Sprint\s*[123]|Fase\s*[123]|Etapa\s*[123])[^\n]*/gim;
+  const matches: { title: string; index: number; length: number }[] = [];
+  let m;
+  while ((m = sprintRegex.exec(markdown)) !== null) {
+    matches.push({ title: m[0].replace(/^#+\s+/, "").trim(), index: m.index, length: m[0].length });
+  }
+  if (matches.length < 2) return [];
+  const colors = ["text-cyan-400", "text-purple-400", "text-emerald-400"];
+  return matches.slice(0, 3).map((match, i) => {
+    const start = match.index + match.length;
+    const end = i < Math.min(matches.length, 3) - 1 ? matches[i + 1].index : markdown.length;
+    const content = markdown.slice(start, end);
+    const tasks = content
+      .split("\n")
+      .map((l) => l.replace(/^[-*✓☐]\s+/, "").replace(/^\[[ x]\]\s+/i, "").trim())
+      .filter((l) => l.length > 5 && !l.startsWith("#") && !l.startsWith("**"));
+    return { title: match.title, color: colors[i] ?? "text-primary", tasks: tasks.slice(0, 7) };
+  });
+}
+
+/** Extrae temas del contenido */
+function parseTopics(markdown: string): { title: string; description: string }[] {
+  const headingRegex = /^#{2,3}\s+(.+)$/gm;
+  const matches: { title: string; index: number; length: number }[] = [];
+  let m;
+  while ((m = headingRegex.exec(markdown)) !== null) {
+    matches.push({ title: m[1].trim(), index: m.index, length: m[0].length });
+  }
+  if (matches.length === 0) return [];
+  return matches
+    .map((match, i) => {
+      const start = match.index + match.length;
+      const end = i < matches.length - 1 ? matches[i + 1].index : markdown.length;
+      const content = markdown.slice(start, end).trim();
+      const description = content
+        .split("\n")
+        .filter((l) => l.trim() && !l.startsWith("#"))
+        .join(" ")
+        .replace(/[-*_`]/g, "")
+        .slice(0, 280);
+      return { title: match.title, description };
+    })
+    .filter((t) => t.description.length > 20);
 }
 
 export const Route = createFileRoute("/_authenticated/builder/")({
@@ -803,18 +883,20 @@ const BLUEPRINT_SECTIONS: {
   key: SectionKey;
   num: string;
   title: string;
+  shortTitle: string;
   icon: typeof Sparkles;
   accent: string;
   color: string;
+  borderColor: string;
 }[] = [
-  { key: "base_conocimientos", num: "01", title: "Base de conocimientos", icon: Sparkles, accent: "from-emerald-500/20 to-emerald-500/5", color: "text-emerald-500" },
-  { key: "estructura",         num: "02", title: "Estructura",            icon: Database, accent: "from-purple-500/20 to-purple-500/5", color: "text-purple-500" },
-  { key: "arquitectura",       num: "03", title: "Arquitectura y flujos", icon: Network,  accent: "from-blue-500/20 to-blue-500/5",   color: "text-blue-500"   },
-  { key: "herramientas",       num: "04", title: "Herramientas",          icon: Wrench,   accent: "from-amber-500/20 to-amber-500/5", color: "text-amber-500"  },
-  { key: "plan_accion",        num: "05", title: "Plan de acción",        icon: ListChecks, accent: "from-cyan-500/20 to-cyan-500/5", color: "text-cyan-500"   },
-  { key: "rapido_adorable",    num: "06", title: "Rápido y adorable",     icon: Rocket,   accent: "from-pink-500/20 to-pink-500/5",  color: "text-pink-500"   },
-  { key: "contenido",          num: "07", title: "Contenido",             icon: BookOpen, accent: "from-orange-500/20 to-orange-500/5", color: "text-orange-500" },
-  { key: "economia",           num: "08", title: "Economía",              icon: PiggyBank, accent: "from-teal-500/20 to-teal-500/5", color: "text-teal-500"   },
+  { key: "base_conocimientos", num: "01", title: "Base de conocimientos", shortTitle: "Base",       icon: Sparkles,   accent: "from-emerald-500/20 to-emerald-500/5",  color: "text-emerald-400",  borderColor: "border-emerald-500/30" },
+  { key: "estructura",         num: "02", title: "Estructura",            shortTitle: "Estructura", icon: Database,   accent: "from-purple-500/20 to-purple-500/5",    color: "text-purple-400",   borderColor: "border-purple-500/30"  },
+  { key: "arquitectura",       num: "03", title: "Arquitectura",          shortTitle: "Arquitect.", icon: Network,    accent: "from-blue-500/20 to-blue-500/5",        color: "text-blue-400",     borderColor: "border-blue-500/30"    },
+  { key: "herramientas",       num: "04", title: "Herramientas",          shortTitle: "Herram.",    icon: Wrench,     accent: "from-amber-500/20 to-amber-500/5",      color: "text-amber-400",    borderColor: "border-amber-500/30"   },
+  { key: "plan_accion",        num: "05", title: "Plan de acción",        shortTitle: "Plan",       icon: ListChecks, accent: "from-cyan-500/20 to-cyan-500/5",        color: "text-cyan-400",     borderColor: "border-cyan-500/30"    },
+  { key: "rapido_adorable",    num: "06", title: "Rápido y adorable",     shortTitle: "Rápido",     icon: Rocket,     accent: "from-pink-500/20 to-pink-500/5",        color: "text-pink-400",     borderColor: "border-pink-500/30"    },
+  { key: "contenido",          num: "07", title: "Contenido",             shortTitle: "Contenido",  icon: BookOpen,   accent: "from-orange-500/20 to-orange-500/5",    color: "text-orange-400",   borderColor: "border-orange-500/30"  },
+  { key: "economia",           num: "08", title: "Economía",              shortTitle: "Economía",   icon: PiggyBank,  accent: "from-teal-500/20 to-teal-500/5",        color: "text-teal-400",     borderColor: "border-teal-500/30"    },
 ];
 
 function ResultView({
@@ -846,8 +928,18 @@ function ResultView({
 
   if (!blueprint) return null;
 
-  const activeSectionMeta = BLUEPRINT_SECTIONS.find((s) => s.key === openSection);
-  const ActiveSectionIcon = activeSectionMeta?.icon ?? null;
+  // Navegación full-page de sección
+  if (openSection !== null) {
+    return (
+      <SectionDetailPage
+        blueprint={blueprint}
+        currentSection={openSection}
+        onChangeSection={setOpenSection}
+        onBack={() => setOpenSection(null)}
+        onRestart={onRestart}
+      />
+    );
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
@@ -859,17 +951,17 @@ function ResultView({
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition shrink-0"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Volver al inicio</span>
-          <span className="sm:hidden">Volver</span>
+          <span className="hidden sm:inline">Nueva idea</span>
+          <span className="sm:hidden">Nueva</span>
         </button>
         <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium shrink-0">
-          ✨ Generado con IA
+          ✨ Blueprint generado
         </span>
       </div>
 
       {/* Título + descripción + tags */}
       <div className="mb-8 sm:mb-10">
-        <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Tu solución</div>
+        <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Tu solución de IA</div>
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">{blueprint.titulo}</h1>
         <p className="text-sm sm:text-base text-muted-foreground max-w-3xl">{blueprint.descripcion}</p>
         {blueprint.tags?.length > 0 && (
@@ -889,12 +981,11 @@ function ResultView({
         <span className="text-xs text-foreground italic">"{idea}"</span>
       </div>
 
-      {/* Grid de 8 secciones — clic abre el Sheet de detalle */}
+      {/* Grid de 8 secciones */}
       <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
         {BLUEPRINT_SECTIONS.map((s) => {
           const Icon = s.icon;
           const content = blueprint.secciones?.[s.key] ?? "";
-          // Primer párrafo como preview
           const preview = content.split("\n").find((l) => l.trim() && !l.startsWith("#")) || content.slice(0, 120);
           return (
             <button
@@ -919,33 +1010,466 @@ function ResultView({
         })}
       </div>
 
-      {/* Sheet de detalle de sección */}
-      <Sheet open={openSection !== null} onOpenChange={(o) => !o && setOpenSection(null)}>
-        <SheetContent side="right" className="w-full sm:max-w-2xl p-0 flex flex-col">
-          {activeSectionMeta && (
-            <>
-              <SheetHeader className="px-6 pt-6 pb-4 border-b border-border shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className={`inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br ${activeSectionMeta.accent}`}>
-                    {ActiveSectionIcon && <ActiveSectionIcon className={`h-4 w-4 ${activeSectionMeta.color}`} />}
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{activeSectionMeta.num}</p>
-                    <SheetTitle className="text-base">{activeSectionMeta.title}</SheetTitle>
-                  </div>
+      {/* CTA Explorar */}
+      <div className="mt-8 text-center">
+        <p className="text-sm text-muted-foreground mb-3">Hacé clic en cualquier sección para ver el plan completo</p>
+        <Button onClick={() => setOpenSection("rapido_adorable")} className="gap-2">
+          <Rocket className="h-4 w-4" />
+          Empezar por Rápido y adorable
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// SectionDetailPage — Navegación full-page entre las 8 secciones
+// ============================================================
+function SectionDetailPage({
+  blueprint,
+  currentSection,
+  onChangeSection,
+  onBack,
+  onRestart,
+}: {
+  blueprint: Blueprint;
+  currentSection: SectionKey;
+  onChangeSection: (k: SectionKey | null) => void;
+  onBack: () => void;
+  onRestart: () => void;
+}) {
+  const currentIdx = BLUEPRINT_SECTIONS.findIndex((s) => s.key === currentSection);
+  const isFirst = currentIdx === 0;
+  const isLast = currentIdx === BLUEPRINT_SECTIONS.length - 1;
+  const meta = BLUEPRINT_SECTIONS[currentIdx];
+  const Icon = meta.icon;
+  const content = blueprint.secciones[currentSection] ?? "";
+
+  const handlePrev = () => { if (!isFirst) onChangeSection(BLUEPRINT_SECTIONS[currentIdx - 1].key); };
+  const handleNext = () => { if (isLast) onBack(); else onChangeSection(BLUEPRINT_SECTIONS[currentIdx + 1].key); };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Barra superior: navegación + título de sección */}
+      <div className="sticky top-0 z-30 border-b border-border bg-card/80 backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          {/* Fila superior: volver + título + próximo */}
+          <div className="flex items-center justify-between py-3 gap-2">
+            <button
+              onClick={onBack}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition shrink-0"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Vista general</span>
+              <span className="sm:hidden">Volver</span>
+            </button>
+
+            <div className="text-center min-w-0">
+              <div className={`flex items-center justify-center gap-2 ${meta.color}`}>
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="font-semibold text-foreground text-sm sm:text-base truncate">{meta.title}</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">Paso {currentIdx + 1} de {BLUEPRINT_SECTIONS.length}</p>
+            </div>
+
+            <button
+              onClick={handleNext}
+              className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition shrink-0"
+            >
+              {isLast ? (
+                <><span className="hidden sm:inline">Finalizar</span><Check className="h-4 w-4" /></>
+              ) : (
+                <><span className="hidden sm:inline">Próximo</span><ArrowRight className="h-3.5 w-3.5" /></>
+              )}
+            </button>
+          </div>
+
+          {/* Progress bar con los 8 pasos */}
+          <SectionProgressBar
+            currentIdx={currentIdx}
+            onSelect={(i) => onChangeSection(BLUEPRINT_SECTIONS[i].key)}
+          />
+        </div>
+      </div>
+
+      {/* Contenido de la sección */}
+      <div className="flex-1 overflow-auto">
+        {currentSection === "rapido_adorable" ? (
+          <RapidoSection content={content} blueprintTitle={blueprint.titulo} />
+        ) : currentSection === "economia" ? (
+          <EconomiaSection content={content} />
+        ) : currentSection === "plan_accion" ? (
+          <PlanAccionSection content={content} />
+        ) : currentSection === "contenido" ? (
+          <ContenidoSection content={content} />
+        ) : (
+          <DefaultMarkdownSection content={content} />
+        )}
+      </div>
+
+      {/* Barra inferior de navegación */}
+      <div className="sticky bottom-0 border-t border-border bg-card/80 backdrop-blur-xl px-4 py-3">
+        <div className="mx-auto max-w-7xl flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={handlePrev} disabled={isFirst} className="gap-1.5">
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Anterior
+          </Button>
+          <div className="flex items-center gap-1">
+            {BLUEPRINT_SECTIONS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => onChangeSection(BLUEPRINT_SECTIONS[i].key)}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === currentIdx ? "w-6 bg-primary" : i < currentIdx ? "w-1.5 bg-primary/50" : "w-1.5 bg-muted"
+                }`}
+              />
+            ))}
+          </div>
+          <Button size="sm" onClick={handleNext} className="gap-1.5">
+            {isLast ? (
+              <><Check className="h-3.5 w-3.5" />Finalizar</>
+            ) : (
+              <>Próximo<ArrowRight className="h-3.5 w-3.5" /></>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// SectionProgressBar — Los 8 iconos conectados con líneas
+// ============================================================
+function SectionProgressBar({
+  currentIdx,
+  onSelect,
+}: {
+  currentIdx: number;
+  onSelect: (i: number) => void;
+}) {
+  return (
+    <div className="overflow-x-auto pb-2 -mx-2 px-2">
+      <div className="flex items-center justify-center gap-0 min-w-max">
+        {BLUEPRINT_SECTIONS.map((s, i) => {
+          const Icon = s.icon;
+          const isCompleted = i < currentIdx;
+          const isCurrent = i === currentIdx;
+          return (
+            <div key={s.key} className="flex items-center">
+              <button
+                onClick={() => onSelect(i)}
+                title={s.title}
+                className="flex flex-col items-center gap-0.5 group"
+              >
+                <div
+                  className={`
+                    h-8 w-8 rounded-full flex items-center justify-center border-2 transition-all
+                    ${isCompleted
+                      ? "bg-primary/20 border-primary/60 text-primary"
+                      : isCurrent
+                      ? "bg-primary border-primary text-primary-foreground shadow-[0_0_12px_-2px_var(--primary)]"
+                      : "bg-card border-border text-muted-foreground hover:border-muted-foreground/50"}
+                  `}
+                >
+                  {isCompleted ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
                 </div>
-              </SheetHeader>
-              <ScrollArea className="flex-1 px-6 py-5">
-                <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
-                  <ReactMarkdown>
-                    {blueprint.secciones?.[openSection!] ?? ""}
-                  </ReactMarkdown>
-                </div>
-              </ScrollArea>
-            </>
+                <span
+                  className={`text-[9px] leading-tight max-w-[52px] text-center hidden sm:block transition-colors ${
+                    isCurrent ? "text-foreground font-medium" : "text-muted-foreground/60 group-hover:text-muted-foreground"
+                  }`}
+                >
+                  {s.shortTitle}
+                </span>
+              </button>
+              {i < BLUEPRINT_SECTIONS.length - 1 && (
+                <div
+                  className={`w-5 sm:w-8 h-px mx-0.5 sm:mx-1 transition-colors ${
+                    i < currentIdx ? "bg-primary/50" : "bg-border"
+                  }`}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// DefaultMarkdownSection — Renderiza markdown con prose
+// ============================================================
+function DefaultMarkdownSection({ content }: { content: string }) {
+  return (
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
+      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-strong:text-foreground">
+        <ReactMarkdown>{content}</ReactMarkdown>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// RapidoSection — Panel doble: lista de prompts + detalle con copia
+// ============================================================
+function RapidoSection({ content, blueprintTitle }: { content: string; blueprintTitle: string }) {
+  const prompts = parsePrompts(content);
+  const [selected, setSelected] = useState(0);
+  const [copied, setCopied] = useState<number | null>(null);
+  const [copiedAll, setCopiedAll] = useState(false);
+  const [copiedSet, setCopiedSet] = useState<Set<number>>(new Set());
+
+  const copyPrompt = async (idx: number) => {
+    try {
+      await navigator.clipboard.writeText(prompts[idx]?.content ?? "");
+      setCopied(idx);
+      setCopiedSet((prev) => new Set(prev).add(idx));
+      setTimeout(() => setCopied(null), 2000);
+    } catch { /* noop */ }
+  };
+
+  const copyAll = async () => {
+    try {
+      const all = prompts.map((p, i) => `### Paso ${i + 1}: ${p.title}\n\n${p.content}`).join("\n\n---\n\n");
+      await navigator.clipboard.writeText(all);
+      setCopiedAll(true);
+      setTimeout(() => setCopiedAll(false), 2500);
+    } catch { /* noop */ }
+  };
+
+  // Fallback si no se pudieron parsear prompts
+  if (prompts.length === 0) return <DefaultMarkdownSection content={content} />;
+
+  const currentPrompt = prompts[selected];
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6">
+      {/* Barra superior: instrucción + copiar todo */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          Pegá cada indicación en Lovable en el orden en que aparece.
+        </p>
+        <div className="flex items-center gap-3 shrink-0">
+          <span className="text-xs text-muted-foreground">
+            {copiedSet.size} / {prompts.length} copiados
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={copyAll}
+            className="gap-1.5 h-8"
+          >
+            {copiedAll ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+            {copiedAll ? "¡Copiado!" : "Copiar el PRD completo"}
+          </Button>
+        </div>
+      </div>
+
+      {/* Layout doble columna */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        {/* Left: lista de prompts */}
+        <div className="lg:col-span-2 space-y-1.5">
+          {prompts.map((p, i) => (
+            <button
+              key={i}
+              onClick={() => setSelected(i)}
+              className={`w-full text-left rounded-xl p-3 flex items-start gap-3 border transition-all ${
+                selected === i
+                  ? "border-primary/60 bg-primary/5 shadow-sm"
+                  : "border-border bg-card hover:border-border/80 hover:bg-card/80"
+              }`}
+            >
+              <span
+                className={`shrink-0 h-6 w-6 rounded-full text-xs font-semibold flex items-center justify-center transition-colors ${
+                  copiedSet.has(i)
+                    ? "bg-emerald-500/20 text-emerald-400"
+                    : selected === i
+                    ? "bg-primary/20 text-primary"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {copiedSet.has(i) ? <Check className="h-3 w-3" /> : i + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className={`text-sm font-medium truncate ${selected === i ? "text-foreground" : "text-muted-foreground"}`}>
+                  {p.title}
+                </p>
+                <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">
+                  {p.content.slice(0, 55)}…
+                </p>
+              </div>
+              <ChevronRight className={`h-3.5 w-3.5 shrink-0 transition-colors ${selected === i ? "text-primary" : "text-muted-foreground/40"}`} />
+            </button>
+          ))}
+        </div>
+
+        {/* Right: prompt seleccionado */}
+        <div className="lg:col-span-3 rounded-2xl border border-border bg-card flex flex-col">
+          <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4 border-b border-border">
+            <div>
+              <p className="text-[11px] text-muted-foreground mb-0.5">
+                Paso {selected + 1} de {prompts.length}
+              </p>
+              <h3 className="font-semibold text-foreground text-sm sm:text-base leading-tight">
+                {currentPrompt?.title}
+              </h3>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => copyPrompt(selected)}
+              className={`gap-1.5 h-8 shrink-0 transition-colors ${
+                copied === selected ? "border-emerald-500/40 text-emerald-400" : ""
+              }`}
+            >
+              {copied === selected ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied === selected ? "¡Copiado!" : "Copiar"}
+            </Button>
+          </div>
+          <ScrollArea className="flex-1 max-h-[460px]">
+            <pre className="px-5 py-4 text-sm text-muted-foreground whitespace-pre-wrap break-words leading-relaxed font-mono">
+              {currentPrompt?.content ?? ""}
+            </pre>
+          </ScrollArea>
+        </div>
+      </div>
+
+      {/* Tip */}
+      <div className="mt-5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 flex items-start gap-2">
+        <Zap className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+        <p className="text-xs text-amber-300/90">
+          <span className="font-semibold">Consejo:</span> Seguí las indicaciones en orden. Cada prompt hace referencia a tablas y componentes creados en el anterior. Pegá el <strong>primero en un proyecto nuevo de Lovable</strong> y los demás como actualizaciones.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// PlanAccionSection — Kanban de sprints
+// ============================================================
+function PlanAccionSection({ content }: { content: string }) {
+  const sprints = parseSprints(content);
+
+  if (sprints.length < 2) return <DefaultMarkdownSection content={content} />;
+
+  const sprintStyles = [
+    { bg: "bg-cyan-500/10", border: "border-cyan-500/30", badge: "bg-cyan-500/20 text-cyan-400" },
+    { bg: "bg-purple-500/10", border: "border-purple-500/30", badge: "bg-purple-500/20 text-purple-400" },
+    { bg: "bg-emerald-500/10", border: "border-emerald-500/30", badge: "bg-emerald-500/20 text-emerald-400" },
+  ];
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
+      <div className="grid gap-4 md:grid-cols-3">
+        {sprints.map((sprint, i) => {
+          const style = sprintStyles[i] ?? sprintStyles[0];
+          return (
+            <div
+              key={i}
+              className={`rounded-2xl border ${style.border} ${style.bg} p-5`}
+            >
+              <div className="mb-4">
+                <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${style.badge}`}>
+                  {sprint.title}
+                </span>
+              </div>
+              <ul className="space-y-2.5">
+                {sprint.tasks.map((task, j) => (
+                  <li key={j} className="flex items-start gap-2.5 group">
+                    <span className="mt-0.5 h-4 w-4 shrink-0 rounded border border-border bg-background/50 group-hover:border-primary/40 transition" />
+                    <span className="text-sm text-muted-foreground leading-snug">{task}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+
+    </div>
+  );
+}
+
+// ============================================================
+// ContenidoSection — Cards de temas a aprender
+// ============================================================
+function ContenidoSection({ content }: { content: string }) {
+  const topics = parseTopics(content);
+
+  if (topics.length === 0) return <DefaultMarkdownSection content={content} />;
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
+      <div className="space-y-3">
+        {topics.map((topic, i) => (
+          <div
+            key={i}
+            className="rounded-2xl border border-border bg-card p-4 sm:p-5 flex items-start gap-4 hover:border-primary/30 transition"
+          >
+            <div className="shrink-0 h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-orange-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-foreground mb-1 leading-snug">{topic.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{topic.description}</p>
+            </div>
+            <span className="shrink-0 text-2xl font-bold text-muted-foreground/20 tabular-nums">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// EconomiaSection — ROI visual con número prominente + markdown
+// ============================================================
+function EconomiaSection({ content }: { content: string }) {
+  // Intentar extraer número principal de ahorro
+  const moneyMatch = content.match(/\$\s?[\d.,]+(?:\s?[kKmM])?/);
+  const hoursMatch = content.match(/(\d+)\s*horas?\s*(?:\/?\s*mes|ahorradas?)/i);
+  const paybackMatch = content.match(/(\d+(?:[.,]\d+)?)\s*mes(?:es)?\s*(?:de\s*)?payback/i);
+  const roiMatch = content.match(/ROI[^:]*:\s*(\d+\s*%)/i) ?? content.match(/(\d+\s*%).*?retorno/i);
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
+      {/* Hero metrics */}
+      {(moneyMatch || hoursMatch) && (
+        <div className="grid gap-3 sm:grid-cols-3 mb-8">
+          {moneyMatch && (
+            <div className="rounded-2xl border border-teal-500/30 bg-teal-500/10 p-5 text-center">
+              <TrendingUp className="h-5 w-5 text-teal-400 mx-auto mb-2" />
+              <p className="text-3xl sm:text-4xl font-bold text-teal-400">{moneyMatch[0]}</p>
+              <p className="text-xs text-muted-foreground mt-1">Ahorro estimado</p>
+            </div>
           )}
-        </SheetContent>
-      </Sheet>
+          {hoursMatch && (
+            <div className="rounded-2xl border border-purple-500/30 bg-purple-500/10 p-5 text-center">
+              <Clock className="h-5 w-5 text-purple-400 mx-auto mb-2" />
+              <p className="text-3xl sm:text-4xl font-bold text-purple-400">{hoursMatch[1]}h</p>
+              <p className="text-xs text-muted-foreground mt-1">Horas ahorradas / mes</p>
+            </div>
+          )}
+          {(paybackMatch || roiMatch) && (
+            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5 text-center">
+              <PiggyBank className="h-5 w-5 text-emerald-400 mx-auto mb-2" />
+              <p className="text-3xl sm:text-4xl font-bold text-emerald-400">
+                {roiMatch ? roiMatch[1] : `${paybackMatch![1]}m`}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">{roiMatch ? "ROI estimado" : "Payback"}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Markdown completo */}
+      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-strong:text-foreground">
+        <ReactMarkdown>{content}</ReactMarkdown>
+      </div>
     </div>
   );
 }
