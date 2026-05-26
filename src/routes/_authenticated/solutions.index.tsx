@@ -193,18 +193,20 @@ function SolutionsList() {
                           "radial-gradient(55% 50% at 50% 42%, rgba(99,108,150,0.10), transparent 70%)",
                       }}
                     />
-                    <svg
-                      viewBox="0 0 64 64"
-                      className="h-10 w-auto text-foreground opacity-[0.14]"
-                      fill="currentColor"
+                    <span
                       aria-hidden="true"
-                    >
-                      <path d="M4 58 L13 58 L33 8 L29 4 Z" />
-                      <path d="M60 58 L51 58 L35 8 L31 4 Z" />
-                      <path d="M22 58 L30 58 L40 30 L36 26 Z" />
-                      <path d="M50 58 L42 58 L40 30 L44 26 Z" />
-                      <path d="M32 0 L37 11 L32 22 L27 11 Z" />
-                    </svg>
+                      className="block h-10 w-10 bg-current text-foreground opacity-[0.14]"
+                      style={{
+                        WebkitMaskImage: 'url("/logo-implementa.png")',
+                        maskImage: 'url("/logo-implementa.png")',
+                        WebkitMaskSize: "contain",
+                        maskSize: "contain",
+                        WebkitMaskRepeat: "no-repeat",
+                        maskRepeat: "no-repeat",
+                        WebkitMaskPosition: "center",
+                        maskPosition: "center",
+                      }}
+                    />
                   </div>
                 )}
               </div>
