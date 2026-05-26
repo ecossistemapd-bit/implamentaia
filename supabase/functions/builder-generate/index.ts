@@ -23,27 +23,28 @@ const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-opus-4-7";
 
 const SYSTEM_PROMPT = `Sos un consultor senior en implementación de IA para empresas de LatAm, parte de la plataforma Implementa AI.
 
-Recibís la idea de automatización de un usuario y sus respuestas a un diagnóstico. Tu tarea es diseñar el BLUEPRINT de la solución: un plan de implementación con IA estructurado en 8 secciones.
+Recibís la idea de automatización de un usuario y sus respuestas a un diagnóstico. Tu tarea es diseñar el BLUEPRINT COMPLETO de la solución: un plan de implementación con IA estructurado en 8 secciones con contenido DETALLADO y ACCIONABLE.
 
 REGLAS DE ESTILO:
 - Respondé SIEMPRE en español latinoamericano con voseo argentino (vos, tenés, podés, usá, hacé).
 - Sé concreto y accionable. Cero relleno, cero marketing vacío.
 - Usá nombres REALES de herramientas: Lovable, Supabase, n8n, Make, Zapier, Claude (Anthropic), OpenAI, Gemini, WhatsApp Business API, HubSpot, Vercel, etc. NUNCA inventes ni ofusques nombres de marcas.
+- Cada sección es markdown con headers (##, ###), listas (- item) y bloques de código (\`\`\`) donde aplique.
 
 REGLAS DE CONTENIDO:
 - El título tiene que ser corto, claro y ESPECÍFICO a la idea (no genérico). Máx ~60 caracteres.
 - Los tags son 4-6 categorías reales y útiles.
-- Cada resumen de sección tiene que ser específico a ESTA idea concreta, no una descripción genérica de la sección.
+- Cada sección DEBE tener mínimo 150 palabras con contenido específico a ESTA idea, no genérico.
 
 Las 8 secciones del blueprint son:
-1. Base de conocimientos — diagnóstico del problema, usuarios y contexto.
-2. Estructura — los pilares técnicos de la implementación (datos, prompts, modelos, automatización, interfaz).
-3. Arquitectura y flujos — el mapa/flujo del MVP de punta a punta.
-4. Herramientas — el stack recomendado (esenciales + alternativas), con nombres reales.
-5. Plan de acción — cómo se organiza el trabajo en sprints y tareas priorizadas.
-6. Rápido y adorable — las indicaciones (prompts) listas para pegar en Lovable y armar el MVP.
-7. Contenido — qué lecciones/temas conviene aprender para esta solución.
-8. Economía — el ahorro/ROI estimado vs contratar profesionales.
+1. base_conocimientos — Diagnóstico completo: problema raíz, quiénes son los usuarios, qué datos existen hoy, qué supuestos hay que validar y qué KPIs definen el éxito.
+2. estructura — Los 5 pilares técnicos de ESTA implementación: qué datos necesita, cómo se diseñan los prompts, qué modelos usar, cómo se conectan las automatizaciones y cuál es la interfaz.
+3. arquitectura — El flujo completo del MVP paso a paso: actores, eventos, decisiones, APIs y datos que se mueven entre cada componente.
+4. herramientas — Stack completo con justificación: herramienta esencial → para qué → alternativa gratuita. Incluir precios estimados.
+5. plan_accion — Kanban con 3 sprints: Sprint 1 (fundación), Sprint 2 (MVP funcional), Sprint 3 (lanzamiento). Cada sprint con 4-6 tareas concretas.
+6. rapido_adorable — 3 prompts listos para pegar en Lovable o en el LLM, específicos a esta solución. Incluir el system prompt del agente con variables tipo {{variable}}.
+7. contenido — 5-7 temas/recursos específicos que el usuario necesita aprender para implementar esta solución, con descripción de por qué cada uno importa.
+8. economia — ROI calculado: horas ahorradas/mes × valor hora, costo mensual del stack vs costo de contratar. Número concreto de ROI en meses de payback.
 
 Respondé SIEMPRE usando la herramienta generar_blueprint.`;
 
@@ -75,41 +76,42 @@ const BLUEPRINT_TOOL = {
           base_conocimientos: {
             type: "string",
             description:
-              "Resumen 1-2 frases: qué diagnóstico y contexto se cubre para esta idea.",
+              "Markdown completo (mín 150 palabras): diagnóstico del problema, perfil de usuarios, datos disponibles, supuestos a validar y KPIs de éxito para ESTA idea específica.",
           },
           estructura: {
             type: "string",
             description:
-              "Resumen 1-2 frases: los pilares técnicos de la implementación.",
+              "Markdown completo (mín 150 palabras): los 5 pilares técnicos de ESTA implementación — datos, prompts, modelos IA, automatización e interfaz — con detalle concreto.",
           },
           arquitectura: {
             type: "string",
-            description: "Resumen 1-2 frases: el flujo/arquitectura del MVP.",
+            description:
+              "Markdown completo (mín 150 palabras): flujo del MVP paso a paso con actores, eventos, APIs y datos que se mueven entre componentes. Usar listas numeradas.",
           },
           herramientas: {
             type: "string",
             description:
-              "Resumen 1-2 frases: el stack recomendado (nombres reales: Lovable, Supabase, n8n, Claude, etc.).",
+              "Markdown completo (mín 150 palabras): tabla o lista de herramientas esenciales + alternativas con justificación y precios estimados. Solo nombres reales.",
           },
           plan_accion: {
             type: "string",
             description:
-              "Resumen 1-2 frases: cómo se organiza el plan de acción en sprints.",
+              "Markdown completo (mín 200 palabras): Kanban con Sprint 1 (fundación), Sprint 2 (MVP), Sprint 3 (lanzamiento). Cada sprint con 4-6 tareas concretas como checklist.",
           },
           rapido_adorable: {
             type: "string",
             description:
-              "Resumen 1-2 frases: los prompts listos para pegar en Lovable.",
+              "Markdown completo (mín 200 palabras): 3 prompts listos para pegar — el system prompt del agente con variables {{variable}}, un prompt de onboarding y uno de manejo de errores. En bloques de código.",
           },
           contenido: {
             type: "string",
             description:
-              "Resumen 1-2 frases: qué lecciones/temas conviene aprender.",
+              "Markdown completo (mín 150 palabras): 5-7 temas/recursos específicos a aprender para implementar esta solución, con descripción de por qué cada uno importa.",
           },
           economia: {
             type: "string",
             description:
-              "Resumen 1-2 frases: el ahorro/ROI estimado vs contratar profesionales.",
+              "Markdown completo (mín 150 palabras): ROI calculado con números — horas ahorradas/mes, valor hora, costo mensual del stack, costo de contratar profesionales y meses de payback.",
           },
         },
         required: [
@@ -205,7 +207,7 @@ Generá el blueprint completo usando la herramienta generar_blueprint.`;
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 8000,
+        max_tokens: 16000,
         // El system + tool son estables entre requests → cacheables.
         system: [
           {
