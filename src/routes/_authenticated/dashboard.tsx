@@ -128,20 +128,10 @@ function Dashboard() {
     <>
       <OnboardingModal />
 
-      {/* Atmósfera violeta — radial glows fijos detrás de toda la página */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          background: `
-            radial-gradient(45% 40% at 95% -5%, rgba(139,92,246,0.30), transparent 60%),
-            radial-gradient(35% 30% at 100% 35%, rgba(139,92,246,0.15), transparent 65%),
-            radial-gradient(30% 25% at 5% 65%, rgba(139,92,246,0.08), transparent 70%)
-          `,
-        }}
-      />
+      {/* Wash violeta fijo detrás del área del dashboard. No reacciona al hover. */}
+      <div className="dashboard-violet-wash" aria-hidden />
 
-      <div className="relative z-10 mx-auto max-w-[1340px] px-8 py-8">
+      <div className="relative z-[1] mx-auto max-w-[1340px] px-8 py-8">
         {/* HEADER COMPACTO */}
         <header className="mb-6">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
@@ -220,14 +210,13 @@ function HeroRutaIA({
   nextInRoute: Array<{ id: string; title: string; short_description: string }>;
 }) {
   return (
-    <div className="relative col-span-12 overflow-hidden rounded-2xl border border-border bg-card p-7 lg:col-span-8">
-      {/* glow violeta interno top-left */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-1/3 -left-1/4 h-[120%] w-[80%]"
-        style={{ background: "radial-gradient(closest-side, rgba(139,92,246,0.22), transparent 70%)" }}
-      />
-      <div className="relative">
+    <div
+      className="col-span-12 rounded-2xl border border-border bg-card p-7 transition-shadow duration-500 lg:col-span-8"
+      style={{ boxShadow: "0 0 60px -10px rgba(139,92,246,0.14)" }}
+      onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 0 100px -10px rgba(139,92,246,0.32)")}
+      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 0 60px -10px rgba(139,92,246,0.14)")}
+    >
+      <div>
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <span className="rounded border border-border bg-card/60 px-2 py-0.5 text-[10px] font-bold tracking-[0.10em] text-muted-foreground">
             RUTA IA PERSONALIZADA
@@ -328,13 +317,13 @@ function NextMentoria() {
   };
 
   return (
-    <div className="relative col-span-12 overflow-hidden rounded-2xl border border-border bg-card p-5 lg:col-span-4">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-1/3 -left-1/4 h-[120%] w-[80%]"
-        style={{ background: "radial-gradient(closest-side, rgba(139,92,246,0.22), transparent 70%)" }}
-      />
-      <div className="relative">
+    <div
+      className="col-span-12 rounded-2xl border border-border bg-card p-5 transition-shadow duration-500 lg:col-span-4"
+      style={{ boxShadow: "0 0 60px -10px rgba(139,92,246,0.14)" }}
+      onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 0 100px -10px rgba(139,92,246,0.32)")}
+      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 0 60px -10px rgba(139,92,246,0.14)")}
+    >
+      <div>
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
             PRÓXIMA MENTORÍA

@@ -6,22 +6,101 @@ import {
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ComponentType } from "react";
 import {
   LayoutDashboard,
-  Sparkles,
-  FolderKanban,
-  BookOpen,
   Settings as SettingsIcon,
   Settings2,
   LogOut,
   Menu,
   ChevronRight,
-  TrendingUp,
   HeartHandshake,
-  Wand2,
-  Compass,
 } from "lucide-react";
+
+/* ------------------------------------------------------------------
+ * Sidebar custom icons (subpartes nombradas → animaciones temáticas).
+ * Las clases CSS .nav-{name}:hover .{subparte} viven en styles.css.
+ * ------------------------------------------------------------------ */
+type IconProps = { className?: string; strokeWidth?: number };
+
+function IconDashboardGrid({ className, strokeWidth = 1.75 }: IconProps) {
+  return (
+    <svg className={`nav-icon ${className ?? ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect className="db-tile db-tile-1" x="3" y="3" width="7" height="9" />
+      <rect className="db-tile db-tile-2" x="14" y="3" width="7" height="5" />
+      <rect className="db-tile db-tile-3" x="14" y="12" width="7" height="9" />
+      <rect className="db-tile db-tile-4" x="3" y="16" width="7" height="5" />
+    </svg>
+  );
+}
+
+function IconStarSoluciones({ className, strokeWidth = 1.75 }: IconProps) {
+  return (
+    <svg className={`nav-icon ${className ?? ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path className="star-trail" d="M3 21 L8 14" opacity={0} />
+      <path className="star-shape" d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z" />
+    </svg>
+  );
+}
+
+function IconBookCursos({ className, strokeWidth = 1.75 }: IconProps) {
+  return (
+    <svg className={`nav-icon ${className ?? ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path className="book-cover" d="M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2zM4 19h14" />
+      <path className="book-page" d="M7 7h8M7 11h8M7 15h5" strokeWidth={1.4} opacity={0} />
+    </svg>
+  );
+}
+
+function IconTrendProgreso({ className, strokeWidth = 1.75 }: IconProps) {
+  return (
+    <svg className={`nav-icon ${className ?? ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path className="trend-line" d="M3 17l6-6 4 4 8-8" />
+      <path className="trend-arrow" d="M14 7h7v7" />
+    </svg>
+  );
+}
+
+function IconFolderProyectos({ className, strokeWidth = 1.75 }: IconProps) {
+  return (
+    <svg className={`nav-icon ${className ?? ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path className="folder-shape" d="M3 7h6l2-2h10v14H3z" />
+      <rect className="folder-file" x="10" y="2" width="6" height="7" rx="0.5" fill="currentColor" stroke="none" opacity={0} />
+    </svg>
+  );
+}
+
+function IconWandBuilder({ className, strokeWidth = 1.75 }: IconProps) {
+  return (
+    <svg className={`nav-icon ${className ?? ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path className="wand-stick" d="M5 19L15 9" />
+      <path className="wand-tip" d="M14 4l1 3 3 1-3 1-1 3-1-3-3-1 3-1z" />
+      <circle className="wand-spark wand-spark-1" cx="20" cy="6" r="0.7" fill="currentColor" stroke="none" opacity={0} />
+      <circle className="wand-spark wand-spark-2" cx="7" cy="5" r="0.6" fill="currentColor" stroke="none" opacity={0} />
+      <circle className="wand-spark wand-spark-3" cx="19" cy="14" r="0.6" fill="currentColor" stroke="none" opacity={0} />
+    </svg>
+  );
+}
+
+function IconClockMentoria({ className, strokeWidth = 1.75 }: IconProps) {
+  return (
+    <svg className={`nav-icon ${className ?? ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle className="clock-face" cx="12" cy="12" r="9" />
+      <line className="clock-hand-minute" x1="12" y1="12" x2="12" y2="6" />
+      <line className="clock-hand-hour" x1="12" y1="12" x2="15.5" y2="12" strokeWidth={2.2} />
+      <circle className="clock-pivot" cx="12" cy="12" r="0.8" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function IconCogConfig({ className, strokeWidth = 1.75 }: IconProps) {
+  return (
+    <svg className={`nav-icon ${className ?? ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -61,7 +140,8 @@ type RoutePath =
 type NavItem = {
   to: RoutePath;
   label: string;
-  icon: typeof LayoutDashboard;
+  icon: ComponentType<IconProps>;
+  navClass?: string; // clase nav-* para disparar animaciones del icono en hover
   badge?: string;
   implOnly?: boolean;
   adminOnly?: boolean;
@@ -73,31 +153,31 @@ const SECTIONS: NavSection[] = [
   {
     label: "Inicio",
     items: [
-      { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { to: "/solutions", label: "Soluciones", icon: Sparkles },
+      { to: "/dashboard", label: "Dashboard", icon: IconDashboardGrid, navClass: "nav-dashboard" },
+      { to: "/solutions", label: "Soluciones", icon: IconStarSoluciones, navClass: "nav-soluciones" },
     ],
   },
   {
     label: "Aprendizaje",
     items: [
-      { to: "/cursos", label: "Cursos", icon: BookOpen, badge: "NUEVO" },
-      { to: "/mi-progreso", label: "Mi Progreso", icon: TrendingUp },
+      { to: "/cursos", label: "Cursos", icon: IconBookCursos, navClass: "nav-cursos", badge: "NUEVO" },
+      { to: "/mi-progreso", label: "Mi Progreso", icon: IconTrendProgreso, navClass: "nav-progreso" },
     ],
   },
   {
     label: "Herramientas",
     items: [
-      { to: "/projects", label: "Mis Proyectos", icon: FolderKanban },
-      { to: "/builder", label: "Builder", icon: Wand2, badge: "NUEVO" },
+      { to: "/projects", label: "Mis Proyectos", icon: IconFolderProyectos, navClass: "nav-proyectos" },
+      { to: "/builder", label: "Builder", icon: IconWandBuilder, navClass: "nav-builder", badge: "NUEVO" },
       { to: "/contratar-experto", label: "Contratar Experto", icon: HeartHandshake },
-      { to: "/mentoria", label: "Mentoría", icon: Compass, badge: "PRÓXIMAMENTE" },
+      { to: "/mentoria", label: "Mentoría", icon: IconClockMentoria, navClass: "nav-mentorias", badge: "PRÓXIMAMENTE" },
       { to: "/implementador", label: "Panel Impl.", icon: LayoutDashboard, implOnly: true },
       { to: "/admin", label: "Admin", icon: Settings2, adminOnly: true },
     ],
   },
   {
     label: "Cuenta",
-    items: [{ to: "/settings", label: "Configuración", icon: SettingsIcon }],
+    items: [{ to: "/settings", label: "Configuración", icon: IconCogConfig, navClass: "nav-config" }],
   },
 ];
 
@@ -217,7 +297,7 @@ function NavList() {
                 <Link
                   key={item.label}
                   to={item.to}
-                  className={`group flex items-center gap-2.5 rounded-lg border-l-2 px-3 py-2 text-[13px] transition-colors duration-200 ${
+                  className={`${item.navClass ?? ""} group flex items-center gap-2.5 rounded-lg border-l-2 px-3 py-2 text-[13px] transition-colors duration-200 ${
                     active
                       ? "border-primary bg-primary/[0.08] font-medium text-foreground"
                       : "border-transparent font-normal text-muted-foreground hover:bg-white/[0.08] hover:text-foreground"
