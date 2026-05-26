@@ -17,16 +17,16 @@ export function Logo({ className = "" }: { className?: string }) {
         fill="currentColor"
         aria-hidden="true"
       >
-        {/* Banda exterior izquierda — desde base hasta vértice */}
-        <path d="M4 58 L13 58 L33 8 L29 4 Z" />
+        {/* Banda exterior izquierda — trapezoide grueso, base ancha, vértice angosto */}
+        <path d="M3 60 L15 60 L29 10 L23 6 Z" />
         {/* Banda exterior derecha — espejo */}
-        <path d="M60 58 L51 58 L35 8 L31 4 Z" />
-        {/* Banda interior izquierda — más corta, paralela */}
-        <path d="M22 58 L30 58 L40 30 L36 26 Z" />
-        {/* Banda interior derecha — espejo, más corta */}
-        <path d="M50 58 L42 58 L40 30 L44 26 Z" />
-        {/* Rombo/cristal en el vértice */}
-        <path d="M32 0 L37 11 L32 22 L27 11 Z" />
+        <path d="M61 60 L49 60 L35 10 L41 6 Z" />
+        {/* Banda interior izquierda — más corta, sólo en el tercio superior */}
+        <path d="M22 60 L29 60 L33 28 L29 24 Z" />
+        {/* Banda interior derecha — espejo */}
+        <path d="M42 60 L35 60 L31 28 L35 24 Z" />
+        {/* Rombo/cristal en el vértice — eje central, simétrico */}
+        <path d="M32 0 L39 14 L32 28 L25 14 Z" />
       </svg>
       <span className="text-[13px] font-medium uppercase tracking-[0.2em] leading-none">
         Implementa&nbsp;IA

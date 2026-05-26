@@ -199,11 +199,11 @@ function SolutionsList() {
                       fill="currentColor"
                       aria-hidden="true"
                     >
-                      <path d="M4 58 L13 58 L33 8 L29 4 Z" />
-                      <path d="M60 58 L51 58 L35 8 L31 4 Z" />
-                      <path d="M22 58 L30 58 L40 30 L36 26 Z" />
-                      <path d="M50 58 L42 58 L40 30 L44 26 Z" />
-                      <path d="M32 0 L37 11 L32 22 L27 11 Z" />
+                      <path d="M3 60 L15 60 L29 10 L23 6 Z" />
+                      <path d="M61 60 L49 60 L35 10 L41 6 Z" />
+                      <path d="M22 60 L29 60 L33 28 L29 24 Z" />
+                      <path d="M42 60 L35 60 L31 28 L35 24 Z" />
+                      <path d="M32 0 L39 14 L32 28 L25 14 Z" />
                     </svg>
                   </div>
                 )}
