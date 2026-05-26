@@ -3,12 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
-  Bell,
+  Check,
   Clock,
   Flame,
   RefreshCw,
   Play,
   Command,
+  Users,
+  UserCheck,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -309,12 +311,21 @@ function HeroRutaIA({
 
 // =============================================================================
 // Próxima Mentoría — placeholder hasta que esté la tabla `mentorias`
+// Layout: estilo Viver (Próxima Mentoría → FALTAN → HOY · hora → título →
+// con [mentor] → Hacer Check-in → asistencias + cupos).
 // =============================================================================
 function NextMentoria() {
   // TODO(mentorías): leer próxima mentoría de tabla `mentorias` cuando esté lista.
-  // 4 slots por día (9:00 / 10:30 / 14:00 / 15:30 ART), acceso ilimitado, sin reserva.
-  const nextSlot = { hora: "15:30", faltan: "1h 30min" };
-  const yaHubo = ["09:00", "10:30", "14:00"];
+  // 4 slots por día (9:00 / 10:30 / 14:00 / 15:30 ART).
+  const nextSlot = {
+    hora: "15:30",
+    faltan: "1h 30min",
+    titulo: "Mentoría de IA",
+    mentor: "Gino Altamirano", // TODO: campo `mentor` o relación con `profiles` cuando exista
+    asistencias: 8, // TODO: count de asistencias del user a mentorías
+    cuposTomados: 3, // TODO: count de anotados al próximo slot
+    cuposTotal: 8, // TODO: capacidad del slot (si aplica)
+  };
 
   return (
     <div className="relative col-span-12 overflow-hidden rounded-2xl border border-border bg-card p-5 lg:col-span-4">
@@ -332,35 +343,34 @@ function NextMentoria() {
             <Clock className="h-3 w-3" /> FALTAN {nextSlot.faltan}
           </span>
         </div>
-        <div className="mt-4 text-[12px] font-semibold tracking-wide text-muted-foreground">
+        <div className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold tracking-wide text-muted-foreground">
+          <span
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ background: "#8B5CF6" }}
+          />
           HOY · {nextSlot.hora} ART
         </div>
-        <h3 className="mt-1 text-[22px] font-bold leading-tight">Mentoría grupal de IA</h3>
-        <p className="mt-1 text-[13px] text-muted-foreground">Q&A abierto · entrá cuando quieras</p>
+        <h3 className="mt-1 text-[22px] font-bold leading-tight">{nextSlot.titulo}</h3>
+        <p className="mt-1 text-[13px] text-muted-foreground">con {nextSlot.mentor}</p>
         <Link
           to="/mentoria"
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-white px-4 py-[11px] text-[14px] font-semibold text-[#060608] transition hover:bg-zinc-200"
         >
-          <Bell className="h-4 w-4" /> Anotarme · te avisamos antes
+          <Check className="h-4 w-4" /> Hacer Check-in
         </Link>
         <div className="my-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-        <div className="mb-2 text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
-          HOY YA HUBO
-        </div>
-        <div className="flex items-center gap-2 text-[12px]">
-          {yaHubo.map((h, i) => (
-            <span key={h} className="contents">
-              <span className="tabular-nums">{h}</span>
-              {i < yaHubo.length - 1 && <span className="text-muted-foreground/70">·</span>}
-            </span>
-          ))}
-          <Link to="/mentoria" className="ml-auto inline-flex items-center gap-1 text-[12px] font-medium text-foreground hover:text-[#C4B5FD]">
-            Grabaciones →
-          </Link>
-        </div>
-        <div className="my-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-        <div className="text-[11px] text-muted-foreground">
-          4 mentorías por día · entrá a todas las que quieras
+        <div className="flex items-center justify-between text-[12px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <Users className="h-3.5 w-3.5" />
+            <span className="tabular-nums">{nextSlot.asistencias}</span> asistencias
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <UserCheck className="h-3.5 w-3.5" />
+            <span className="tabular-nums">
+              {nextSlot.cuposTomados}/{nextSlot.cuposTotal}
+            </span>{" "}
+            cupos
+          </span>
         </div>
       </div>
     </div>
