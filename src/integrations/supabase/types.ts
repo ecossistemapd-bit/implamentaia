@@ -32,6 +32,24 @@ export type Database = {
         }
         Relationships: []
       }
+      app_config: {
+        Row: {
+          key: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       builder_projects: {
         Row: {
           builder_session_id: string | null
@@ -190,6 +208,42 @@ export type Database = {
           order_index?: number
           thumbnail_url?: string | null
           title?: string
+        }
+        Relationships: []
+      }
+      db_backups: {
+        Row: {
+          created_at: string
+          data: Json
+          error_log: string | null
+          file_name: string
+          id: string
+          row_counts: Json
+          size_bytes: number
+          status: string
+          total_rows: number
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          error_log?: string | null
+          file_name: string
+          id?: string
+          row_counts?: Json
+          size_bytes?: number
+          status?: string
+          total_rows?: number
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          error_log?: string | null
+          file_name?: string
+          id?: string
+          row_counts?: Json
+          size_bytes?: number
+          status?: string
+          total_rows?: number
         }
         Relationships: []
       }
@@ -587,6 +641,8 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_implementer_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      run_daily_backup: { Args: never; Returns: Json }
+      send_weekly_backup_email: { Args: never; Returns: undefined }
     }
     Enums: {
       builder_status:
