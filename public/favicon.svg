@@ -1,4 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="14" fill="#000"/>
-  <text x="32" y="44" font-family="Inter, system-ui, sans-serif" font-size="38" font-weight="700" fill="#fff" text-anchor="middle">I</text>
+  <g fill="#fff">
+    <path d="M4 58 L13 58 L33 8 L29 4 Z"/>
+    <path d="M60 58 L51 58 L35 8 L31 4 Z"/>
+    <path d="M22 58 L30 58 L40 30 L36 26 Z"/>
+    <path d="M50 58 L42 58 L40 30 L44 26 Z"/>
+    <path d="M32 0 L37 11 L32 22 L27 11 Z"/>
+  </g>
 </svg>

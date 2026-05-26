@@ -128,7 +128,10 @@ function Dashboard() {
     <>
       <OnboardingModal />
 
-      <div className="mx-auto max-w-[1340px] px-8 py-8">
+      {/* Wash violeta fijo detrás del área del dashboard. No reacciona al hover. */}
+      <div className="dashboard-violet-wash" aria-hidden />
+
+      <div className="relative z-[1] mx-auto max-w-[1340px] px-8 py-8">
         {/* HEADER COMPACTO */}
         <header className="mb-6">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">

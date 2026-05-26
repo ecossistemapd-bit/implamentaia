@@ -194,17 +194,16 @@ function SolutionsList() {
                       }}
                     />
                     <svg
-                      viewBox="0 0 26 22"
-                      className="h-9 w-auto text-foreground opacity-[0.14]"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      viewBox="0 0 64 64"
+                      className="h-10 w-auto text-foreground opacity-[0.14]"
+                      fill="currentColor"
                       aria-hidden="true"
                     >
-                      <path d="M2.8 2 L2.8 20.5" />
-                      <path d="M7.6 20.5 L15.8 2 L24 20.5" />
+                      <path d="M4 58 L13 58 L33 8 L29 4 Z" />
+                      <path d="M60 58 L51 58 L35 8 L31 4 Z" />
+                      <path d="M22 58 L30 58 L40 30 L36 26 Z" />
+                      <path d="M50 58 L42 58 L40 30 L44 26 Z" />
+                      <path d="M32 0 L37 11 L32 22 L27 11 Z" />
                     </svg>
                   </div>
                 )}
