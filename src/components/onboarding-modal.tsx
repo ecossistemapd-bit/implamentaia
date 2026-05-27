@@ -9,6 +9,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES } from "@/lib/categories";
+import { LunaLoader } from "@/components/builder/luna-loader";
 
 // ============================================================
 // Implementa AI · Onboarding v6 LUNA
@@ -264,9 +265,9 @@ export function OnboardingModal() {
           className={`iai-onb-modal ${status === "closing" ? "iai-onb-modal--exit" : ""}`}
         >
           <div className="iai-onb-grid">
-            {/* === VISUAL PANE: Luna === */}
+            {/* === VISUAL PANE: Luna animada === */}
             <div className="iai-onb-visual">
-              <LunaOrb />
+              <LunaLoader size={200} />
               <LunaCaption />
             </div>
 
@@ -353,20 +354,8 @@ export function OnboardingModal() {
 }
 
 // ============================================================
-// LUNA · orb estático plateado premium
+// LUNA · caption (orb animada vive en LunaLoader, importada arriba)
 // ============================================================
-function LunaOrb() {
-  return (
-    <div className="iai-onb-orb-static">
-      <div className="iai-onb-orb">
-        <div className="iai-onb-orb-craters" />
-        <div className="iai-onb-orb-shine-1" />
-        <div className="iai-onb-orb-shine-2" />
-      </div>
-    </div>
-  );
-}
-
 function LunaCaption() {
   return (
     <div className="iai-onb-caption">
