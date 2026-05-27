@@ -18,8 +18,8 @@ const corsHeaders = {
 };
 
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
-// Modelo por defecto: claude-opus-4-5. Overridable vía secret ANTHROPIC_MODEL.
-const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-opus-4-5";
+// Modelo por defecto: claude-3-5-sonnet (probado, disponible en todos los planes).
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-3-5-sonnet-20241022";
 
 const SYSTEM_PROMPT = `Sos un consultor senior en implementación de IA para empresas de LatAm, parte de la plataforma Implementa AI.
 
@@ -207,15 +207,8 @@ Generá el blueprint completo usando la herramienta generar_blueprint.`;
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 16000,
-        // El system + tool son estables entre requests → cacheables.
-        system: [
-          {
-            type: "text",
-            text: SYSTEM_PROMPT,
-            cache_control: { type: "ephemeral" },
-          },
-        ],
+        max_tokens: 8000,
+        system: SYSTEM_PROMPT,
         tools: [BLUEPRINT_TOOL],
         tool_choice: { type: "tool", name: "generar_blueprint" },
         messages: [{ role: "user", content: userPrompt }],
