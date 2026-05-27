@@ -448,10 +448,7 @@ function FeaturedCard({
             </div>
           )}
 
-          <button
-            onClick={onClick}
-            className="mt-6 inline-flex w-fit items-center gap-2 rounded-lg bg-white text-black hover:bg-zinc-100"
-          >
+          <button onClick={onClick} className="app-cta-primary mt-6 w-fit">
             <Sparkles className="h-4 w-4" />
             {inProgress ? "Continuar donde lo dejé" : "Comenzar curso"}
           </button>

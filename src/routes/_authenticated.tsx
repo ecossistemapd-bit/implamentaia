@@ -201,8 +201,12 @@ function AuthenticatedLayout() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
+      {/* Wash violeta atmosférico global — visible en TODAS las rutas autenticadas.
+       * Theme-aware (alpha sube en light, baja en dark). Fixed → no scroll. */}
+      <div className="app-violet-wash" aria-hidden />
+
       <DesktopSidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative z-[1] flex min-w-0 flex-1 flex-col">
         <MobileTopBar />
         <main className="flex-1 animate-fade-in">
           <Outlet />

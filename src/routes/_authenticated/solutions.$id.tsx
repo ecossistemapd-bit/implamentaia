@@ -283,7 +283,7 @@ function SolutionByIdDetail() {
             {!inDev && (
               <Button
                 onClick={goToJourney}
-                className="mt-6 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:opacity-90"
+                className="app-cta-primary mt-6"
               >
                 Continuar Solución <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
@@ -390,7 +390,7 @@ function SolutionByIdDetail() {
             </p>
             <Button
               onClick={() => toast.success("Te avisaremos al email cuando esté lista.", { duration: 4000 })}
-              className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="app-cta-primary mt-5"
             >
               Avisarme cuando esté lista
             </Button>
