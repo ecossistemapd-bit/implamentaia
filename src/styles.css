@@ -137,6 +137,26 @@
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.10), 0 6px 18px rgba(0, 0, 0, 0.08);
   --card-shadow-hover: 0 24px 48px -12px rgba(0, 0, 0, 0.22), 0 8px 16px -4px rgba(0, 0, 0, 0.10);
   --card-border-hover: #86868B;
+
+  /* Dashboard violet tokens — LIGHT theme. Más alpha para compensar bg blanco. */
+  --violet-border: rgba(139,92,246,0.32);
+  --violet-border-hover: rgba(139,92,246,0.58);
+  --violet-glow-hover: rgba(139,92,246,0.22);
+  --violet-text: #6D28D9;
+  --violet-text-strong: #5B21B6;
+  --violet-pill-bg: rgba(139,92,246,0.08);
+  --violet-pill-border: rgba(139,92,246,0.30);
+  --wash-1: 0.32;
+  --wash-2: 0.24;
+  --wash-3: 0.16;
+
+  /* CTA primario en LIGHT: violeta sólido (premium high-ticket) */
+  --cta-primary-bg: #6D28D9;
+  --cta-primary-bg-hover: #5B21B6;
+  --cta-primary-text: #FFFFFF;
+  --cta-primary-shadow: rgba(109,40,217,0.32);
+  --cta-ghost-bg: rgba(0,0,0,0.02);
+  --cta-ghost-bg-hover: rgba(139,92,246,0.10);
 }
 
 .dark {
@@ -191,6 +211,26 @@
   --card-shadow: none;
   --card-shadow-hover: 0 0 0 1px rgba(255, 255, 255, 0.10), 0 20px 48px -12px rgba(0, 0, 0, 0.7);
   --card-border-hover: rgba(255, 255, 255, 0.38);
+
+  /* Dashboard violet tokens — DARK theme. Más sutiles (sobre negro el violeta vibra más). */
+  --violet-border: rgba(139,92,246,0.18);
+  --violet-border-hover: rgba(139,92,246,0.36);
+  --violet-glow-hover: rgba(139,92,246,0.14);
+  --violet-text: #A78BFA;
+  --violet-text-strong: #C4B5FD;
+  --violet-pill-bg: rgba(139,92,246,0.05);
+  --violet-pill-border: rgba(139,92,246,0.20);
+  --wash-1: 0.16;
+  --wash-2: 0.12;
+  --wash-3: 0.08;
+
+  /* CTA primario en DARK: blanco sobre negro */
+  --cta-primary-bg: #FFFFFF;
+  --cta-primary-bg-hover: #F5F5F7;
+  --cta-primary-text: #060608;
+  --cta-primary-shadow: rgba(255,255,255,0.10);
+  --cta-ghost-bg: rgba(255,255,255,0.04);
+  --cta-ghost-bg-hover: rgba(139,92,246,0.08);
 }
 
 @layer base {
@@ -368,18 +408,18 @@
  * Sólo aplica al área del dashboard autenticado (sidebar tiene su propio bg).
  * ============================================================ */
 
-/* Wash violeta MUY sutil — ambient delicado, no protagonista.
- * Funciona en ambos temas: rgba con alpha bajo se mezcla con cualquier bg
- * (dark → tinte violáceo apenas, light → tinte lavanda apenas). */
+/* Wash violeta theme-aware — alpha escala según tema (más fuerte en light para
+ * compensar el bg blanco). Funciona en ambos temas vía CSS vars. */
 .dashboard-violet-wash {
   position: fixed;
   top: 0; bottom: 0; right: 0; left: 220px;
   pointer-events: none;
   z-index: 1;
   background:
-    radial-gradient(60% 50% at 25% 20%, rgba(139,92,246,0.10), transparent 70%),
-    radial-gradient(55% 45% at 80% 50%, rgba(139,92,246,0.07), transparent 72%),
-    radial-gradient(50% 40% at 50% 95%, rgba(139,92,246,0.05), transparent 75%);
+    radial-gradient(60% 50% at 25% 20%, rgba(139,92,246,var(--wash-1)), transparent 70%),
+    radial-gradient(55% 45% at 80% 50%, rgba(139,92,246,var(--wash-2)), transparent 72%),
+    radial-gradient(50% 40% at 50% 95%, rgba(139,92,246,var(--wash-3)), transparent 75%);
+  transition: background 240ms ease;
 }
 .dashboard-violet-wash + * { position: relative; z-index: 2; }
 @media (max-width: 1024px) {
@@ -388,49 +428,91 @@
 
 /* ============================================================
  * Dashboard cards — marco violeta sutil + lift al hover.
- * Premium = restraint. Idle apenas se nota, hover intensifica suavemente.
- * Usa rgba con alpha bajo para que funcione en dark y light theme.
+ * Theme-aware vía tokens: en dark sutil, en light intensifica.
  * ============================================================ */
 .dashboard-card {
   background-color: var(--card);
-  border: 1px solid rgba(139,92,246,0.14);
+  border: 1px solid var(--violet-border);
   border-radius: 16px;
   box-shadow: 0 4px 16px -12px rgba(0,0,0,0.4);
   transition:
     transform 380ms cubic-bezier(0.16, 1, 0.3, 1),
     border-color 320ms ease,
-    box-shadow 380ms ease;
+    box-shadow 380ms ease,
+    background-color 240ms ease;
   will-change: transform;
 }
 .dashboard-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(139,92,246,0.30);
+  border-color: var(--violet-border-hover);
   box-shadow:
-    0 0 20px -6px rgba(139,92,246,0.12),
+    0 0 20px -6px var(--violet-glow-hover),
     0 16px 32px -18px rgba(0,0,0,0.55);
 }
 
 /* Mini step cards dentro del Hero — más livianas que dashboard-card */
 .dashboard-mini-step {
   background-color: var(--card);
-  border: 1px solid rgba(139,92,246,0.10);
+  border: 1px solid var(--violet-pill-border);
   border-radius: 12px;
   transition:
     transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
     border-color 220ms ease,
-    box-shadow 280ms ease;
+    box-shadow 280ms ease,
+    background-color 240ms ease;
 }
 .dashboard-mini-step:hover {
   transform: translateY(-2px);
-  border-color: rgba(139,92,246,0.24);
+  border-color: var(--violet-border-hover);
   box-shadow: 0 8px 20px -14px rgba(0,0,0,0.5);
 }
 
-/* Pill con accent violeta — para datos premium (streak, FALTAN, etc.) */
+/* Pill con accent violeta — para datos premium (streak, FALTAN, RUTA IA, etc.) */
 .dashboard-pill-violet {
-  color: #C4B5FD;
-  background: rgba(139,92,246,0.04);
-  border: 1px solid rgba(139,92,246,0.18);
+  color: var(--violet-text-strong);
+  background: var(--violet-pill-bg);
+  border: 1px solid var(--violet-pill-border);
+  transition: color 240ms ease, background 240ms ease, border-color 240ms ease;
+}
+
+/* ============================================================
+ * Dashboard CTAs — theme-aware.
+ * Primary: en dark blanco/zinc, en light violeta sólido (premium high-ticket).
+ * Ghost: outline violeta sutil en ambos.
+ * ============================================================ */
+.dashboard-cta-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 16px; border-radius: 10px;
+  font-size: 14px; font-weight: 600;
+  background: var(--cta-primary-bg);
+  color: var(--cta-primary-text);
+  border: 1px solid transparent;
+  box-shadow: 0 4px 14px -4px var(--cta-primary-shadow);
+  transition: background 240ms ease, color 240ms ease, box-shadow 240ms ease, transform 240ms ease;
+  cursor: pointer;
+}
+.dashboard-cta-primary:hover {
+  background: var(--cta-primary-bg-hover);
+  color: var(--cta-primary-text);
+  box-shadow:
+    0 0 28px -2px rgba(139,92,246,0.55),
+    0 8px 24px -6px rgba(139,92,246,0.40);
+  transform: translateY(-2px);
+}
+.dashboard-cta-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 16px; border-radius: 10px;
+  font-size: 14px; font-weight: 600;
+  color: var(--foreground);
+  background: var(--cta-ghost-bg);
+  border: 1px solid var(--violet-pill-border);
+  transition: background 240ms ease, border-color 240ms ease, transform 240ms ease;
+  cursor: pointer;
+}
+.dashboard-cta-ghost:hover {
+  background: var(--cta-ghost-bg-hover);
+  border-color: var(--violet-border-hover);
+  transform: translateY(-1px);
 }
 
 /* Reduced motion */
@@ -438,7 +520,9 @@
   .dashboard-card,
   .dashboard-card:hover,
   .dashboard-mini-step,
-  .dashboard-mini-step:hover {
+  .dashboard-mini-step:hover,
+  .dashboard-cta-primary:hover,
+  .dashboard-cta-ghost:hover {
     transform: none !important;
     transition: none !important;
   }

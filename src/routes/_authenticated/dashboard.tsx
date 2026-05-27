@@ -241,21 +241,21 @@ function HeroRutaIA({
             <Link
               to="/solutions/$id"
               params={{ id: recommended.id }}
-              className="inline-flex items-center gap-2 rounded-[10px] bg-white px-4 py-[11px] text-[14px] font-semibold text-[#060608] transition hover:bg-zinc-200"
+              className="dashboard-cta-primary"
             >
               <Play className="h-4 w-4 fill-current" /> Comenzar ahora
             </Link>
           ) : (
             <Link
               to="/solutions"
-              className="inline-flex items-center gap-2 rounded-[10px] bg-white px-4 py-[11px] text-[14px] font-semibold text-[#060608] transition hover:bg-zinc-200"
+              className="dashboard-cta-primary"
             >
               <Play className="h-4 w-4 fill-current" /> Explorar soluciones
             </Link>
           )}
           <Link
             to="/builder"
-            className="inline-flex items-center gap-2 rounded-[10px] border border-border bg-white/[0.04] px-4 py-[11px] text-[14px] font-semibold text-foreground transition hover:bg-white/[0.07]"
+            className="dashboard-cta-ghost"
           >
             <RefreshCw className="h-4 w-4" /> Regenerar ruta
           </Link>
@@ -330,7 +330,7 @@ function NextMentoria() {
       <p className="mt-1 text-[13px] text-muted-foreground">Q&amp;A abierto · entrá cuando quieras</p>
       <Link
         to="/mentoria"
-        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-white px-4 py-[11px] text-[14px] font-semibold text-[#060608] transition hover:bg-zinc-200"
+        className="dashboard-cta-primary mt-4 w-full justify-center"
       >
         <Bell className="h-4 w-4" /> Anotarme · te avisamos antes
       </Link>

@@ -9,8 +9,7 @@ export function Logo({ className = "" }: { className?: string }) {
     <Link
       to="/"
       aria-label="Implementa IA"
-      className={`group inline-flex items-center gap-2.5 text-foreground transition-transform duration-300 ease-out hover:scale-[1.06] ${className}`}
-      style={{ transformOrigin: "left center" }}
+      className={`group inline-flex items-center gap-2.5 text-foreground transition-opacity duration-200 hover:opacity-80 ${className}`}
     >
       <span
         aria-hidden="true"
