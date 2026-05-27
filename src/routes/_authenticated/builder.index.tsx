@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { PremiumMarkdown } from "@/components/builder/premium-markdown";
 import { LunaLoader } from "@/components/builder/luna-loader";
@@ -31,6 +31,7 @@ import {
   TrendingUp,
   GraduationCap,
   DollarSign,
+  FolderKanban,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -305,6 +306,7 @@ function loadDraft(): DraftState | null {
 }
 
 function BuilderPage() {
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("landing");
   const [idea, setIdea] = useState("");
   const [essentialAnswers, setEssentialAnswers] = useState<Record<string, string>>({});
@@ -554,6 +556,7 @@ function BuilderPage() {
           setOpenSection={setOpenSection}
           onRestart={restart}
           onRetry={() => setStep("generating")}
+          onGoToProjects={() => navigate({ to: "/projects" })}
         />
       )}
     </div>
@@ -1031,7 +1034,7 @@ const BLUEPRINT_SECTIONS: {
 ];
 
 function ResultView({
-  idea, blueprint, error, openSection, setOpenSection, onRestart, onRetry,
+  idea, blueprint, error, openSection, setOpenSection, onRestart, onRetry, onGoToProjects,
 }: {
   idea: string;
   blueprint: Blueprint | null;
@@ -1040,6 +1043,7 @@ function ResultView({
   setOpenSection: (k: SectionKey | null) => void;
   onRestart: () => void;
   onRetry: () => void;
+  onGoToProjects: () => void;
 }) {
   if (error) {
     return (
@@ -1157,15 +1161,21 @@ function ResultView({
       </div>
 
       {/* CTA principal */}
-      <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-        <button onClick={() => setOpenSection("rapido_adorable")} className="app-cta-primary">
-          <Rocket className="h-4 w-4" />
-          Empezar por Rápido y adorable
-        </button>
-        <button onClick={() => setOpenSection("economia")} className="app-cta-ghost">
-          <TrendingUp className="h-4 w-4" />
-          Ver ROI
-        </button>
+      <div className="mt-12 app-card p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="flex flex-col gap-1 min-w-0">
+          <span className="text-[13px] font-semibold text-foreground">¿Querés implementar esta solución?</span>
+          <span className="text-[13px] text-muted-foreground">Guardalo en tus proyectos para darle seguimiento y acceder cuando quieras.</span>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          <button onClick={onGoToProjects} className="app-cta-primary whitespace-nowrap">
+            <FolderKanban className="h-4 w-4" />
+            Ver en mis proyectos
+          </button>
+          <button onClick={() => setOpenSection("rapido_adorable")} className="app-cta-ghost whitespace-nowrap">
+            <Rocket className="h-4 w-4" />
+            Empezar a construir
+          </button>
+        </div>
       </div>
     </div>
   );

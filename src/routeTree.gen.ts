@@ -28,7 +28,6 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as SolutionsIdContratarRouteImport } from './routes/solutions.$id.contratar'
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
 import { Route as AuthenticatedSolutionsIdRouteImport } from './routes/_authenticated/solutions.$id'
-import { Route as AuthenticatedBuilderSolutionIdRouteImport } from './routes/_authenticated/builder.$solutionId'
 import { Route as AuthenticatedImplementadorProyectoProjectIdRouteImport } from './routes/_authenticated/implementador.proyecto.$projectId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -133,10 +132,6 @@ const AuthenticatedSolutionsIdRoute =
     path: '/solutions/$id',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedBuilderSolutionIdRoute =
-  AuthenticatedBuilderSolutionIdRouteImport.update({
-    id: '/builder/$solutionId',
-    path: '/builder/$solutionId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedImplementadorProyectoProjectIdRoute =
@@ -156,7 +151,6 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
   '/cursos/$courseId': typeof CursosCourseIdRoute
-  '/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
@@ -178,7 +172,6 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
   '/cursos/$courseId': typeof CursosCourseIdRoute
-  '/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
@@ -202,7 +195,6 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
   '/cursos/$courseId': typeof CursosCourseIdRoute
-  '/_authenticated/builder/$solutionId': typeof AuthenticatedBuilderSolutionIdRoute
   '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
@@ -226,7 +218,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/contratar/confirmacion'
     | '/cursos/$courseId'
-    | '/builder/$solutionId'
     | '/solutions/$id'
     | '/solutions/$slug'
     | '/solutions/$id/contratar'
@@ -248,7 +239,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/contratar/confirmacion'
     | '/cursos/$courseId'
-    | '/builder/$solutionId'
     | '/solutions/$id'
     | '/solutions/$slug'
     | '/solutions/$id/contratar'
@@ -271,7 +261,6 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/contratar/confirmacion'
     | '/cursos/$courseId'
-    | '/_authenticated/builder/$solutionId'
     | '/_authenticated/solutions/$id'
     | '/_authenticated/solutions/$slug'
     | '/solutions/$id/contratar'
@@ -428,13 +417,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSolutionsIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/builder/$solutionId': {
-      id: '/_authenticated/builder/$solutionId'
-      path: '/builder/$solutionId'
-      fullPath: '/builder/$solutionId'
-      preLoaderRoute: typeof AuthenticatedBuilderSolutionIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/implementador/proyecto/$projectId': {
       id: '/_authenticated/implementador/proyecto/$projectId'
       path: '/implementador/proyecto/$projectId'
@@ -451,7 +433,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMiProgresoRoute: typeof AuthenticatedMiProgresoRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
-  AuthenticatedBuilderSolutionIdRoute: typeof AuthenticatedBuilderSolutionIdRoute
   AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRoute
   AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -469,7 +450,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMiProgresoRoute: AuthenticatedMiProgresoRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
-  AuthenticatedBuilderSolutionIdRoute: AuthenticatedBuilderSolutionIdRoute,
   AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRoute,
   AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,

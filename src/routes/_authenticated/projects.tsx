@@ -3,13 +3,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,33 +13,34 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ArrowRight, Eye, Trash2, FolderKanban } from "lucide-react";
+import {
+  Wand2,
+  Trash2,
+  ChevronRight,
+  Plus,
+  Clock,
+  Sparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/projects")({
   component: Projects,
 });
 
-type SessionRow = {
-  id: string;
-  solution_id: string;
-  current_step: number;
-  status: string;
-  updated_at: string;
-  generated_prompt: string | null;
-  solutions: { title: string; category: string } | null;
-};
+// ── Types ──────────────────────────────────────────────────────
+interface Blueprint {
+  titulo: string;
+  descripcion: string;
+  tags: string[];
+  secciones: Record<string, string>;
+}
 
-type ProjectRow = {
+interface BlueprintRow {
   id: string;
-  title: string;
-  status: string;
-  type: string | null;
-  builder_session_id: string | null;
+  idea: string;
+  blueprint: Blueprint;
   created_at: string;
-  source_solution_id: string | null;
-  solutions: { title: string; category: string } | null;
-};
+}
 
 function timeAgo(iso: string) {
   const ms = Date.now() - new Date(iso).getTime();
@@ -56,315 +50,115 @@ function timeAgo(iso: string) {
   const h = Math.floor(m / 60);
   if (h < 24) return `hace ${h} h`;
   const d = Math.floor(h / 24);
-  return `hace ${d} d`;
+  if (d < 30) return `hace ${d} d`;
+  return new Date(iso).toLocaleDateString("es-AR", { day: "numeric", month: "short" });
 }
 
-function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
-  return (
-    <div className="border-l-4 border-violet-500 pl-4">
-      <h2 className="text-xl font-semibold text-zinc-100">{title}</h2>
-      {subtitle && <p className="mt-0.5 text-sm text-zinc-400">{subtitle}</p>}
-    </div>
-  );
-}
-
-function statusInfo(s: string) {
-  if (s === "ready" || s === "completed")
-    return { label: "Completado", cls: "bg-violet-500/15 text-violet-300 border-violet-500/30" };
-  if (s === "pending")
-    return { label: "Pendiente", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
-  if (s === "generating")
-    return { label: "En curso", cls: "bg-violet-500/15 text-violet-300 border-violet-500/30" };
-  return { label: s, cls: "bg-zinc-800/50 text-zinc-300 border-zinc-700/40" };
-}
-
+// ── Page ──────────────────────────────────────────────────────
 function Projects() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const [promptModal, setPromptModal] = useState<{ open: boolean; content: string }>(
-    { open: false, content: "" },
-  );
-  const [confirm, setConfirm] = useState<
-    | { open: true; kind: "session" | "project"; id: string; label: string }
-    | { open: false }
-  >({ open: false });
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
-  const { data: inProgress, isLoading: loadingSessions } = useQuery({
-    queryKey: ["builder-sessions-in-progress", user?.id],
+  const { data: blueprints, isLoading } = useQuery({
+    queryKey: ["blueprints-projects", user?.id],
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("builder_sessions")
-        .select("id, solution_id, current_step, status, updated_at, generated_prompt, solutions(title, category)")
-        .in("status", ["in_progress", "paused"])
-        .order("updated_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as unknown as SessionRow[];
-    },
-  });
-
-  const { data: projects, isLoading: loadingProjects } = useQuery({
-    queryKey: ["builder-projects-all", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("builder_projects")
-        .select("id, title, status, type, builder_session_id, created_at, source_solution_id, solutions:source_solution_id(title, category)")
+        .from("builder_blueprints")
+        .select("id, idea, blueprint, created_at")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as ProjectRow[];
+      return (data ?? []) as unknown as BlueprintRow[];
     },
   });
 
-  const openPrompt = async (sessionId: string) => {
-    const { data } = await supabase
-      .from("builder_sessions")
-      .select("generated_prompt")
-      .eq("id", sessionId)
-      .maybeSingle();
-    setPromptModal({ open: true, content: data?.generated_prompt ?? "Sin prompt generado." });
+  const handleDelete = async () => {
+    if (!deleteTarget || !user) return;
+    const { id } = deleteTarget;
+    qc.setQueryData<BlueprintRow[]>(
+      ["blueprints-projects", user.id],
+      (old) => (old ?? []).filter((b) => b.id !== id),
+    );
+    const { error } = await supabase
+      .from("builder_blueprints")
+      .delete()
+      .eq("id", id);
+    if (error) {
+      toast.error("No se pudo eliminar", { duration: 4000 });
+      qc.invalidateQueries({ queryKey: ["blueprints-projects", user?.id] });
+    } else {
+      toast.success("Blueprint eliminado", { duration: 4000 });
+    }
+    setDeleteTarget(null);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!confirm.open || !user) return;
-    const { kind, id } = confirm;
-    if (kind === "project") {
-      // Optimistic update
-      qc.setQueryData<ProjectRow[]>(
-        ["builder-projects-all", user.id],
-        (old) => (old ?? []).filter((p) => p.id !== id),
-      );
-      const { error } = await supabase
-        .from("builder_projects")
-        .delete()
-        .eq("id", id)
-        .eq("user_id", user.id);
-      if (error) {
-        toast.error("No se pudo eliminar", { duration: 4000 });
-        qc.invalidateQueries({ queryKey: ["builder-projects-all", user.id] });
-      } else {
-        toast.success("Proyecto eliminado", { duration: 4000 });
-      }
-    } else {
-      qc.setQueryData<SessionRow[]>(
-        ["builder-sessions-in-progress", user.id],
-        (old) => (old ?? []).filter((s) => s.id !== id),
-      );
-      const { error } = await supabase
-        .from("builder_sessions")
-        .delete()
-        .eq("id", id)
-        .eq("user_id", user.id);
-      if (error) {
-        toast.error("No se pudo eliminar", { duration: 4000 });
-        qc.invalidateQueries({ queryKey: ["builder-sessions-in-progress", user.id] });
-      } else {
-        toast.success("Sesión eliminada", { duration: 4000 });
-      }
-    }
-    setConfirm({ open: false });
+  const openBlueprint = (b: BlueprintRow) => {
+    // Navegar al builder y auto-cargar el blueprint (lo toma de la DB al montar)
+    navigate({ to: "/builder" });
   };
 
   return (
-    <div className="mx-auto max-w-[960px] px-6 py-10">
-      <div className="border-l-4 border-violet-500 pl-4">
-        <h1 className="text-3xl font-bold tracking-tight text-white">
-          Mis <span className="text-violet-400">proyectos</span>
-        </h1>
-        <p className="mt-1 text-sm text-zinc-400">
-          Tus implementaciones en curso y completadas.
-        </p>
+    <div className="mx-auto max-w-[1340px] px-8 py-10">
+
+      {/* Header */}
+      <div className="mb-10 flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[11px] text-muted-foreground uppercase tracking-[0.15em] font-semibold mb-2">
+            Mis proyectos
+          </p>
+          <h1 className="text-[44px] font-bold tracking-[-0.02em] leading-[1.05] text-foreground">
+            Tus <span className="[color:var(--violet-text)]">blueprints</span>
+          </h1>
+          <p className="mt-2 text-[15px] text-muted-foreground max-w-[480px] leading-relaxed">
+            Cada blueprint es un plan completo de implementación de IA generado por el Builder.
+          </p>
+        </div>
+        <button
+          onClick={() => navigate({ to: "/builder" })}
+          className="app-cta-primary shrink-0"
+        >
+          <Plus className="h-4 w-4" />
+          <span className="hidden sm:inline">Nuevo blueprint</span>
+        </button>
       </div>
 
-      {/* En progreso */}
-      <section className="mt-10">
-        <SectionHeader title="En progreso" subtitle="Sesiones del Builder activas" />
-        <div className="mt-4 space-y-3">
-          {loadingSessions ? (
-            <div className="h-20 animate-pulse rounded-xl bg-zinc-900/60" />
-          ) : (inProgress ?? []).length === 0 ? (
-            <EmptyState text="No tenés implementaciones en curso." />
-          ) : (
-            (inProgress ?? []).map((s) => {
-              const pct = Math.round(((s.current_step ?? 1) / 5) * 100);
-              return (
-                <div
-                  key={s.id}
-                  className="group relative flex flex-col gap-3 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-violet-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <div className="truncate text-sm font-semibold text-zinc-100">
-                        {s.solutions?.title ?? "Solución"}
-                      </div>
-                      {s.status === "paused" && (
-                        <span className="rounded-md border border-zinc-700/40 bg-zinc-800/40 px-2 py-0.5 text-[10px] font-medium text-zinc-300">
-                          Pausada
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-2 flex items-center gap-2">
-                      <div className="whitespace-nowrap text-xs text-zinc-400">
-                        Paso {s.current_step ?? 1} de 5
-                      </div>
-                      <div className="h-1.5 w-32 overflow-hidden rounded-full bg-zinc-800">
-                        <div className="h-full bg-violet-400" style={{ width: `${pct}%` }} />
-                      </div>
-                    </div>
-                    <div className="mt-1.5 text-xs text-zinc-600">
-                      Última actividad: {timeAgo(s.updated_at)}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      className="app-cta-primary h-9 shrink-0 rounded-xl px-4 py-0 text-[13px]"
-                      onClick={() => {
-                        try {
-                          localStorage.setItem(`builder_session_${s.solution_id}`, s.id);
-                        } catch {}
-                        navigate({ to: "/builder/$solutionId", params: { solutionId: s.solution_id } });
-                      }}
-                    >
-                      Continuar <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                    </Button>
-                    <button
-                      onClick={() =>
-                        setConfirm({
-                          open: true,
-                          kind: "session",
-                          id: s.id,
-                          label: s.solutions?.title ?? "esta sesión",
-                        })
-                      }
-                      title="Eliminar"
-                      aria-label="Eliminar"
-                      className="rounded-lg p-2 text-zinc-400 opacity-0 transition hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })
-          )}
+      {/* Content */}
+      {isLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-48 animate-pulse rounded-2xl bg-muted/50" />
+          ))}
         </div>
-      </section>
-
-      {/* Completados */}
-      <section className="mt-12">
-        <SectionHeader title="Completados" subtitle="Tus proyectos finalizados" />
-        <div className="mt-4 space-y-3">
-          {loadingProjects ? (
-            <div className="h-20 animate-pulse rounded-xl bg-zinc-900/60" />
-          ) : (projects ?? []).length === 0 ? (
-            <EmptyState text="Todavía no tenés proyectos completados." />
-          ) : (
-            (projects ?? []).map((p) => {
-              const isImpl = p.type === "implementador";
-              const st = statusInfo(p.status);
-              return (
-                <div
-                  key={p.id}
-                  className="group relative flex flex-col gap-2 rounded-xl border border-zinc-800/50 bg-zinc-900/80 p-4 shadow-lg shadow-black/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:border-violet-500/40 hover:shadow-2xl hover:shadow-black/40 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-semibold text-zinc-100">
-                      {p.solutions?.title ?? p.title}
-                    </div>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                      {p.solutions?.category && (
-                        <span className="text-xs capitalize text-zinc-400">
-                          {p.solutions.category}
-                        </span>
-                      )}
-                      <span
-                        className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${
-                          isImpl
-                            ? "bg-violet-500/15 text-violet-300 border border-violet-500/30"
-                            : "bg-zinc-800/40 text-zinc-300 border border-zinc-700/40"
-                        }`}
-                      >
-                        {isImpl ? "Implementador" : "DIY"}
-                      </span>
-                      <span
-                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium ${st.cls}`}
-                      >
-                        {st.label}
-                      </span>
-                      <span className="text-xs text-zinc-600">
-                        {new Date(p.created_at).toLocaleDateString("es", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {p.builder_session_id && (
-                      <Button
-                        variant="outline"
-                        className="h-8 shrink-0 rounded-xl border-zinc-700 bg-transparent text-xs text-zinc-300 hover:border-violet-500 hover:text-violet-400"
-                        onClick={() => openPrompt(p.builder_session_id!)}
-                      >
-                        <Eye className="mr-1 h-3.5 w-3.5" /> Ver prompt generado
-                      </Button>
-                    )}
-                    <button
-                      onClick={() =>
-                        setConfirm({
-                          open: true,
-                          kind: "project",
-                          id: p.id,
-                          label: p.solutions?.title ?? p.title,
-                        })
-                      }
-                      title="Eliminar"
-                      aria-label="Eliminar"
-                      className="rounded-lg p-2 text-zinc-400 opacity-0 transition hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })
-          )}
+      ) : !blueprints || blueprints.length === 0 ? (
+        <EmptyState onNew={() => navigate({ to: "/builder" })} />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {blueprints.map((b) => (
+            <BlueprintCard
+              key={b.id}
+              blueprint={b}
+              onOpen={() => openBlueprint(b)}
+              onDelete={() => setDeleteTarget({ id: b.id, title: b.blueprint?.titulo ?? b.idea })}
+            />
+          ))}
         </div>
-      </section>
+      )}
 
-      <Dialog open={promptModal.open} onOpenChange={(o) => setPromptModal((s) => ({ ...s, open: o }))}>
-        <DialogContent className="max-w-2xl border-zinc-800 bg-zinc-900 text-zinc-100">
-          <DialogHeader>
-            <DialogTitle>Prompt generado</DialogTitle>
-          </DialogHeader>
-          <div className="max-h-[60vh] overflow-y-auto rounded-lg bg-zinc-900/60 p-4 font-mono text-xs whitespace-pre-wrap text-zinc-200">
-            {promptModal.content}
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog
-        open={confirm.open}
-        onOpenChange={(o) => !o && setConfirm({ open: false })}
-      >
-        <AlertDialogContent className="border-zinc-800 bg-zinc-900 text-zinc-100">
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">¿Eliminar proyecto?</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
-              Esta acción no se puede deshacer. El proyecto y toda su configuración se eliminarán permanentemente.
+            <AlertDialogTitle>¿Eliminar blueprint?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <strong>"{deleteTarget?.title}"</strong> se va a eliminar permanentemente. Esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100">
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              className="bg-red-600 text-white hover:bg-red-500"
-            >
-              Sí, eliminar
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-white">
+              Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -373,16 +167,97 @@ function Projects() {
   );
 }
 
-function EmptyState({ text }: { text: string }) {
+// ── BlueprintCard ──────────────────────────────────────────────
+function BlueprintCard({
+  blueprint: b,
+  onOpen,
+  onDelete,
+}: {
+  blueprint: BlueprintRow;
+  onOpen: () => void;
+  onDelete: () => void;
+}) {
+  const bp = b.blueprint;
+  const sectionCount = bp?.secciones ? Object.keys(bp.secciones).filter((k) => bp.secciones[k]?.length > 0).length : 0;
+
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800/60 bg-zinc-900/40 py-12 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-violet-500/15">
-        <FolderKanban className="h-7 w-7 text-violet-400" />
+    <div className="app-card group flex flex-col gap-0 overflow-hidden">
+      {/* Card body — clickable */}
+      <button
+        onClick={onOpen}
+        className="flex-1 text-left p-5 flex flex-col gap-3"
+      >
+        {/* Top row */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="h-9 w-9 rounded-xl bg-[var(--violet-pill-bg)] border border-[var(--violet-pill-border)] flex items-center justify-center [color:var(--violet-text)] shrink-0">
+            <Wand2 className="h-4 w-4" />
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground/30 group-hover:[color:var(--violet-text)] transition mt-0.5 shrink-0" />
+        </div>
+
+        {/* Title */}
+        <div>
+          <h3 className="font-bold text-foreground text-[15px] leading-snug line-clamp-2 mb-1.5">
+            {bp?.titulo || "Blueprint sin título"}
+          </h3>
+          <p className="text-[13px] text-muted-foreground leading-relaxed line-clamp-2">
+            {bp?.descripcion || b.idea}
+          </p>
+        </div>
+
+        {/* Tags */}
+        {bp?.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {bp.tags.slice(0, 3).map((tag, i) => (
+              <span key={i} className="app-pill-violet inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium [color:var(--violet-text-strong)]">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </button>
+
+      {/* Footer */}
+      <div className="px-5 py-3 border-t border-[var(--violet-border)]/40 flex items-center justify-between">
+        <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {timeAgo(b.created_at)}
+          </span>
+          <span className="flex items-center gap-1">
+            <Sparkles className="h-3 w-3" />
+            {sectionCount}/8 secciones
+          </span>
+        </div>
+        <button
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          className="p-1.5 rounded-lg text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition opacity-0 group-hover:opacity-100"
+          title="Eliminar"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
       </div>
-      <p className="mt-3 font-medium text-zinc-300">{text}</p>
-      <p className="mt-1 text-sm text-zinc-600">
-        Cuando inicies una implementación, va a aparecer acá.
-      </p>
+    </div>
+  );
+}
+
+// ── EmptyState ─────────────────────────────────────────────────
+function EmptyState({ onNew }: { onNew: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-24 text-center gap-6">
+      <div className="h-20 w-20 rounded-2xl bg-[var(--violet-pill-bg)] border border-[var(--violet-border)] flex items-center justify-center [color:var(--violet-text)]">
+        <Wand2 className="h-9 w-9" />
+      </div>
+      <div>
+        <h2 className="text-[22px] font-bold text-foreground mb-2">Todavía no tenés blueprints</h2>
+        <p className="text-[14px] text-muted-foreground max-w-[360px] leading-relaxed">
+          Usá el Builder para describir tu idea y la IA va a generar un plan completo de implementación.
+        </p>
+      </div>
+      <button onClick={onNew} className="app-cta-primary">
+        <Plus className="h-4 w-4" />
+        Crear mi primer blueprint
+      </button>
     </div>
   );
 }
