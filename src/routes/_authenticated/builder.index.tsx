@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import { PremiumMarkdown } from "@/components/builder/premium-markdown";
+import { LunaLoader } from "@/components/builder/luna-loader";
 import {
   Wand2,
   MessageSquare,
@@ -806,16 +807,19 @@ function LandingView({
 function LoadingView({ title, subtitle, stage }: { title: string; subtitle: string; stage: string }) {
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-8 py-16 text-center">
-      <div className="relative mb-10">
-        <div
-          className="h-28 w-28 rounded-full bg-[var(--violet-pill-bg)] border border-[var(--violet-border)] shadow-[0_0_48px_-8px_rgba(139,92,246,0.4)] animate-pulse"
-          aria-hidden
-        />
-        <div className="absolute inset-0 rounded-full border border-[var(--violet-border-hover)] animate-ping opacity-60" aria-hidden />
-        <Wand2 className="absolute inset-0 m-auto h-10 w-10 [color:var(--violet-text)]" aria-hidden />
+      {/* Luna — la IA de Implementa pensando */}
+      <div className="mb-10">
+        <LunaLoader size={128} />
       </div>
-      <h2 className="text-[26px] font-bold tracking-[-0.01em] text-foreground mb-2">{title}</h2>
-      <p className="text-[15px] text-muted-foreground mb-10 max-w-[400px] leading-relaxed">{subtitle}</p>
+      <div className="mb-2 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--violet-text-strong)" }}>
+        <span
+          className="block h-1.5 w-1.5 rounded-full"
+          style={{ background: "var(--violet-text)", boxShadow: "0 0 8px var(--violet-text)" }}
+        />
+        Luna · IA de Implementa
+      </div>
+      <h2 className="text-[28px] font-bold tracking-[-0.015em] text-foreground mb-2">{title}</h2>
+      <p className="text-[15px] text-muted-foreground mb-10 max-w-[440px] leading-relaxed">{subtitle}</p>
       <div className="w-full max-w-xs">
         <div className="app-progress-track">
           <div className="app-progress-fill animate-[progressbar_3s_ease-in-out_forwards] w-0" />
@@ -1347,9 +1351,7 @@ function SectionProgressBar({
 function DefaultMarkdownSection({ content }: { content: string }) {
   return (
     <div className="mx-auto max-w-3xl px-8 py-10">
-      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-li:text-muted-foreground prose-code:text-[var(--violet-text)] prose-code:bg-[var(--violet-pill-bg)] prose-code:rounded prose-code:px-1 prose-pre:bg-card prose-pre:border prose-pre:border-border prose-strong:text-foreground prose-a:text-[var(--violet-text)]">
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </div>
+      <PremiumMarkdown content={content} />
     </div>
   );
 }
@@ -1639,10 +1641,8 @@ function EconomiaSection({ content }: { content: string }) {
         </>
       )}
 
-      {/* Markdown completo */}
-      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-li:text-muted-foreground prose-code:text-[var(--violet-text)] prose-code:bg-[var(--violet-pill-bg)] prose-code:rounded prose-code:px-1 prose-pre:bg-card prose-pre:border prose-pre:border-border prose-strong:text-foreground prose-table:text-sm">
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </div>
+      {/* Markdown premium con cards, tablas, checklists, code blocks */}
+      <PremiumMarkdown content={content} />
     </div>
   );
 }
