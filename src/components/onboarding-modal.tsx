@@ -310,8 +310,17 @@ export function OnboardingModal() {
               {!isLast && (
                 <button
                   onClick={skip}
-                  className="iai-onb-btn iai-onb-btn--ghost"
                   type="button"
+                  className="text-[12px] font-medium transition-colors"
+                  style={{
+                    color: "var(--muted-foreground)",
+                    background: "transparent",
+                    border: "none",
+                    padding: "10px 8px",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "var(--foreground)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-foreground)")}
                 >
                   Saltar tour
                 </button>
@@ -319,8 +328,9 @@ export function OnboardingModal() {
               {step > 1 && (
                 <button
                   onClick={goBack}
-                  className="iai-onb-btn iai-onb-btn--secondary"
+                  className="app-cta-ghost"
                   type="button"
+                  style={{ padding: "10px 16px", fontSize: 13 }}
                 >
                   ← Atrás
                 </button>
@@ -328,8 +338,9 @@ export function OnboardingModal() {
               <button
                 onClick={goNext}
                 disabled={(step === 1 && !canAdvanceStep1) || saving}
-                className="iai-onb-btn iai-onb-btn--primary"
+                className="app-cta-primary"
                 type="button"
+                style={{ padding: "10px 18px", fontSize: 13, opacity: ((step === 1 && !canAdvanceStep1) || saving) ? 0.5 : 1 }}
               >
                 {saving ? "Guardando…" : isLast ? "Comenzar →" : "Continuar →"}
               </button>
@@ -387,7 +398,7 @@ function StepWelcome({
 }) {
   return (
     <>
-      <div className="iai-onb-label">Bienvenida · Paso 1 de 5</div>
+      <div className="app-pill-violet inline-flex items-center rounded-full px-3 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase mb-4 self-start">Bienvenida · Paso 1 de 5</div>
       <h1 id="iai-onb-title" className="iai-onb-title">
         Bienvenido a Implementa AI
       </h1>
@@ -444,7 +455,7 @@ function StepSoluciones({
 }) {
   return (
     <>
-      <div className="iai-onb-label">Catálogo · Paso 2 de 5</div>
+      <div className="app-pill-violet inline-flex items-center rounded-full px-3 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase mb-4 self-start">Catálogo · Paso 2 de 5</div>
       <h1 className="iai-onb-title">
         +{stats.solutionsTotal - 3} soluciones de IA listas para activar en tu empresa
       </h1>
@@ -465,21 +476,21 @@ function StepSoluciones({
         </div>
       </div>
       <div className="iai-onb-mini-cards">
-        <div className="iai-onb-mini">
-          <div className="iai-onb-mini-orb" />
-          <div className="iai-onb-mini-cat">Ventas</div>
-          <div className="iai-onb-mini-title">SDR con IA</div>
-        </div>
-        <div className="iai-onb-mini">
-          <div className="iai-onb-mini-orb" />
-          <div className="iai-onb-mini-cat">Marketing</div>
-          <div className="iai-onb-mini-title">Clip.AI</div>
-        </div>
-        <div className="iai-onb-mini">
-          <div className="iai-onb-mini-orb" />
-          <div className="iai-onb-mini-cat">Operaciones</div>
-          <div className="iai-onb-mini-title">Backlog AI</div>
-        </div>
+        {[
+          { cat: "Ventas", title: "SDR con IA" },
+          { cat: "Marketing", title: "Clip.AI" },
+          { cat: "Operaciones", title: "Backlog AI" },
+        ].map((m) => (
+          <div key={m.title} className="app-card p-4 text-center flex flex-col items-center gap-2">
+            <div className="iai-onb-mini-orb" />
+            <div className="text-[10px] font-semibold tracking-[0.12em] uppercase" style={{ color: "var(--violet-text-strong)" }}>
+              {m.cat}
+            </div>
+            <div className="text-[13px] font-semibold text-foreground">
+              {m.title}
+            </div>
+          </div>
+        ))}
       </div>
     </>
   );
@@ -494,7 +505,7 @@ function StepCursos({
 }) {
   return (
     <>
-      <div className="iai-onb-label">Herramientas para tu equipo · Paso 3 de 5</div>
+      <div className="app-pill-violet inline-flex items-center rounded-full px-3 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase mb-4 self-start">Herramientas para tu equipo · Paso 3 de 5</div>
       <h1 className="iai-onb-title">Que tu equipo no dependa de externos</h1>
       <p className="iai-onb-sub">
         Cursos prácticos sobre las herramientas que tu equipo va a usar para
@@ -511,21 +522,21 @@ function StepCursos({
         </div>
       </div>
       <div className="iai-onb-mini-cards">
-        <div className="iai-onb-mini">
-          <div className="iai-onb-mini-orb iai-onb-mini-orb--lovable" />
-          <div className="iai-onb-mini-cat">Formación</div>
-          <div className="iai-onb-mini-title">Lovable</div>
-        </div>
-        <div className="iai-onb-mini">
-          <div className="iai-onb-mini-orb iai-onb-mini-orb--claude" />
-          <div className="iai-onb-mini-cat">Formación</div>
-          <div className="iai-onb-mini-title">Claude</div>
-        </div>
-        <div className="iai-onb-mini">
-          <div className="iai-onb-mini-orb iai-onb-mini-orb--n8n" />
-          <div className="iai-onb-mini-cat">Formación</div>
-          <div className="iai-onb-mini-title">n8n</div>
-        </div>
+        {[
+          { tool: "Lovable", mod: "iai-onb-mini-orb--lovable" },
+          { tool: "Claude", mod: "iai-onb-mini-orb--claude" },
+          { tool: "n8n", mod: "iai-onb-mini-orb--n8n" },
+        ].map((m) => (
+          <div key={m.tool} className="app-card p-4 text-center flex flex-col items-center gap-2">
+            <div className={`iai-onb-mini-orb ${m.mod}`} />
+            <div className="text-[10px] font-semibold tracking-[0.12em] uppercase" style={{ color: "var(--violet-text-strong)" }}>
+              Formación
+            </div>
+            <div className="text-[13px] font-semibold text-foreground">
+              {m.tool}
+            </div>
+          </div>
+        ))}
       </div>
       <p className="iai-onb-sub-sm">Acceso compartido para todo tu equipo.</p>
     </>
@@ -535,7 +546,7 @@ function StepCursos({
 function StepBuilder() {
   return (
     <>
-      <div className="iai-onb-label">Construcción a medida · Paso 4 de 5</div>
+      <div className="app-pill-violet inline-flex items-center rounded-full px-3 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase mb-4 self-start">Construcción a medida · Paso 4 de 5</div>
       <h1 className="iai-onb-title">
         Cuando ninguna solución encaja, tu equipo la construye
       </h1>
@@ -578,74 +589,62 @@ function StepPaths({
 }) {
   return (
     <>
-      <div className="iai-onb-label">Empezá ahora · Paso 5 de 5</div>
+      <div className="app-pill-violet inline-flex items-center rounded-full px-3 py-1 text-[10px] font-semibold tracking-[0.14em] uppercase mb-4 self-start">Empezá ahora · Paso 5 de 5</div>
       <h1 className="iai-onb-title">¿Por dónde arrancás?</h1>
       <p className="iai-onb-sub">
         Elegí tu primera acción. Podés cambiar el camino cuando quieras.
       </p>
       <div className="iai-onb-paths">
-        <button
-          type="button"
-          className="iai-onb-path"
-          onClick={() => onPath("/solutions")}
-        >
-          <div className="iai-onb-pico">⭐</div>
-          <div className="iai-onb-pt">
-            <div className="iai-onb-pt-title">Activar mi primera solución</div>
-            <div className="iai-onb-pt-sub">
-              Las {availableCount} más implementadas, ROI rápido
+        {[
+          { ico: "⭐", title: "Activar mi primera solución", sub: `Las ${availableCount} más implementadas, ROI rápido`, to: "/solutions" as const, soon: false },
+          { ico: "📂", title: `Explorar las ${totalCount} por categoría`, sub: "Ventas, Marketing, RRHH, Finanzas, Operaciones, Atención…", to: "/solutions" as const, soon: false },
+          { ico: "🎓", title: "Ver los cursos para mi equipo", sub: "Lovable, Claude, n8n y más — acceso compartido", to: "/cursos" as const, soon: false },
+          { ico: "🛠️", title: "Abrir el Builder", sub: "Para soluciones a medida sin código", to: "/solutions" as const, soon: true },
+        ].map((p, i) => (
+          <button
+            key={i}
+            type="button"
+            className="app-card flex items-center gap-4 text-left p-4 w-full"
+            onClick={() => onPath(p.to)}
+            aria-disabled={p.soon ? "true" : undefined}
+          >
+            <div
+              className="flex-none h-12 w-12 rounded-xl flex items-center justify-center text-[22px]"
+              style={{
+                background: "var(--violet-pill-bg)",
+                border: "1px solid var(--violet-border)",
+              }}
+            >
+              {p.ico}
             </div>
-          </div>
-          <div className="iai-onb-parrow">→</div>
-        </button>
-        <button
-          type="button"
-          className="iai-onb-path"
-          onClick={() => onPath("/solutions")}
-        >
-          <div className="iai-onb-pico">📂</div>
-          <div className="iai-onb-pt">
-            <div className="iai-onb-pt-title">
-              Explorar las {totalCount} por categoría
+            <div className="flex-1 min-w-0">
+              <div className="text-[14px] font-semibold text-foreground flex items-center gap-2">
+                {p.title}
+                {p.soon && (
+                  <span
+                    className="text-[9px] font-semibold tracking-[0.12em] uppercase px-1.5 py-0.5 rounded"
+                    style={{
+                      background: "var(--violet-pill-bg)",
+                      color: "var(--violet-text-strong)",
+                      border: "1px solid var(--violet-pill-border)",
+                    }}
+                  >
+                    Próximamente
+                  </span>
+                )}
+              </div>
+              <div className="text-[12px] text-muted-foreground mt-0.5 leading-snug">
+                {p.sub}
+              </div>
             </div>
-            <div className="iai-onb-pt-sub">
-              Ventas, Marketing, RRHH, Finanzas, Operaciones, Atención…
+            <div
+              className="flex-none text-[18px]"
+              style={{ color: "var(--violet-text)" }}
+            >
+              →
             </div>
-          </div>
-          <div className="iai-onb-parrow">→</div>
-        </button>
-        <button
-          type="button"
-          className="iai-onb-path"
-          onClick={() => onPath("/cursos")}
-        >
-          <div className="iai-onb-pico">🎓</div>
-          <div className="iai-onb-pt">
-            <div className="iai-onb-pt-title">Ver los cursos para mi equipo</div>
-            <div className="iai-onb-pt-sub">
-              Lovable, Claude, n8n y más — acceso compartido
-            </div>
-          </div>
-          <div className="iai-onb-parrow">→</div>
-        </button>
-        <button
-          type="button"
-          className="iai-onb-path"
-          onClick={() => onPath("/solutions")}
-          aria-disabled="true"
-        >
-          <div className="iai-onb-pico">🛠️</div>
-          <div className="iai-onb-pt">
-            <div className="iai-onb-pt-title">
-              Abrir el Builder
-              <span className="iai-onb-pt-badge">Próximamente</span>
-            </div>
-            <div className="iai-onb-pt-sub">
-              Para soluciones a medida sin código
-            </div>
-          </div>
-          <div className="iai-onb-parrow">→</div>
-        </button>
+          </button>
+        ))}
       </div>
     </>
   );
