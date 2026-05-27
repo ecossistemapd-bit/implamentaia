@@ -368,24 +368,80 @@
  * Sólo aplica al área del dashboard autenticado (sidebar tiene su propio bg).
  * ============================================================ */
 
+/* Wash violeta MUY sutil — ambient delicado, no protagonista.
+ * Funciona en ambos temas: rgba con alpha bajo se mezcla con cualquier bg
+ * (dark → tinte violáceo apenas, light → tinte lavanda apenas). */
 .dashboard-violet-wash {
   position: fixed;
   top: 0; bottom: 0; right: 0; left: 220px;
   pointer-events: none;
-  /* z-index: 0 dejaba la capa por debajo del bg sólido del layout. Subimos al 1
-     para que se vea sobre bg-background pero por debajo del contenido del dashboard
-     (que usa relative z-[1]). */
   z-index: 1;
   background:
-    radial-gradient(60% 50% at 25% 15%, rgba(139,92,246,0.48), transparent 70%),
-    radial-gradient(55% 45% at 80% 40%, rgba(139,92,246,0.40), transparent 72%),
-    radial-gradient(50% 40% at 50% 90%, rgba(139,92,246,0.26), transparent 75%),
-    radial-gradient(40% 30% at 10% 70%, rgba(139,92,246,0.22), transparent 75%);
+    radial-gradient(60% 50% at 25% 20%, rgba(139,92,246,0.10), transparent 70%),
+    radial-gradient(55% 45% at 80% 50%, rgba(139,92,246,0.07), transparent 72%),
+    radial-gradient(50% 40% at 50% 95%, rgba(139,92,246,0.05), transparent 75%);
 }
-/* El contenido del dashboard tiene que sentarse sobre el wash. */
 .dashboard-violet-wash + * { position: relative; z-index: 2; }
 @media (max-width: 1024px) {
   .dashboard-violet-wash { left: 0; }
+}
+
+/* ============================================================
+ * Dashboard cards — marco violeta sutil + lift al hover.
+ * Premium = restraint. Idle apenas se nota, hover intensifica suavemente.
+ * Usa rgba con alpha bajo para que funcione en dark y light theme.
+ * ============================================================ */
+.dashboard-card {
+  background-color: var(--card);
+  border: 1px solid rgba(139,92,246,0.14);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px -12px rgba(0,0,0,0.4);
+  transition:
+    transform 380ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 320ms ease,
+    box-shadow 380ms ease;
+  will-change: transform;
+}
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(139,92,246,0.30);
+  box-shadow:
+    0 0 20px -6px rgba(139,92,246,0.12),
+    0 16px 32px -18px rgba(0,0,0,0.55);
+}
+
+/* Mini step cards dentro del Hero — más livianas que dashboard-card */
+.dashboard-mini-step {
+  background-color: var(--card);
+  border: 1px solid rgba(139,92,246,0.10);
+  border-radius: 12px;
+  transition:
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 220ms ease,
+    box-shadow 280ms ease;
+}
+.dashboard-mini-step:hover {
+  transform: translateY(-2px);
+  border-color: rgba(139,92,246,0.24);
+  box-shadow: 0 8px 20px -14px rgba(0,0,0,0.5);
+}
+
+/* Pill con accent violeta — para datos premium (streak, FALTAN, etc.) */
+.dashboard-pill-violet {
+  color: #C4B5FD;
+  background: rgba(139,92,246,0.04);
+  border: 1px solid rgba(139,92,246,0.18);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-card,
+  .dashboard-card:hover,
+  .dashboard-mini-step,
+  .dashboard-mini-step:hover {
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 /* ----- Sidebar icon animations (hover sobre el nav-item del sidebar) ----- */
