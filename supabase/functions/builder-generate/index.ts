@@ -18,8 +18,8 @@ const corsHeaders = {
 };
 
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
-// Modelo por defecto: Opus 4.7 (best). Overridable a Sonnet por costo vía secret.
-const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-opus-4-7";
+// Modelo por defecto: claude-opus-4-5. Overridable vía secret ANTHROPIC_MODEL.
+const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-opus-4-5";
 
 const SYSTEM_PROMPT = `Sos un consultor senior en implementación de IA para empresas de LatAm, parte de la plataforma Implementa AI.
 
