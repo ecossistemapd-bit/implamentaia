@@ -113,11 +113,9 @@ function Dashboard() {
     null;
   const emailLocal = user?.email?.split("@")[0] ?? null;
   const rawName = fullName ?? metaName ?? emailLocal ?? "bienvenido";
-  // Si el "nombre" parece un email/slug (sin espacios y todo minúscula), capitalizamos
-  // el primer caracter para que se vea humano. Si tiene espacios, tomamos la primera palabra.
-  const greetName = rawName.includes(" ")
-    ? rawName.split(" ")[0]
-    : rawName.charAt(0).toUpperCase() + rawName.slice(1);
+  // Siempre capitalizar la primera palabra (sirve para "gino", "gino altamirano", "GINO", etc.)
+  const firstWord = rawName.split(" ")[0];
+  const greetName = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
   const streakDays = memberSince
     ? Math.max(1, Math.floor((Date.now() - memberSince.getTime()) / (1000 * 60 * 60 * 24)) + 1)
     : 1;
@@ -141,15 +139,15 @@ function Dashboard() {
       <div className="dashboard-violet-wash" aria-hidden />
 
       <div className="relative z-[2] mx-auto max-w-[1340px] px-8 py-8">
-        {/* HEADER COMPACTO */}
-        <header className="mb-6">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+        {/* HEADER */}
+        <header className="mb-8">
+          <span className="dashboard-pill-violet inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium">
             <Flame className="h-3 w-3" /> {streakDays} días consecutivos
           </span>
-          <h1 className="mt-3 text-[36px] font-bold leading-tight tracking-tight">
+          <h1 className="mt-4 text-[44px] font-bold leading-[1.05] tracking-[-0.02em]">
             {tod}, {greetName}
           </h1>
-          <p className="mt-2 text-[15px] text-muted-foreground">
+          <p className="mt-3 max-w-[640px] text-[16px] leading-relaxed text-muted-foreground">
             Tu ruta personalizada está lista. Empezás por la solución con mayor match.
           </p>
         </header>
@@ -219,15 +217,10 @@ function HeroRutaIA({
   nextInRoute: Array<{ id: string; title: string; short_description: string }>;
 }) {
   return (
-    <div
-      className="col-span-12 rounded-2xl border border-border bg-card p-7 transition-shadow duration-500 lg:col-span-8"
-      style={{ boxShadow: "0 0 60px -10px rgba(139,92,246,0.14)" }}
-      onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 0 100px -10px rgba(139,92,246,0.32)")}
-      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 0 60px -10px rgba(139,92,246,0.14)")}
-    >
+    <div className="dashboard-card col-span-12 p-7 lg:col-span-8">
       <div>
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="rounded border border-border bg-card/60 px-2 py-0.5 text-[10px] font-bold tracking-[0.10em] text-muted-foreground">
+          <span className="dashboard-pill-violet rounded px-2 py-0.5 text-[10px] font-bold tracking-[0.10em]">
             RUTA IA PERSONALIZADA
           </span>
           <span className="text-[12px] text-muted-foreground/70">Generada por Nina · hace unos minutos</span>
@@ -282,7 +275,7 @@ function HeroRutaIA({
                 key={s.id}
                 to="/solutions/$id"
                 params={{ id: s.id }}
-                className="flex items-center gap-3 rounded-xl border border-border bg-white/[0.015] p-3 transition hover:border-white/20"
+                className="dashboard-mini-step flex items-center gap-3 p-3"
               >
                 <StepNum muted>{String(idx + 2).padStart(2, "0")}</StepNum>
                 <div className="min-w-0 flex-1">
@@ -291,7 +284,7 @@ function HeroRutaIA({
                     {s.short_description?.slice(0, 60) ?? ""}
                   </div>
                 </div>
-                <span className="text-[11px] tabular-nums text-muted-foreground/70">
+                <span className="text-[11px] font-medium tabular-nums" style={{ color: "#A78BFA" }}>
                   {idx === 0 ? "87%" : "82%"}
                 </span>
               </Link>
@@ -320,15 +313,12 @@ function NextMentoria() {
   const pastSlotsHoy = ["09:00", "10:30", "14:00"];
 
   return (
-    <div
-      className="col-span-12 rounded-2xl border border-border bg-card p-5 transition-shadow duration-500 lg:col-span-4"
-      style={{ boxShadow: "0 0 60px -10px rgba(139,92,246,0.14)" }}
-    >
+    <div className="dashboard-card col-span-12 p-5 lg:col-span-4">
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
           PRÓXIMA MENTORÍA
         </span>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+        <span className="dashboard-pill-violet inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium">
           <Clock className="h-3 w-3" /> FALTAN {nextSlot.faltan}
         </span>
       </div>
@@ -384,7 +374,7 @@ function KpiCard({
   sparkline?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
+    <div className="dashboard-card p-5">
       <div className="mb-3 flex items-center justify-between">
         <span className="text-[11px] font-semibold tracking-[0.15em] text-muted-foreground/70">
           {label}
@@ -437,7 +427,7 @@ function TuJourney({
   recommended: { id: string; title: string } | null;
 }) {
   return (
-    <section className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
+    <section className="dashboard-card mt-6 overflow-hidden">
       <div className="flex items-center justify-between px-6 pt-5">
         <div>
           <div className="text-[11px] font-semibold tracking-[0.15em] text-muted-foreground/70">
@@ -494,7 +484,7 @@ function JourneyCard({
     <Link
       to={to as never}
       params={params as never}
-      className="block rounded-xl border border-border bg-white/[0.015] p-4 transition hover:border-white/20"
+      className="dashboard-mini-step block p-4"
     >
       <div className="mb-3 flex items-center gap-3">
         <StepNum>{step}</StepNum>
@@ -566,7 +556,7 @@ function PassingCard({
     <Link
       to={to as never}
       params={params as never}
-      className="block rounded-2xl border border-border bg-card p-4 transition hover:border-white/20"
+      className="dashboard-card block p-4"
     >
       <div className="mb-3 flex items-center gap-2">
         <span className="rounded border border-border bg-card/60 px-1.5 py-0.5 text-[10px] font-bold tracking-[0.10em] text-muted-foreground">
