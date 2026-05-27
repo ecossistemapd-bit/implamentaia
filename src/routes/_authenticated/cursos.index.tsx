@@ -52,7 +52,7 @@ function FilterSelect({
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger
-        className="h-10 min-w-[170px] rounded-full border bg-card px-4 text-[13px] text-foreground transition-colors"
+        className="h-10 w-full rounded-full border bg-card px-4 text-[13px] text-foreground transition-colors hover:bg-muted/30"
         style={{ borderColor: "var(--violet-pill-border)" }}
       >
         <SelectValue placeholder={placeholder} />
@@ -168,8 +168,8 @@ function CapacitacionPage() {
           Aprendé las herramientas, procesos y prácticas que usan los mejores implementadores.
         </p>
 
-        <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div className="relative flex-1">
+        <div className="mt-6 space-y-3">
+          <div className="relative">
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               value={query}
@@ -185,7 +185,7 @@ function CapacitacionPage() {
               }
             />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
             <FilterSelect
               value={area}
               onChange={setArea}
