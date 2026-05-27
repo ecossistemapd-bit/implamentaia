@@ -18,8 +18,8 @@ const corsHeaders = {
 };
 
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
-// Modelo activo: claude-3-5-sonnet-20241022
-const MODEL = "claude-3-5-sonnet-20241022";
+// Modelo: claude-sonnet-4-6 (sucesor de claude-3-5-sonnet; claude-3-5-sonnet-20241022 fue retirado)
+const MODEL = "claude-sonnet-4-6";
 
 const SYSTEM_PROMPT = `Sos un consultor senior en implementación de IA para empresas de LatAm, parte de la plataforma Implementa AI.
 
@@ -207,7 +207,7 @@ Generá el blueprint completo usando la herramienta generar_blueprint.`;
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 8000,
+        max_tokens: 16000,
         system: SYSTEM_PROMPT,
         tools: [BLUEPRINT_TOOL],
         tool_choice: { type: "tool", name: "generar_blueprint" },
@@ -220,7 +220,13 @@ Generá el blueprint completo usando la herramienta generar_blueprint.`;
       console.error(`Anthropic error ${aiResp.status}:`, errText);
       if (aiResp.status === 401) {
         return json(
-          { error: "API key de Anthropic inválida. Revisá el secret." },
+          { error: "API key de Anthropic inválida. Revisá el secret ANTHROPIC_API_KEY." },
+          502,
+        );
+      }
+      if (aiResp.status === 404) {
+        return json(
+          { error: `Modelo no encontrado en Anthropic: ${MODEL}. Contactá soporte.` },
           502,
         );
       }
@@ -234,7 +240,7 @@ Generá el blueprint completo usando la herramienta generar_blueprint.`;
         );
       }
       return json(
-        { error: `Error del proveedor de IA (${aiResp.status}).` },
+        { error: `Error del proveedor de IA (${aiResp.status}): ${errText.slice(0, 200)}` },
         502,
       );
     }
