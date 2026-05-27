@@ -1,4 +1,5 @@
 import { Users, BookOpen, ChevronRight } from "lucide-react";
+import { useCourseCover } from "@/hooks/use-course-cover";
 
 export type CapacitacionCourse = {
   id: string;
@@ -52,6 +53,7 @@ export function CourseCard({ course, progress, onClick }: Props) {
   const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
   const inProgress = progress.done > 0 && !course.coming_soon;
   const hasModules = progress.total > 0;
+  const coverUrl = useCourseCover(course.thumbnail_url);
 
   return (
     <button
@@ -60,9 +62,9 @@ export function CourseCard({ course, progress, onClick }: Props) {
       className="app-card group flex w-full flex-col overflow-hidden text-left disabled:cursor-not-allowed"
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden">
-        {course.thumbnail_url ? (
+        {coverUrl ? (
           <img
-            src={course.thumbnail_url}
+            src={coverUrl}
             alt={course.title}
             className="h-full w-full object-cover transition-transform duration-[380ms]"
             style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
