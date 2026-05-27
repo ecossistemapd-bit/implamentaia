@@ -670,9 +670,9 @@ function LandingView({
               <button
                 key={insp.id}
                 onClick={() => onPickInspiration(insp)}
-                className="group text-left rounded-xl border border-border bg-card p-5 hover:border-primary/40 hover:bg-card transition shadow-sm"
+                className="app-card group text-left p-5"
               >
-                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary/15">
+                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg" style={{ background: "var(--violet-pill-bg)", color: "var(--violet-text-strong)" }}>
                   <Icon className="h-5 w-5" />
                 </div>
                 <h3 className="font-semibold text-foreground mb-1">{insp.title}</h3>
@@ -755,8 +755,8 @@ function WizardView({
           <span>Pregunta {currentQ + 1} de {total}</span>
           <span>{Math.round(progress)} %</span>
         </div>
-        <div className="h-1 rounded-full bg-muted overflow-hidden">
-          <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
+        <div className="app-progress-track" style={{ height: 4 }}>
+          <div className="app-progress-fill" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
@@ -836,9 +836,10 @@ function ConfirmView({ onGenerate, onAddPremium, onBack, premiumAdded }: {
       <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 max-w-2xl mx-auto mb-8">
         <button
           onClick={onGenerate}
-          className="group rounded-2xl border-2 border-primary bg-primary/5 p-6 text-left hover:bg-primary/10 transition"
+          className="app-card group p-6 text-left"
+          style={{ borderWidth: 2 }}
         >
-          <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg" style={{ background: "var(--violet-pill-bg)", color: "var(--violet-text-strong)" }}>
             <Zap className="h-5 w-5" />
           </div>
           <h3 className="font-semibold text-foreground mb-1">Generar ahora</h3>

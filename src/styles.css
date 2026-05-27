@@ -514,6 +514,48 @@
   transform: translateY(-1px);
 }
 
+/* Filter chips (catálogos, filtros de cursos/solutions/etc.) */
+.app-chip,
+.app-chip-active {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 220ms ease, border-color 220ms ease, color 220ms ease, transform 220ms ease;
+}
+.app-chip {
+  background: var(--cta-ghost-bg);
+  border: 1px solid var(--violet-pill-border);
+  color: var(--muted-foreground);
+}
+.app-chip:hover {
+  background: var(--violet-pill-bg);
+  border-color: var(--violet-border-hover);
+  color: var(--foreground);
+}
+.app-chip-active {
+  background: var(--violet-pill-bg);
+  border: 1px solid var(--violet-border-hover);
+  color: var(--violet-text-strong);
+  font-weight: 600;
+}
+
+/* Progress bar premium — gradient violeta theme-aware */
+.app-progress-track {
+  background: var(--cta-ghost-bg);
+  border-radius: 999px;
+  overflow: hidden;
+  height: 6px;
+}
+.app-progress-fill {
+  background: linear-gradient(90deg, var(--violet-text), var(--violet-text-strong));
+  height: 100%;
+  border-radius: 999px;
+  transition: width 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .app-card,
@@ -521,7 +563,9 @@
   .app-mini-step,
   .app-mini-step:hover,
   .app-cta-primary:hover,
-  .app-cta-ghost:hover {
+  .app-cta-ghost:hover,
+  .app-chip:hover,
+  .app-progress-fill {
     transform: none !important;
     transition: none !important;
   }
