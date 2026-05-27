@@ -1,138 +1,101 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Users, BookOpen, Lock, Sparkles } from "lucide-react";
+import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { CATEGORIES } from "@/lib/categories";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CourseCarousel } from "@/components/capacitacion/CourseCarousel";
+import type { CapacitacionCourse, CourseProgress } from "@/components/capacitacion/CourseCard";
 
 export const Route = createFileRoute("/_authenticated/cursos/")({
-  component: CursosPage,
+  component: CapacitacionPage,
 });
 
-type Course = {
-  id: string;
-  title: string;
-  description: string | null;
-  category: string | null;
-  level: string | null;
-};
+const SECTIONS = [
+  { key: "herramientas", label: "Herramientas" },
+  { key: "consejos", label: "Consejos y tutoriales" },
+  { key: "detras_escena", label: "Detrás de escena" },
+  { key: "dentro_de_poco", label: "Dentro de poco" },
+] as const;
 
-type ThumbStyle = {
-  gradient: string;
-  badge: string;
-  initial: string;
-  tagline: string;
-};
+const FORMATS = ["Formación", "Tutorial"] as const;
+const LEVELS = ["Principiante", "Intermedio", "Avanzado"] as const;
 
-const THUMB_BY_KEY: Record<string, ThumbStyle> = {
-  lovable: {
-    gradient: "from-purple-900 via-violet-800 to-zinc-900",
-    badge: "bg-violet-500/20 text-violet-300 border-violet-500/40",
-    initial: "L",
-    tagline: "Formación Lovable",
-  },
-  claude: {
-    gradient: "from-orange-900 via-amber-800 to-zinc-900",
-    badge: "bg-amber-500/20 text-amber-300 border-amber-500/40",
-    initial: "C",
-    tagline: "Formación Claude",
-  },
-  n8n: {
-    gradient: "from-green-900 via-emerald-800 to-zinc-900",
-    badge: "bg-green-500/20 text-emerald-300 border-green-500/40",
-    initial: "n8n",
-    tagline: "Formación n8n",
-  },
-  default: {
-    gradient: "from-violet-900 via-sky-900 to-zinc-900",
-    badge: "bg-violet-500/20 text-violet-300 border-violet-500/40",
-    initial: "AI",
-    tagline: "Formación IA",
-  },
-};
+const STATUS = [
+  { key: "all", label: "Todos los cursos" },
+  { key: "in_progress", label: "En curso" },
+  { key: "not_started", label: "No iniciado" },
+  { key: "completed", label: "Completado" },
+] as const;
 
-function thumbFor(c: { title: string; category?: string | null }): ThumbStyle {
-  const t = c.title.toLowerCase();
-  if (t.includes("lovable")) return THUMB_BY_KEY.lovable;
-  if (t.includes("claude")) return THUMB_BY_KEY.claude;
-  if (t.includes("n8n")) return THUMB_BY_KEY.n8n;
-  return THUMB_BY_KEY.default;
-}
+type StatusKey = (typeof STATUS)[number]["key"];
 
-const FILTERS = ["Todos", "No-Code", "IA", "Automatización"] as const;
-type Filter = (typeof FILTERS)[number];
-
-const COMING_SOON = [
-  { title: "ChatGPT para Negocios", category: "IA", gradient: "from-green-900 via-teal-800 to-zinc-900" },
-  { title: "Make (Integromat)", category: "Automatización", gradient: "from-fuchsia-900 via-purple-800 to-zinc-900" },
-  { title: "WhatsApp Business API", category: "Automatización", gradient: "from-green-900 via-lime-800 to-zinc-900" },
-  { title: "Meta Ads con IA", category: "Marketing", gradient: "from-blue-900 via-indigo-800 to-zinc-900" },
-];
-
-function categoryMatches(filter: Filter, cat: string | null) {
-  if (filter === "Todos") return true;
-  if (!cat) return false;
-  const c = cat.toLowerCase();
-  if (filter === "No-Code") return c.includes("no-code") || c.includes("nocode");
-  if (filter === "IA") return c.includes("ia") || c.includes("inteligencia") || c.includes("ai");
-  if (filter === "Automatización") return c.includes("autom");
-  return false;
-}
-
-function Thumbnail({
-  style,
-  size = "md",
-  locked = false,
+function FilterSelect({
+  value,
+  onChange,
+  placeholder,
+  options,
 }: {
-  style: ThumbStyle;
-  size?: "md" | "lg";
-  locked?: boolean;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  options: { key: string; label: string }[];
 }) {
   return (
-    <div className={`course-card-gradient relative w-full overflow-hidden ${size === "lg" ? "aspect-[16/10]" : "aspect-video"} bg-gradient-to-br ${style.gradient}`}>
-      <div className="absolute inset-0 opacity-20" style={{
-        backgroundImage:
-          "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15) 0, transparent 40%), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0, transparent 40%)",
-      }} />
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-        <div className={`flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 font-bold ${size === "lg" ? "h-24 w-24 text-5xl" : "h-16 w-16 text-3xl"}`}>
-          {style.initial}
-        </div>
-        <div className={`mt-3 font-semibold tracking-tight ${size === "lg" ? "text-2xl" : "text-base"}`}>
-          {style.tagline}
-        </div>
-      </div>
-      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent" />
-      {locked && (
-        <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm">
-          <Lock className="h-8 w-8 text-zinc-300" />
-        </div>
-      )}
-    </div>
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger
+        className="h-10 min-w-[170px] rounded-full border bg-card px-4 text-[13px] text-foreground transition-colors"
+        style={{ borderColor: "var(--violet-pill-border)" }}
+      >
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent className="border-border bg-popover text-popover-foreground">
+        <SelectItem value="all">{placeholder}</SelectItem>
+        {options.map((o) => (
+          <SelectItem key={o.key} value={o.key}>
+            {o.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 
-function CursosPage() {
+function CapacitacionPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [filter, setFilter] = useState<Filter>("Todos");
+
   const [query, setQuery] = useState("");
+  const [area, setArea] = useState("all");
+  const [format, setFormat] = useState("all");
+  const [level, setLevel] = useState("all");
+  const [status, setStatus] = useState<StatusKey>("all");
 
   const { data: courses, isLoading } = useQuery({
-    queryKey: ["courses"],
+    queryKey: ["capacitacion-courses"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("courses" as never)
-        .select("*")
+        .select(
+          "id, title, description, category, level, thumbnail_url, instructor_name, format, section_key, student_count, coming_soon",
+        )
         .eq("is_published", true)
         .order("order_index");
       if (error) throw error;
-      return data as Course[];
+      return (data ?? []) as CapacitacionCourse[];
     },
   });
 
   const { data: progressMap } = useQuery({
-    queryKey: ["courses-progress", user?.id],
+    queryKey: ["capacitacion-progress", user?.id],
     enabled: !!user && !!courses,
     queryFn: async () => {
       const { data: modules } = await supabase
@@ -145,7 +108,7 @@ function CursosPage() {
       const mods = (modules ?? []) as Array<{ id: string; course_id: string }>;
       const prog = (progress ?? []) as Array<{ module_id: string; completed: boolean }>;
       const completedSet = new Set(prog.filter((p) => p.completed).map((p) => p.module_id));
-      const map: Record<string, { total: number; done: number }> = {};
+      const map: Record<string, CourseProgress> = {};
       mods.forEach((m) => {
         if (!map[m.course_id]) map[m.course_id] = { total: 0, done: 0 };
         map[m.course_id].total += 1;
@@ -156,298 +119,158 @@ function CursosPage() {
   });
 
   const filtered = useMemo(() => {
-    return (courses ?? []).filter((c) => {
-      if (!categoryMatches(filter, c.category)) return false;
-      if (query && !`${c.title} ${c.description ?? ""}`.toLowerCase().includes(query.toLowerCase())) return false;
+    const list = courses ?? [];
+    return list.filter((c) => {
+      if (query) {
+        const hay =
+          `${c.title} ${c.description ?? ""} ${c.instructor_name ?? ""}`.toLowerCase();
+        if (!hay.includes(query.toLowerCase())) return false;
+      }
+      if (area !== "all" && c.category !== area) return false;
+      if (format !== "all" && c.format !== format) return false;
+      if (level !== "all" && c.level !== level) return false;
+      if (status !== "all") {
+        const p = progressMap?.[c.id];
+        const done = p?.done ?? 0;
+        const total = p?.total ?? 0;
+        if (status === "in_progress" && !(done > 0 && done < total)) return false;
+        if (status === "not_started" && done !== 0) return false;
+        if (status === "completed" && !(total > 0 && done === total)) return false;
+      }
       return true;
     });
-  }, [courses, filter, query]);
+  }, [courses, query, area, format, level, status, progressMap]);
 
-  const featured = filtered[0];
-  const rest = filtered.slice(1);
+  const bySection = useMemo(() => {
+    const map: Record<string, CapacitacionCourse[]> = {};
+    SECTIONS.forEach((s) => (map[s.key] = []));
+    filtered.forEach((c) => {
+      const key = c.coming_soon ? "dentro_de_poco" : c.section_key || "herramientas";
+      if (!map[key]) map[key] = [];
+      map[key].push(c);
+    });
+    return map;
+  }, [filtered]);
 
-  const goCourse = (id: string) => navigate({ to: "/cursos/$courseId", params: { courseId: id } });
+  const goCourse = (id: string) =>
+    navigate({ to: "/cursos/$courseId", params: { courseId: id } });
+
+  const hasResults = filtered.length > 0;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
+    <div className="relative z-[1] mx-auto max-w-[1340px] px-8 py-8">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold text-zinc-100">
-          Cursos de <span className="text-violet-400">IA</span>
+        <h1 className="text-[44px] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground">
+          Capacitación
         </h1>
-        <p className="mt-2 text-zinc-400">
-          Capacitación práctica en las herramientas que usan los mejores implementadores.
+        <p className="page-subtitle mt-3 max-w-[640px]">
+          Aprendé las herramientas, procesos y prácticas que usan los mejores implementadores.
         </p>
 
-        <div className="relative mt-6">
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar cursos..."
-            className="w-full rounded-md py-3 pl-11 pr-4 outline-none transition-colors duration-200"
-            style={{
-              backgroundColor: "#1C2333",
-              border: "1px solid rgba(201,168,76,0.12)",
-              color: "#E8EDF5",
-            }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)")}
-            onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(201,168,76,0.12)")}
-          />
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {FILTERS.map((f) => {
-            const active = filter === f;
-            return (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={active ? "app-chip-active" : "app-chip"}
-              >
-                {f}
-              </button>
-            );
-          })}
+        <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Busque por nombre o descripción del curso"
+              className="w-full rounded-full border bg-card py-2.5 pl-11 pr-4 text-[14px] text-foreground placeholder:text-muted-foreground outline-none transition-colors"
+              style={{ borderColor: "var(--violet-pill-border)" }}
+              onFocus={(e) =>
+                (e.currentTarget.style.borderColor = "var(--violet-border-hover)")
+              }
+              onBlur={(e) =>
+                (e.currentTarget.style.borderColor = "var(--violet-pill-border)")
+              }
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <FilterSelect
+              value={area}
+              onChange={setArea}
+              placeholder="Todas las áreas"
+              options={CATEGORIES.map((c) => ({ key: c.key, label: c.label }))}
+            />
+            <FilterSelect
+              value={format}
+              onChange={setFormat}
+              placeholder="Todos los formatos"
+              options={FORMATS.map((f) => ({ key: f, label: f }))}
+            />
+            <FilterSelect
+              value={level}
+              onChange={setLevel}
+              placeholder="Todos los niveles"
+              options={LEVELS.map((l) => ({ key: l, label: l }))}
+            />
+            <FilterSelect
+              value={status}
+              onChange={(v) => setStatus(v as StatusKey)}
+              placeholder="Todos los cursos"
+              options={STATUS.filter((s) => s.key !== "all").map((s) => ({
+                key: s.key,
+                label: s.label,
+              }))}
+            />
+          </div>
         </div>
       </div>
+
+      <div
+        className="my-8 h-px w-full"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent)",
+        }}
+      />
 
       {/* Loading skeleton */}
       {isLoading && (
-        <section className="mt-10">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="overflow-hidden rounded-xl border border-zinc-800/50 bg-muted animate-pulse">
-                <div className="aspect-video bg-zinc-800/60" />
-                <div className="space-y-2 p-4">
-                  <div className="h-4 w-3/4 rounded bg-zinc-800/60" />
-                  <div className="h-3 w-1/2 rounded bg-zinc-800/60" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Featured */}
-      {featured && (
-        <section className="mt-10">
-          <div className="mb-3 flex items-center gap-3 border-l-4 border-violet-500 pl-3">
-            <h2 className="text-xl font-semibold text-zinc-100">Destacado</h2>
-          </div>
-          <FeaturedCard
-            course={featured}
-            progress={progressMap?.[featured.id] ?? { total: 0, done: 0 }}
-            onClick={() => goCourse(featured.id)}
-          />
-        </section>
-      )}
-
-      {/* Tools grid */}
-      {rest.length > 0 && (
-        <section className="mt-12">
-          <div className="mb-4 flex items-center gap-3 border-l-4 border-violet-500 pl-3">
-            <h2 className="text-xl font-semibold text-zinc-100">Herramientas de IA</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {rest.map((c) => (
-              <CourseCard
-                key={c.id}
-                course={c}
-                progress={progressMap?.[c.id] ?? { total: 0, done: 0 }}
-                onClick={() => goCourse(c.id)}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {filtered.length === 0 && (
-        <div className="mt-10 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/40 p-10 text-center text-zinc-400">
-          No encontramos cursos con esos filtros.
-        </div>
-      )}
-
-      {/* Coming soon */}
-      <section className="mt-14">
-        <div className="mb-4 flex items-center gap-3 border-l-4 border-violet-500 pl-3">
-          <h2 className="text-xl font-semibold text-zinc-100">Próximamente</h2>
-        </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {COMING_SOON.map((c) => (
-            <div
-              key={c.title}
-              className="overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900/60"
-            >
-              <Thumbnail
-                style={{
-                  gradient: c.gradient,
-                  badge: "",
-                  initial: "AI",
-                  tagline: c.title,
-                }}
-                locked
-              />
-              <div className="p-4">
-                <span className="inline-block rounded-full border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold tracking-wide text-amber-300">
-                  MUY PRONTO
-                </span>
-                <h3 className="mt-2 line-clamp-2 text-sm font-semibold text-zinc-100">{c.title}</h3>
-                <p className="mt-1 text-xs text-zinc-600">Disponible próximamente</p>
+        <section className="space-y-10">
+          {[0, 1].map((row) => (
+            <div key={row}>
+              <div className="mb-5 h-7 w-48 animate-pulse rounded bg-muted" />
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="app-card overflow-hidden"
+                  >
+                    <div className="aspect-[3/4] animate-pulse bg-muted" />
+                    <div className="space-y-2 p-5">
+                      <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+                      <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
+        </section>
+      )}
+
+      {/* Sections */}
+      {!isLoading && hasResults && (
+        <div>
+          {SECTIONS.map((s) => (
+            <CourseCarousel
+              key={s.key}
+              title={s.label}
+              courses={bySection[s.key] ?? []}
+              progressMap={progressMap ?? {}}
+              onCourseClick={goCourse}
+            />
+          ))}
         </div>
-      </section>
-    </div>
-  );
-}
+      )}
 
-function levelBadgeClass(level: string | null) {
-  const l = (level ?? "").toLowerCase();
-  if (l.includes("avanz")) return "bg-rose-500/20 text-rose-300 border-rose-500/40";
-  if (l.includes("interm")) return "bg-amber-500/20 text-amber-300 border-amber-500/40";
-  return "bg-green-500/20 text-emerald-300 border-green-500/40";
-}
-
-function CourseCard({
-  course,
-  progress,
-  onClick,
-}: {
-  course: Course;
-  progress: { total: number; done: number };
-  onClick: () => void;
-}) {
-  const style = thumbFor(course);
-  const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
-  const inProgress = progress.done > 0;
-  const hasModules = progress.total > 0;
-
-  return (
-    <button
-      onClick={onClick}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-800/50 bg-zinc-900/80 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-500/50 hover:shadow-2xl hover:shadow-black/50"
-    >
-      <div className="relative overflow-hidden">
-        <div className="transition-transform duration-200 group-hover:scale-[1.03]">
-          <Thumbnail style={style} />
+      {/* Empty state */}
+      {!isLoading && !hasResults && (
+        <div className="app-card mt-10 p-10 text-center text-muted-foreground">
+          No encontramos cursos con esos filtros.
         </div>
-        <span className={`absolute left-3 top-3 rounded-md border px-2 py-0.5 text-[11px] font-medium backdrop-blur-sm ${levelBadgeClass(course.level)}`}>
-          {course.level ?? "Principiante"}
-        </span>
-        {inProgress && (
-          <span className="absolute right-3 top-3 rounded-md border border-violet-500/50 bg-violet-500/30 px-2 py-0.5 text-[11px] font-semibold tracking-wide text-teal-200 backdrop-blur-sm">
-            EN PROGRESO
-          </span>
-        )}
-      </div>
-
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="line-clamp-2 text-base font-semibold text-white">{course.title}</h3>
-
-        <div className="mt-2 flex items-center gap-4 text-xs text-zinc-400">
-          <span className="flex items-center gap-1.5">
-            <Users className="h-3.5 w-3.5" />
-            Sé el primero
-          </span>
-          <span className="flex items-center gap-1.5">
-            <BookOpen className="h-3.5 w-3.5" />
-            {hasModules ? `${progress.total} módulos` : "Próximamente"}
-          </span>
-        </div>
-
-        {inProgress ? (
-          <div className="mt-4">
-            <div className="text-xs text-zinc-400">
-              {progress.done} de {progress.total} módulos completados
-            </div>
-            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-              <div className="h-full bg-violet-400 transition-all" style={{ width: `${pct}%` }} />
-            </div>
-          </div>
-        ) : (
-          <div className="mt-4 h-1.5" />
-        )}
-
-        <div className="mt-4">
-          {inProgress ? (
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-violet-400">
-              Continuar →
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 rounded-md border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-200 transition-colors group-hover:border-violet-500/50 group-hover:text-violet-300">
-              Ver curso →
-            </span>
-          )}
-        </div>
-      </div>
-    </button>
-  );
-}
-
-function FeaturedCard({
-  course,
-  progress,
-  onClick,
-}: {
-  course: Course;
-  progress: { total: number; done: number };
-  onClick: () => void;
-}) {
-  const style = thumbFor(course);
-  const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
-  const inProgress = progress.done > 0;
-  const hasModules = progress.total > 0;
-
-  return (
-    <div className={`overflow-hidden rounded-2xl border border-zinc-800/50 bg-gradient-to-br ${style.gradient} shadow-2xl shadow-black/40`}>
-      <div className="grid grid-cols-1 gap-0 lg:grid-cols-5">
-        <div className="lg:col-span-3">
-          <Thumbnail style={style} size="lg" />
-        </div>
-        <div className="flex flex-col justify-center bg-zinc-900/70 p-8 backdrop-blur-sm lg:col-span-2">
-          <div className="flex items-center gap-2">
-            {course.category && (
-              <span className="rounded-md border border-violet-500/40 bg-violet-500/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-violet-300">
-                {course.category}
-              </span>
-            )}
-            <span className={`rounded-md border px-2 py-0.5 text-[11px] font-medium ${levelBadgeClass(course.level)}`}>
-              {course.level ?? "Principiante"}
-            </span>
-          </div>
-          <h3 className="mt-3 text-3xl font-bold text-white">{course.title}</h3>
-          {course.description && (
-            <p className="mt-2 line-clamp-3 text-sm text-zinc-300">{course.description}</p>
-          )}
-          <div className="mt-4 flex items-center gap-5 text-sm text-zinc-400">
-            <span className="flex items-center gap-1.5">
-              <Users className="h-4 w-4" /> Sé el primero
-            </span>
-            <span className="flex items-center gap-1.5">
-              <BookOpen className="h-4 w-4" />
-              {hasModules ? `${progress.total} módulos` : "Próximamente"}
-            </span>
-          </div>
-
-          {inProgress && (
-            <div className="mt-5">
-              <div className="text-xs text-zinc-400">
-                {progress.done} de {progress.total} completados
-              </div>
-              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-                <div className="h-full bg-violet-400" style={{ width: `${pct}%` }} />
-              </div>
-            </div>
-          )}
-
-          <button onClick={onClick} className="app-cta-primary mt-6 w-fit">
-            <Sparkles className="h-4 w-4" />
-            {inProgress ? "Continuar donde lo dejé" : "Comenzar curso"}
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
