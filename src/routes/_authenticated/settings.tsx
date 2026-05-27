@@ -70,7 +70,7 @@ function SettingsPage() {
         <button
           onClick={save}
           disabled={saving}
-          className="rounded-xl bg-white px-6 py-2.5 font-semibold text-black transition-all duration-200 hover:opacity-90 hover:bg-zinc-100 disabled:opacity-60"
+          className="app-cta-primary disabled:opacity-60"
         >
           {saving ? "Guardando..." : "Guardar"}
         </button>

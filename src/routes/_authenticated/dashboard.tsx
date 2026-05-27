@@ -135,13 +135,10 @@ function Dashboard() {
     <>
       <OnboardingModal />
 
-      {/* Wash violeta fijo detrás del área del dashboard. No reacciona al hover. */}
-      <div className="dashboard-violet-wash" aria-hidden />
-
-      <div className="relative z-[2] mx-auto max-w-[1340px] px-8 py-8">
+      <div className="mx-auto max-w-[1340px] px-8 py-8">
         {/* HEADER */}
         <header className="mb-8">
-          <span className="dashboard-pill-violet inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium">
+          <span className="app-pill-violet inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium">
             <Flame className="h-3 w-3" /> {streakDays} días consecutivos
           </span>
           <h1 className="mt-4 text-[44px] font-bold leading-[1.05] tracking-[-0.02em]">
@@ -217,10 +214,10 @@ function HeroRutaIA({
   nextInRoute: Array<{ id: string; title: string; short_description: string }>;
 }) {
   return (
-    <div className="dashboard-card col-span-12 p-7 lg:col-span-8">
+    <div className="app-card col-span-12 p-7 lg:col-span-8">
       <div>
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="dashboard-pill-violet rounded px-2 py-0.5 text-[10px] font-bold tracking-[0.10em]">
+          <span className="app-pill-violet rounded px-2 py-0.5 text-[10px] font-bold tracking-[0.10em]">
             RUTA IA PERSONALIZADA
           </span>
           <span className="text-[12px] text-muted-foreground/70">Generada por Nina · hace unos minutos</span>
@@ -241,21 +238,21 @@ function HeroRutaIA({
             <Link
               to="/solutions/$id"
               params={{ id: recommended.id }}
-              className="dashboard-cta-primary"
+              className="app-cta-primary"
             >
               <Play className="h-4 w-4 fill-current" /> Comenzar ahora
             </Link>
           ) : (
             <Link
               to="/solutions"
-              className="dashboard-cta-primary"
+              className="app-cta-primary"
             >
               <Play className="h-4 w-4 fill-current" /> Explorar soluciones
             </Link>
           )}
           <Link
             to="/builder"
-            className="dashboard-cta-ghost"
+            className="app-cta-ghost"
           >
             <RefreshCw className="h-4 w-4" /> Regenerar ruta
           </Link>
@@ -275,7 +272,7 @@ function HeroRutaIA({
                 key={s.id}
                 to="/solutions/$id"
                 params={{ id: s.id }}
-                className="dashboard-mini-step flex items-center gap-3 p-3"
+                className="app-mini-step flex items-center gap-3 p-3"
               >
                 <StepNum muted>{String(idx + 2).padStart(2, "0")}</StepNum>
                 <div className="min-w-0 flex-1">
@@ -313,12 +310,12 @@ function NextMentoria() {
   const pastSlotsHoy = ["09:00", "10:30", "14:00"];
 
   return (
-    <div className="dashboard-card col-span-12 p-5 lg:col-span-4">
+    <div className="app-card col-span-12 p-5 lg:col-span-4">
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
           PRÓXIMA MENTORÍA
         </span>
-        <span className="dashboard-pill-violet inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium">
+        <span className="app-pill-violet inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium">
           <Clock className="h-3 w-3" /> FALTAN {nextSlot.faltan}
         </span>
       </div>
@@ -330,7 +327,7 @@ function NextMentoria() {
       <p className="mt-1 text-[13px] text-muted-foreground">Q&amp;A abierto · entrá cuando quieras</p>
       <Link
         to="/mentoria"
-        className="dashboard-cta-primary mt-4 w-full justify-center"
+        className="app-cta-primary mt-4 w-full justify-center"
       >
         <Bell className="h-4 w-4" /> Anotarme · te avisamos antes
       </Link>
@@ -374,7 +371,7 @@ function KpiCard({
   sparkline?: boolean;
 }) {
   return (
-    <div className="dashboard-card p-5">
+    <div className="app-card p-5">
       <div className="mb-3 flex items-center justify-between">
         <span className="text-[11px] font-semibold tracking-[0.15em] text-muted-foreground/70">
           {label}
@@ -427,7 +424,7 @@ function TuJourney({
   recommended: { id: string; title: string } | null;
 }) {
   return (
-    <section className="dashboard-card mt-6 overflow-hidden">
+    <section className="app-card mt-6 overflow-hidden">
       <div className="flex items-center justify-between px-6 pt-5">
         <div>
           <div className="text-[11px] font-semibold tracking-[0.15em] text-muted-foreground/70">
@@ -484,7 +481,7 @@ function JourneyCard({
     <Link
       to={to as never}
       params={params as never}
-      className="dashboard-mini-step block p-4"
+      className="app-mini-step block p-4"
     >
       <div className="mb-3 flex items-center gap-3">
         <StepNum>{step}</StepNum>
@@ -556,7 +553,7 @@ function PassingCard({
     <Link
       to={to as never}
       params={params as never}
-      className="dashboard-card block p-4"
+      className="app-card block p-4"
     >
       <div className="mb-3 flex items-center gap-2">
         <span className="rounded border border-border bg-card/60 px-1.5 py-0.5 text-[10px] font-bold tracking-[0.10em] text-muted-foreground">

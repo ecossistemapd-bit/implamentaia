@@ -410,27 +410,26 @@
 
 /* Wash violeta theme-aware — alpha escala según tema (más fuerte en light para
  * compensar el bg blanco). Funciona en ambos temas vía CSS vars. */
-.dashboard-violet-wash {
+.app-violet-wash {
   position: fixed;
   top: 0; bottom: 0; right: 0; left: 220px;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
   background:
     radial-gradient(60% 50% at 25% 20%, rgba(139,92,246,var(--wash-1)), transparent 70%),
     radial-gradient(55% 45% at 80% 50%, rgba(139,92,246,var(--wash-2)), transparent 72%),
     radial-gradient(50% 40% at 50% 95%, rgba(139,92,246,var(--wash-3)), transparent 75%);
   transition: background 240ms ease;
 }
-.dashboard-violet-wash + * { position: relative; z-index: 2; }
 @media (max-width: 1024px) {
-  .dashboard-violet-wash { left: 0; }
+  .app-violet-wash { left: 0; }
 }
 
 /* ============================================================
  * Dashboard cards — marco violeta sutil + lift al hover.
  * Theme-aware vía tokens: en dark sutil, en light intensifica.
  * ============================================================ */
-.dashboard-card {
+.app-card {
   background-color: var(--card);
   border: 1px solid var(--violet-border);
   border-radius: 16px;
@@ -442,7 +441,7 @@
     background-color 240ms ease;
   will-change: transform;
 }
-.dashboard-card:hover {
+.app-card:hover {
   transform: translateY(-3px);
   border-color: var(--violet-border-hover);
   box-shadow:
@@ -450,8 +449,8 @@
     0 16px 32px -18px rgba(0,0,0,0.55);
 }
 
-/* Mini step cards dentro del Hero — más livianas que dashboard-card */
-.dashboard-mini-step {
+/* Mini step cards dentro del Hero — más livianas que app-card */
+.app-mini-step {
   background-color: var(--card);
   border: 1px solid var(--violet-pill-border);
   border-radius: 12px;
@@ -461,14 +460,14 @@
     box-shadow 280ms ease,
     background-color 240ms ease;
 }
-.dashboard-mini-step:hover {
+.app-mini-step:hover {
   transform: translateY(-2px);
   border-color: var(--violet-border-hover);
   box-shadow: 0 8px 20px -14px rgba(0,0,0,0.5);
 }
 
 /* Pill con accent violeta — para datos premium (streak, FALTAN, RUTA IA, etc.) */
-.dashboard-pill-violet {
+.app-pill-violet {
   color: var(--violet-text-strong);
   background: var(--violet-pill-bg);
   border: 1px solid var(--violet-pill-border);
@@ -480,7 +479,7 @@
  * Primary: en dark blanco/zinc, en light violeta sólido (premium high-ticket).
  * Ghost: outline violeta sutil en ambos.
  * ============================================================ */
-.dashboard-cta-primary {
+.app-cta-primary {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 11px 16px; border-radius: 10px;
   font-size: 14px; font-weight: 600;
@@ -491,7 +490,7 @@
   transition: background 240ms ease, color 240ms ease, box-shadow 240ms ease, transform 240ms ease;
   cursor: pointer;
 }
-.dashboard-cta-primary:hover {
+.app-cta-primary:hover {
   background: var(--cta-primary-bg-hover);
   color: var(--cta-primary-text);
   box-shadow:
@@ -499,7 +498,7 @@
     0 8px 24px -6px rgba(139,92,246,0.40);
   transform: translateY(-2px);
 }
-.dashboard-cta-ghost {
+.app-cta-ghost {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 11px 16px; border-radius: 10px;
   font-size: 14px; font-weight: 600;
@@ -509,7 +508,7 @@
   transition: background 240ms ease, border-color 240ms ease, transform 240ms ease;
   cursor: pointer;
 }
-.dashboard-cta-ghost:hover {
+.app-cta-ghost:hover {
   background: var(--cta-ghost-bg-hover);
   border-color: var(--violet-border-hover);
   transform: translateY(-1px);
@@ -517,12 +516,12 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .dashboard-card,
-  .dashboard-card:hover,
-  .dashboard-mini-step,
-  .dashboard-mini-step:hover,
-  .dashboard-cta-primary:hover,
-  .dashboard-cta-ghost:hover {
+  .app-card,
+  .app-card:hover,
+  .app-mini-step,
+  .app-mini-step:hover,
+  .app-cta-primary:hover,
+  .app-cta-ghost:hover {
     transform: none !important;
     transition: none !important;
   }
