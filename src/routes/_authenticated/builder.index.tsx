@@ -269,6 +269,40 @@ const INSPIRATIONS: Inspiration[] = [
   },
 ];
 
+// ============================================================
+// localStorage key + TTL (24 h) para el estado en-progreso del wizard
+// ============================================================
+const DRAFT_KEY = "implementa_builder_draft_v1";
+const DRAFT_TTL = 24 * 60 * 60 * 1000; // 24 horas
+
+interface DraftState {
+  step: "landing" | "wizard" | "confirm";
+  idea: string;
+  essentialAnswers: Record<string, string>;
+  premiumAnswers: Record<string, string>;
+  includePremium: boolean;
+  currentQ: number;
+  ts: number;
+}
+
+function saveDraft(draft: DraftState) {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); } catch { /* storage full */ }
+}
+
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch { /* noop */ }
+}
+
+function loadDraft(): DraftState | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const d: DraftState = JSON.parse(raw);
+    if (Date.now() - (d.ts || 0) > DRAFT_TTL) { clearDraft(); return null; }
+    return d;
+  } catch { return null; }
+}
+
 function BuilderPage() {
   const [step, setStep] = useState<Step>("landing");
   const [idea, setIdea] = useState("");
@@ -282,10 +316,69 @@ function BuilderPage() {
 
   const [savedBlueprints, setSavedBlueprints] = useState<SavedBlueprint[]>([]);
   const [loadingHistorico, setLoadingHistorico] = useState(false);
+  // Mientras cargamos el estado inicial (localStorage + DB) mostramos spinner
+  const [initLoading, setInitLoading] = useState(true);
 
   const questions = includePremium
     ? [...ESSENTIAL_QUESTIONS, ...PREMIUM_QUESTIONS]
     : ESSENTIAL_QUESTIONS;
+
+  // ── Carga inicial al montar ────────────────────────────────────
+  // Orden de prioridad:
+  //   1. Si hay un borrador activo en localStorage → restaurar el wizard
+  //   2. Si hay blueprints guardados en DB → mostrar el más reciente
+  //   3. Si no hay nada → mostrar landing vacío
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      // 1. localStorage
+      const draft = loadDraft();
+      if (draft) {
+        if (!cancelled) {
+          setIdea(draft.idea || "");
+          setEssentialAnswers(draft.essentialAnswers || {});
+          setPremiumAnswers(draft.premiumAnswers || {});
+          setIncludePremium(draft.includePremium || false);
+          setCurrentQ(draft.currentQ || 0);
+          setStep(draft.step || "landing");
+          setInitLoading(false);
+        }
+        return;
+      }
+      // 2. DB — último blueprint guardado
+      try {
+        const { data } = await supabase
+          .from("builder_blueprints")
+          .select("id, idea, blueprint, created_at")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (!cancelled && data) {
+          const saved = data as unknown as SavedBlueprint;
+          setIdea(saved.idea);
+          setBlueprint(saved.blueprint as Blueprint);
+          setStep("result");
+        }
+      } catch { /* sin conexión o sin datos */ }
+      if (!cancelled) setInitLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Persistir wizard en-progreso en localStorage ──────────────
+  useEffect(() => {
+    if (!["landing", "wizard", "confirm"].includes(step)) return;
+    saveDraft({
+      step: step as DraftState["step"],
+      idea, essentialAnswers, premiumAnswers, includePremium, currentQ,
+      ts: Date.now(),
+    });
+  }, [step, idea, essentialAnswers, premiumAnswers, includePremium, currentQ]);
+
+  // ── Limpiar borrador cuando el blueprint fue generado ─────────
+  useEffect(() => {
+    if (step === "result" && blueprint) clearDraft();
+  }, [step, blueprint]);
 
   const startAnalyzing = () => {
     if (!idea.trim()) return;
@@ -293,6 +386,7 @@ function BuilderPage() {
   };
 
   const restart = () => {
+    clearDraft();
     setStep("landing");
     setIdea("");
     setEssentialAnswers({});
@@ -368,10 +462,25 @@ function BuilderPage() {
     return () => { cancelled = true; };
   }, [step, idea, essentialAnswers, premiumAnswers]);
 
+  // ── Spinner de carga inicial (antes del primer render real) ───
+  if (initLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-5">
+          <div className="relative">
+            <div className="h-20 w-20 rounded-full bg-[var(--violet-pill-bg)] border border-[var(--violet-border)] animate-pulse" />
+            <Wand2 className="absolute inset-0 m-auto h-8 w-8 [color:var(--violet-text)]" />
+          </div>
+          <p className="text-[14px] text-muted-foreground tracking-[0.04em]">Cargando tus proyectos…</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen text-foreground">
-      {(step === "landing" || step === "historico") && (
-        <BuilderHeader onHistorico={openHistorico} activeHistorico={step === "historico"} />
+      {(step === "landing" || step === "historico" || step === "result") && (
+        <BuilderHeader onHistorico={openHistorico} activeHistorico={step === "historico"} onNuevo={restart} showNuevo={step === "result"} />
       )}
 
       {step === "landing" && (
@@ -456,24 +565,37 @@ function BuilderPage() {
 function BuilderHeader({
   onHistorico,
   activeHistorico,
+  onNuevo,
+  showNuevo = false,
 }: {
   onHistorico: () => void;
   activeHistorico: boolean;
+  onNuevo?: () => void;
+  showNuevo?: boolean;
 }) {
   return (
-    <div className="border-b border-border bg-card/40 backdrop-blur-xl">
+    <div className="border-b border-border bg-card/40 backdrop-blur-xl sticky top-0 z-30">
       <div className="mx-auto flex max-w-[1340px] items-center justify-between gap-2 px-8 py-3">
         <div className="flex items-center gap-2">
           <Wand2 className="h-4 w-4 [color:var(--violet-text)]" />
           <span className="text-sm font-semibold text-foreground tracking-tight">Builder</span>
         </div>
         <div className="flex items-center gap-2">
+          {showNuevo && onNuevo && (
+            <button
+              onClick={onNuevo}
+              className="app-cta-primary text-sm px-3 py-1.5 h-8"
+            >
+              <Plus className="h-3.5 w-3.5 shrink-0" />
+              <span className="hidden sm:inline">Nuevo</span>
+            </button>
+          )}
           <button
             onClick={onHistorico}
             className={activeHistorico ? "app-cta-primary text-sm px-3 py-1.5 h-8" : "app-cta-ghost text-sm px-3 py-1.5 h-8"}
           >
             <History className="h-3.5 w-3.5 shrink-0" />
-            <span className="hidden sm:inline">Histórico</span>
+            <span className="hidden sm:inline">Mis blueprints</span>
           </button>
           <button
             disabled
@@ -1068,7 +1190,7 @@ function SectionDetailPage({
   const handleNext = () => { if (isLast) onBack(); else onChangeSection(BLUEPRINT_SECTIONS[currentIdx + 1].key); };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Sticky top bar */}
       <div className="sticky top-0 z-30 border-b border-border bg-card/80 backdrop-blur-xl">
         <div className="mx-auto max-w-[1340px] px-8">
