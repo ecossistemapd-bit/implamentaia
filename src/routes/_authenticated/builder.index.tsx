@@ -369,7 +369,7 @@ function BuilderPage() {
   }, [step, idea, essentialAnswers, premiumAnswers]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen text-foreground">
       {(step === "landing" || step === "historico") && (
         <BuilderHeader onHistorico={openHistorico} activeHistorico={step === "historico"} />
       )}
@@ -1068,7 +1068,7 @@ function SectionDetailPage({
   const handleNext = () => { if (isLast) onBack(); else onChangeSection(BLUEPRINT_SECTIONS[currentIdx + 1].key); };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       {/* Sticky top bar */}
       <div className="sticky top-0 z-30 border-b border-border bg-card/80 backdrop-blur-xl">
         <div className="mx-auto max-w-[1340px] px-8">
