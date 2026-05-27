@@ -428,7 +428,9 @@
 /* ============================================================
  * Dashboard cards — marco violeta sutil + lift al hover.
  * Theme-aware vía tokens: en dark sutil, en light intensifica.
+ * Aliases app-* = design-system-doc naming (dashboard-* = legacy).
  * ============================================================ */
+.dashboard-card,
 .app-card {
   background-color: var(--card);
   border: 1px solid var(--violet-border);
@@ -441,6 +443,7 @@
     background-color 240ms ease;
   will-change: transform;
 }
+.dashboard-card:hover,
 .app-card:hover {
   transform: translateY(-3px);
   border-color: var(--violet-border-hover);
@@ -449,7 +452,8 @@
     0 16px 32px -18px rgba(0,0,0,0.55);
 }
 
-/* Mini step cards dentro del Hero — más livianas que app-card */
+/* Mini step cards dentro del Hero — más livianas que dashboard-card */
+.dashboard-mini-step,
 .app-mini-step {
   background-color: var(--card);
   border: 1px solid var(--violet-pill-border);
@@ -460,6 +464,7 @@
     box-shadow 280ms ease,
     background-color 240ms ease;
 }
+.dashboard-mini-step:hover,
 .app-mini-step:hover {
   transform: translateY(-2px);
   border-color: var(--violet-border-hover);
@@ -467,6 +472,7 @@
 }
 
 /* Pill con accent violeta — para datos premium (streak, FALTAN, RUTA IA, etc.) */
+.dashboard-pill-violet,
 .app-pill-violet {
   color: var(--violet-text-strong);
   background: var(--violet-pill-bg);
@@ -479,6 +485,7 @@
  * Primary: en dark blanco/zinc, en light violeta sólido (premium high-ticket).
  * Ghost: outline violeta sutil en ambos.
  * ============================================================ */
+.dashboard-cta-primary,
 .app-cta-primary {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 11px 16px; border-radius: 10px;
@@ -490,6 +497,7 @@
   transition: background 240ms ease, color 240ms ease, box-shadow 240ms ease, transform 240ms ease;
   cursor: pointer;
 }
+.dashboard-cta-primary:hover,
 .app-cta-primary:hover {
   background: var(--cta-primary-bg-hover);
   color: var(--cta-primary-text);
@@ -498,6 +506,7 @@
     0 8px 24px -6px rgba(139,92,246,0.40);
   transform: translateY(-2px);
 }
+.dashboard-cta-ghost,
 .app-cta-ghost {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 11px 16px; border-radius: 10px;
@@ -508,6 +517,7 @@
   transition: background 240ms ease, border-color 240ms ease, transform 240ms ease;
   cursor: pointer;
 }
+.dashboard-cta-ghost:hover,
 .app-cta-ghost:hover {
   background: var(--cta-ghost-bg-hover);
   border-color: var(--violet-border-hover);
@@ -558,10 +568,16 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
+  .dashboard-card,
+  .dashboard-card:hover,
   .app-card,
   .app-card:hover,
+  .dashboard-mini-step,
+  .dashboard-mini-step:hover,
   .app-mini-step,
   .app-mini-step:hover,
+  .dashboard-cta-primary:hover,
+  .dashboard-cta-ghost:hover,
   .app-cta-primary:hover,
   .app-cta-ghost:hover,
   .app-chip:hover,

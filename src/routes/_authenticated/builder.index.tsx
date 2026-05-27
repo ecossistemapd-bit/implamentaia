@@ -29,6 +29,7 @@ import {
   Check,
   TrendingUp,
   GraduationCap,
+  DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -48,7 +49,7 @@ import { supabase } from "@/integrations/supabase/client";
 //
 // Extras:
 //   - Histórico: lista de blueprints guardados por el usuario
-//   - Detalle de sección: Sheet con markdown completo por sección
+//   - Detalle de sección: página full-screen con markdown completo
 // ============================================================
 
 interface Blueprint {
@@ -78,10 +79,7 @@ interface SavedBlueprint {
 // Helpers para parsear el contenido de las secciones
 // ============================================================
 
-/** Extrae prompts de la sección rapido_adorable.
- *  Soporta formato ### Título\n```\ncontenido\n``` (nuevo)
- *  y ## Título\n```\ncontenido\n``` (legacy)
- */
+/** Extrae prompts de la sección rapido_adorable. */
 function parsePrompts(markdown: string): { title: string; content: string }[] {
   const results: { title: string; content: string }[] = [];
   const headingRegex = /^#{2,3}\s+(.+)$/gm;
@@ -105,7 +103,7 @@ function parsePrompts(markdown: string): { title: string; content: string }[] {
 }
 
 /** Extrae los 3 sprints del plan de acción */
-function parseSprints(markdown: string): { title: string; color: string; tasks: string[] }[] {
+function parseSprints(markdown: string): { title: string; tasks: string[] }[] {
   const sprintRegex = /^#{1,3}\s*(Sprint\s*[123]|Fase\s*[123]|Etapa\s*[123])[^\n]*/gim;
   const matches: { title: string; index: number; length: number }[] = [];
   let m;
@@ -113,7 +111,6 @@ function parseSprints(markdown: string): { title: string; color: string; tasks: 
     matches.push({ title: m[0].replace(/^#+\s+/, "").trim(), index: m.index, length: m[0].length });
   }
   if (matches.length < 2) return [];
-  const colors = ["text-cyan-400", "text-purple-400", "text-emerald-400"];
   return matches.slice(0, 3).map((match, i) => {
     const start = match.index + match.length;
     const end = i < Math.min(matches.length, 3) - 1 ? matches[i + 1].index : markdown.length;
@@ -122,7 +119,7 @@ function parseSprints(markdown: string): { title: string; color: string; tasks: 
       .split("\n")
       .map((l) => l.replace(/^[-*✓☐]\s+/, "").replace(/^\[[ x]\]\s+/i, "").trim())
       .filter((l) => l.length > 5 && !l.startsWith("#") && !l.startsWith("**"));
-    return { title: match.title, color: colors[i] ?? "text-primary", tasks: tasks.slice(0, 7) };
+    return { title: match.title, tasks: tasks.slice(0, 7) };
   });
 }
 
@@ -283,7 +280,6 @@ function BuilderPage() {
   const [genError, setGenError] = useState<string | null>(null);
   const [openSection, setOpenSection] = useState<SectionKey | null>(null);
 
-  // Histórico
   const [savedBlueprints, setSavedBlueprints] = useState<SavedBlueprint[]>([]);
   const [loadingHistorico, setLoadingHistorico] = useState(false);
 
@@ -332,14 +328,12 @@ function BuilderPage() {
     setSavedBlueprints((prev) => prev.filter((b) => b.id !== id));
   };
 
-  // Auto-progress de analyzing → wizard (mock 2.5s)
   useEffect(() => {
     if (step !== "analyzing") return;
     const t = setTimeout(() => setStep("wizard"), 2500);
     return () => clearTimeout(t);
   }, [step]);
 
-  // Generación REAL: llama a la edge function builder-generate (Anthropic)
   useEffect(() => {
     if (step !== "generating") return;
     let cancelled = false;
@@ -376,7 +370,6 @@ function BuilderPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header del Builder */}
       {(step === "landing" || step === "historico") && (
         <BuilderHeader onHistorico={openHistorico} activeHistorico={step === "historico"} />
       )}
@@ -437,7 +430,7 @@ function BuilderPage() {
       {step === "generating" && (
         <LoadingView
           title="Diseñando tu solución…"
-          subtitle="Armando el blueprint completo."
+          subtitle="Armando el blueprint completo con IA."
           stage="Etapa 3 de 3 — Generación"
         />
       )}
@@ -468,33 +461,29 @@ function BuilderHeader({
   activeHistorico: boolean;
 }) {
   return (
-    <div className="border-b border-border bg-card/30 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Wand2 className="h-4 w-4 shrink-0" />
-          <span className="font-medium text-foreground">Builder</span>
+    <div className="border-b border-border bg-card/40 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-[1340px] items-center justify-between gap-2 px-8 py-3">
+        <div className="flex items-center gap-2">
+          <Wand2 className="h-4 w-4 [color:var(--violet-text)]" />
+          <span className="text-sm font-semibold text-foreground tracking-tight">Builder</span>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant={activeHistorico ? "default" : "outline"}
-            size="sm"
+          <button
             onClick={onHistorico}
-            className="gap-1.5"
+            className={activeHistorico ? "app-cta-primary text-sm px-3 py-1.5 h-8" : "app-cta-ghost text-sm px-3 py-1.5 h-8"}
           >
             <History className="h-3.5 w-3.5 shrink-0" />
             <span className="hidden sm:inline">Histórico</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+          </button>
+          <button
             disabled
-            className="gap-1.5 cursor-not-allowed opacity-50"
-            title="Próximamente (Soluciones del Equipo)"
+            className="app-cta-ghost text-sm px-3 py-1.5 h-8 opacity-40 cursor-not-allowed"
+            title="Próximamente"
           >
             <Users2 className="h-3.5 w-3.5 shrink-0" />
-            <span className="hidden sm:inline">Soluciones del Equipo</span>
+            <span className="hidden sm:inline">Equipo</span>
             <Lock className="h-3 w-3 ml-1 hidden sm:inline" />
-          </Button>
+          </button>
         </div>
       </div>
     </div>
@@ -505,11 +494,7 @@ function BuilderHeader({
 // Vista: Histórico
 // ============================================================
 function HistoricoView({
-  blueprints,
-  loading,
-  onOpen,
-  onDelete,
-  onBack,
+  blueprints, loading, onOpen, onDelete, onBack,
 }: {
   blueprints: SavedBlueprint[];
   loading: boolean;
@@ -518,8 +503,8 @@ function HistoricoView({
   onBack: () => void;
 }) {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
-      <div className="mb-6 flex items-center gap-3">
+    <div className="mx-auto max-w-[1340px] px-8 py-8">
+      <div className="mb-8 flex items-center gap-3">
         <button
           onClick={onBack}
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
@@ -527,68 +512,66 @@ function HistoricoView({
           <ArrowLeft className="h-3.5 w-3.5" />
           Volver
         </button>
-        <h2 className="text-xl font-bold text-foreground">Mis blueprints</h2>
+        <div className="my-0 h-px bg-gradient-to-r from-transparent via-border to-transparent w-8" />
+        <h2 className="text-[26px] font-bold tracking-[-0.01em] leading-tight text-foreground">Mis blueprints</h2>
       </div>
 
       {loading && (
-        <div className="flex justify-center py-16">
-          <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+        <div className="flex justify-center py-20">
+          <div className="h-6 w-6 rounded-full border-2 border-[var(--violet-text)] border-t-transparent animate-spin" />
         </div>
       )}
 
       {!loading && blueprints.length === 0 && (
-        <div className="text-center py-16 text-muted-foreground">
-          <History className="h-10 w-10 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Todavía no generaste ningún blueprint.</p>
-          <button onClick={onBack} className="mt-4 text-sm text-primary hover:underline">
+        <div className="text-center py-20">
+          <History className="h-12 w-12 mx-auto mb-4 opacity-20 [color:var(--violet-text)]" />
+          <p className="text-base text-muted-foreground mb-2">Todavía no generaste ningún blueprint.</p>
+          <button onClick={onBack} className="text-sm [color:var(--violet-text)] hover:opacity-80 transition font-medium">
             Crear el primero →
           </button>
         </div>
       )}
 
       {!loading && blueprints.length > 0 && (
-        <div className="space-y-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {blueprints.map((b) => (
             <button
               key={b.id}
               onClick={() => onOpen(b)}
-              className="app-card group w-full text-left p-4 sm:p-5 flex items-start justify-between gap-3"
+              className="app-card p-5 text-left group flex flex-col gap-3"
             >
-              <div className="min-w-0">
-                <h3 className="font-semibold text-foreground truncate">
+              <div className="flex items-start justify-between gap-2">
+                <h3 className="font-semibold text-foreground leading-snug line-clamp-2">
                   {b.blueprint?.titulo || "Blueprint sin título"}
                 </h3>
-                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1 italic">
-                  "{b.idea}"
-                </p>
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {b.blueprint?.tags?.slice(0, 3).map((tag, i) => (
-                    <span
-                      key={i}
-                      className="rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] text-muted-foreground"
-                    >
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={(e) => onDelete(b.id, e)}
+                    className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition opacity-0 group-hover:opacity-100"
+                    title="Eliminar"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:[color:var(--violet-text)] transition" />
+                </div>
+              </div>
+              <p className="text-[13px] text-muted-foreground line-clamp-1 italic">
+                "{b.idea}"
+              </p>
+              {b.blueprint?.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {b.blueprint.tags.slice(0, 3).map((tag, i) => (
+                    <span key={i} className="app-pill-violet inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold [color:var(--violet-text-strong)]">
                       {tag}
                     </span>
                   ))}
                 </div>
-                <div className="mt-2 flex items-center gap-1 text-[11px] text-muted-foreground">
-                  <Clock className="h-3 w-3" />
-                  {new Date(b.created_at).toLocaleDateString("es-AR", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </div>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <button
-                  onClick={(e) => onDelete(b.id, e)}
-                  className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition opacity-0 group-hover:opacity-100"
-                  title="Eliminar"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition" />
+              )}
+              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-auto">
+                <Clock className="h-3 w-3" />
+                {new Date(b.created_at).toLocaleDateString("es-AR", {
+                  day: "numeric", month: "short", year: "numeric",
+                })}
               </div>
             </button>
           ))}
@@ -602,9 +585,7 @@ function HistoricoView({
 // Vista: Landing
 // ============================================================
 function LandingView({
-  idea,
-  setIdea,
-  onContinue,
+  idea, setIdea, onContinue,
 }: {
   idea: string;
   setIdea: (v: string) => void;
@@ -624,26 +605,30 @@ function LandingView({
   const canContinue = idea.trim().length >= 20;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
-      <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-3 bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
-          BUILDER
+    <div className="mx-auto max-w-[1340px] px-8 py-12 sm:py-20">
+      {/* Hero */}
+      <div className="text-center mb-12">
+        <span className="app-pill-violet inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold tracking-[0.12em] uppercase [color:var(--violet-text-strong)] mb-5">
+          <Wand2 className="h-3 w-3 mr-1.5" />
+          Implementa AI Builder
+        </span>
+        <h1 className="text-[44px] font-bold tracking-[-0.02em] leading-[1.05] text-foreground mb-4">
+          ¿Qué vamos a{" "}
+          <span className="[color:var(--violet-text)]">construir</span>?
         </h1>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-foreground mb-3 sm:mb-4">
-          ¿Qué vamos a <span className="text-primary">construir</span>?
-        </h2>
-        <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
-          Describí tu problema o proceso y la IA va a diseñar la solución completa.
+        <p className="text-[16px] text-muted-foreground leading-relaxed max-w-[560px] mx-auto">
+          Describí tu problema o proceso y la IA va a diseñar la solución completa: arquitectura, stack, plan de acción y más.
         </p>
       </div>
 
-      <div className="app-card relative overflow-hidden shadow-lg focus-within:border-[color:var(--violet-border-hover)] focus-within:ring-2 focus-within:ring-[color:var(--violet-pill-bg)] transition">
+      {/* Textarea */}
+      <div className="app-card p-0 overflow-hidden focus-within:border-[var(--violet-border-hover)] transition-colors max-w-3xl mx-auto mb-12">
         <Textarea
           ref={textareaRef}
           value={idea}
           onChange={(e) => setIdea(e.target.value)}
           placeholder="Ej: Quiero automatizar la calificación de leads que llegan por Instagram y enviar propuestas por WhatsApp…"
-          className="min-h-[120px] sm:min-h-[140px] resize-none border-0 bg-transparent text-base p-4 sm:p-6 focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="min-h-[140px] resize-none border-0 bg-transparent text-[15px] p-6 focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground placeholder:text-muted-foreground/50"
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && canContinue) {
               e.preventDefault();
@@ -651,32 +636,39 @@ function LandingView({
             }
           }}
         />
-        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 border-t border-border bg-muted/30">
-          <span className="text-[11px] text-muted-foreground hidden sm:inline">⌘ + Enter</span>
-          <span className="text-[11px] text-muted-foreground sm:hidden" aria-hidden />
-          <Button disabled={!canContinue} onClick={onContinue} className="app-cta-primary ml-auto gap-1.5 disabled:opacity-60" style={{ padding: "8px 14px", fontSize: 13 }}>
+        <div className="flex items-center justify-between px-6 py-3 border-t border-[var(--violet-border)] bg-[var(--violet-pill-bg)]">
+          <span className="text-[11px] text-muted-foreground hidden sm:inline tracking-[0.05em]">⌘ + Enter para continuar</span>
+          <span aria-hidden className="sm:hidden" />
+          <button
+            disabled={!canContinue}
+            onClick={onContinue}
+            className="app-cta-primary ml-auto"
+          >
             <ArrowUp className="h-3.5 w-3.5" />
             Continuar
-          </Button>
+          </button>
         </div>
       </div>
 
-      <div className="mt-8 sm:mt-10">
-        <p className="text-sm text-muted-foreground mb-4">O empezá con una inspiración</p>
-        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Inspiraciones */}
+      <div className="max-w-3xl mx-auto">
+        <p className="text-[11px] text-muted-foreground uppercase tracking-[0.15em] font-semibold mb-4">
+          O empezá con una inspiración
+        </p>
+        <div className="grid gap-4 sm:grid-cols-3">
           {INSPIRATIONS.map((insp) => {
             const Icon = insp.icon;
             return (
               <button
                 key={insp.id}
                 onClick={() => onPickInspiration(insp)}
-                className="app-card group text-left p-5"
+                className="app-card p-5 text-left group"
               >
-                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg" style={{ background: "var(--violet-pill-bg)", color: "var(--violet-text-strong)" }}>
-                  <Icon className="h-5 w-5" />
+                <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--violet-pill-bg)] border border-[var(--violet-pill-border)] [color:var(--violet-text)] group-hover:bg-[var(--violet-glow-hover)] transition-colors">
+                  <Icon className="h-4 w-4" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-1">{insp.title}</h3>
-                <p className="text-[13px] text-muted-foreground">{insp.desc}</p>
+                <h3 className="font-semibold text-foreground mb-1 text-[14px]">{insp.title}</h3>
+                <p className="text-[13px] text-muted-foreground leading-relaxed">{insp.desc}</p>
               </button>
             );
           })}
@@ -691,20 +683,23 @@ function LandingView({
 // ============================================================
 function LoadingView({ title, subtitle, stage }: { title: string; subtitle: string; stage: string }) {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-16 text-center sm:px-6">
-      <div className="relative mb-8 sm:mb-10">
+    <div className="flex min-h-[70vh] flex-col items-center justify-center px-8 py-16 text-center">
+      <div className="relative mb-10">
         <div
-          className="h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-gradient-to-br from-primary/80 via-primary to-primary/60 shadow-[0_0_60px_-10px_var(--primary)] animate-pulse"
+          className="h-28 w-28 rounded-full bg-[var(--violet-pill-bg)] border border-[var(--violet-border)] shadow-[0_0_48px_-8px_rgba(139,92,246,0.4)] animate-pulse"
           aria-hidden
         />
-        <div className="absolute inset-0 rounded-full border border-primary/30 animate-ping" aria-hidden />
+        <div className="absolute inset-0 rounded-full border border-[var(--violet-border-hover)] animate-ping opacity-60" aria-hidden />
+        <Wand2 className="absolute inset-0 m-auto h-10 w-10 [color:var(--violet-text)]" aria-hidden />
       </div>
-      <h2 className="text-xl sm:text-2xl font-semibold text-foreground mb-2">{title}</h2>
-      <p className="text-sm text-muted-foreground mb-8">{subtitle}</p>
-      <div className="w-full max-w-xs h-1 rounded-full bg-muted overflow-hidden">
-        <div className="h-full bg-gradient-to-r from-primary to-primary/60 animate-[progressbar_2.5s_ease-in-out_forwards] w-0" />
+      <h2 className="text-[26px] font-bold tracking-[-0.01em] text-foreground mb-2">{title}</h2>
+      <p className="text-[15px] text-muted-foreground mb-10 max-w-[400px] leading-relaxed">{subtitle}</p>
+      <div className="w-full max-w-xs">
+        <div className="app-progress-track">
+          <div className="app-progress-fill animate-[progressbar_3s_ease-in-out_forwards] w-0" />
+        </div>
       </div>
-      <p className="mt-6 text-xs text-muted-foreground tracking-wider uppercase">{stage}</p>
+      <p className="mt-5 text-[11px] text-muted-foreground tracking-[0.15em] uppercase font-semibold">{stage}</p>
       <style>{`@keyframes progressbar { from { width: 0; } to { width: 100%; } }`}</style>
     </div>
   );
@@ -740,41 +735,44 @@ function WizardView({
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
-      <div className="mb-6 sm:mb-8">
+    <div className="mx-auto max-w-3xl px-8 py-10">
+      {/* Progress header */}
+      <div className="mb-10">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2 text-sm">
-            <Wand2 className="h-4 w-4 text-primary" />
-            <span className="font-medium text-foreground">Builder</span>
+          <div className="flex items-center gap-2">
+            <Wand2 className="h-4 w-4 [color:var(--violet-text)]" />
+            <span className="text-sm font-semibold text-foreground">Builder</span>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition p-1 -m-1" aria-label="Cerrar">
-            <X className="h-5 w-5" />
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition p-1 -m-1 rounded-lg" aria-label="Cerrar">
+            <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-2 tracking-[0.05em]">
           <span>Pregunta {currentQ + 1} de {total}</span>
-          <span>{Math.round(progress)} %</span>
+          <span className="font-mono tabular-nums">{Math.round(progress)}%</span>
         </div>
-        <div className="app-progress-track" style={{ height: 4 }}>
-          <div className="app-progress-fill" style={{ width: `${progress}%` }} />
+        <div className="app-progress-track">
+          <div className="app-progress-fill transition-all duration-500" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
-      <div className="mb-6 sm:mb-8 rounded-lg border border-border bg-card/50 px-3 sm:px-4 py-2.5">
-        <span className="text-xs text-muted-foreground">Tu idea: </span>
-        <span className="text-xs text-foreground line-clamp-1">{idea}</span>
+      {/* Idea recap */}
+      <div className="app-card px-4 py-3 mb-8">
+        <span className="text-[11px] text-muted-foreground uppercase tracking-[0.1em] font-semibold">Tu idea: </span>
+        <span className="text-[13px] text-foreground line-clamp-1">{idea}</span>
       </div>
 
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-baseline gap-3 mb-3 sm:mb-4">
-          <span className="text-4xl sm:text-5xl font-bold text-muted-foreground/30 tabular-nums">
+      {/* Question */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-5">
+          <span className="font-mono text-[44px] font-bold leading-[1] text-muted-foreground/20 tabular-nums">
             {String(currentQ + 1).padStart(2, "0")}
           </span>
-          <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium">
+          <span className="app-pill-violet inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold [color:var(--violet-text-strong)]">
             {q.category}
           </span>
         </div>
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-foreground leading-snug mb-5 sm:mb-6">
+        <h2 className="text-[22px] font-semibold text-foreground leading-snug mb-6">
           {q.text}
         </h2>
         <div className="relative">
@@ -783,28 +781,36 @@ function WizardView({
             onChange={(e) => setAnswer(q.id, e.target.value)}
             placeholder={q.placeholder}
             maxLength={2000}
-            className="min-h-[160px] resize-none border-border bg-card text-base p-4"
+            className="min-h-[160px] resize-none border-border bg-card text-[15px] p-4 focus-visible:ring-[var(--violet-border-hover)]"
             autoFocus
           />
-          <span className="absolute bottom-2 right-3 text-[11px] text-muted-foreground">{answer.length}/2000</span>
+          <span className="absolute bottom-3 right-3 text-[11px] text-muted-foreground font-mono tabular-nums">{answer.length}/2000</span>
         </div>
       </div>
 
+      {/* Navigation */}
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => !isFirst && setCurrentQ(currentQ - 1)} disabled={isFirst} className="gap-1.5">
+        <button
+          onClick={() => !isFirst && setCurrentQ(currentQ - 1)}
+          disabled={isFirst}
+          className="app-cta-ghost disabled:opacity-30"
+        >
           <ArrowLeft className="h-3.5 w-3.5" />
           Volver
-        </Button>
-        <Button onClick={handleNext} disabled={!canContinue} className="app-cta-primary gap-1.5 disabled:opacity-60">
+        </button>
+        <button onClick={handleNext} disabled={!canContinue} className="app-cta-primary disabled:opacity-40">
           {isLast ? <><Zap className="h-3.5 w-3.5" />Listo</> : <>Próximo<ArrowRight className="h-3.5 w-3.5" /></>}
-        </Button>
+        </button>
       </div>
 
-      <div className="mt-12 flex items-center justify-center gap-2">
+      {/* Step dots */}
+      <div className="mt-12 flex items-center justify-center gap-1.5">
         {questions.map((_, i) => (
           <span
             key={i}
-            className={`h-1 rounded-full transition-all ${i === currentQ ? "w-8 bg-primary" : i < currentQ ? "w-2 bg-primary/60" : "w-2 bg-muted"}`}
+            className={`h-1 rounded-full transition-all duration-300 ${
+              i === currentQ ? "w-8 bg-[var(--violet-text)]" : i < currentQ ? "w-2 bg-[var(--violet-text)]/50" : "w-2 bg-muted"
+            }`}
           />
         ))}
       </div>
@@ -822,53 +828,54 @@ function ConfirmView({ onGenerate, onAddPremium, onBack, premiumAdded }: {
   premiumAdded: boolean;
 }) {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-20 text-center">
-      <div className="mx-auto mb-6 sm:mb-8 inline-flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-        <Wand2 className="h-7 w-7 sm:h-8 sm:w-8" />
+    <div className="mx-auto max-w-3xl px-8 py-20 text-center">
+      <div className="mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--violet-pill-bg)] border border-[var(--violet-border)] [color:var(--violet-text)]">
+        <Wand2 className="h-8 w-8" />
       </div>
-      <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">¿Listo para generar?</h2>
-      <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto mb-8 sm:mb-12">
+      <h2 className="text-[44px] font-bold tracking-[-0.02em] leading-[1.05] text-foreground mb-4">
+        ¿Listo para generar?
+      </h2>
+      <p className="text-[16px] text-muted-foreground leading-relaxed max-w-[520px] mx-auto mb-12">
         {premiumAdded
           ? "Ya respondiste todas las preguntas. Tu blueprint va a tener máxima precisión."
-          : "Ya respondiste las 5 preguntas esenciales. Podés generar ahora o sumar 5 preguntas más para un blueprint más detallado."}
+          : "Respondiste las 5 preguntas esenciales. Podés generar ahora o sumar 5 más para un blueprint más detallado."}
       </p>
 
-      <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 max-w-2xl mx-auto mb-8">
+      <div className="grid gap-4 sm:grid-cols-2 max-w-2xl mx-auto mb-10">
         <button
           onClick={onGenerate}
-          className="app-card group p-6 text-left"
-          style={{ borderWidth: 2 }}
+          className="app-card p-6 text-left border-[var(--violet-border-hover)] group hover:border-[var(--violet-border-hover)]"
         >
-          <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg" style={{ background: "var(--violet-pill-bg)", color: "var(--violet-text-strong)" }}>
+          <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--violet-pill-bg)] border border-[var(--violet-pill-border)] [color:var(--violet-text)]">
             <Zap className="h-5 w-5" />
           </div>
-          <h3 className="font-semibold text-foreground mb-1">Generar ahora</h3>
-          <p className="text-sm text-muted-foreground">La IA ya tiene información suficiente para diseñar tu solución.</p>
+          <h3 className="font-bold text-foreground mb-1.5 text-[17px]">Generar ahora</h3>
+          <p className="text-[13px] text-muted-foreground leading-relaxed">La IA ya tiene información suficiente para diseñar tu solución completa.</p>
         </button>
 
         {!premiumAdded ? (
           <button
             onClick={onAddPremium}
-            className="app-card group p-6 text-left"
+            className="app-card p-6 text-left group"
           >
-            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-foreground">
+            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-muted [color:var(--muted-foreground)]">
               <Plus className="h-5 w-5" />
             </div>
-            <h3 className="font-semibold text-foreground mb-1">Responder más</h3>
-            <p className="text-sm text-muted-foreground">+ 5 preguntas para un blueprint aún más detallado.</p>
+            <h3 className="font-bold text-foreground mb-1.5 text-[17px]">Más contexto</h3>
+            <p className="text-[13px] text-muted-foreground leading-relaxed">+ 5 preguntas para un blueprint aún más detallado y preciso.</p>
           </button>
         ) : (
-          <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-6 text-left">
-            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground">
+          <div className="app-card p-6 text-left opacity-60">
+            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-muted [color:var(--muted-foreground)]">
               <Sparkles className="h-5 w-5" />
             </div>
-            <h3 className="font-semibold text-muted-foreground mb-1">Modo premium activo</h3>
-            <p className="text-sm text-muted-foreground">Todas las preguntas respondidas. Mejor precisión.</p>
+            <h3 className="font-bold text-muted-foreground mb-1.5 text-[17px]">Modo premium activo</h3>
+            <p className="text-[13px] text-muted-foreground">Todas las preguntas respondidas.</p>
           </div>
         )}
       </div>
 
-      <button onClick={onBack} className="text-sm text-muted-foreground hover:text-foreground transition">
+      <button onClick={onBack} className="text-[13px] text-muted-foreground hover:text-foreground transition">
         ← Volver a la pregunta anterior
       </button>
     </div>
@@ -876,7 +883,7 @@ function ConfirmView({ onGenerate, onAddPremium, onBack, premiumAdded }: {
 }
 
 // ============================================================
-// Vista: Result
+// Vista: Result — Tipo y metadatos de secciones
 // ============================================================
 type SectionKey = keyof Blueprint["secciones"];
 
@@ -886,18 +893,15 @@ const BLUEPRINT_SECTIONS: {
   title: string;
   shortTitle: string;
   icon: typeof Sparkles;
-  accent: string;
-  color: string;
-  borderColor: string;
 }[] = [
-  { key: "base_conocimientos", num: "01", title: "Base de conocimientos", shortTitle: "Base",       icon: Sparkles,   accent: "from-emerald-500/20 to-emerald-500/5",  color: "text-emerald-400",  borderColor: "border-emerald-500/30" },
-  { key: "estructura",         num: "02", title: "Estructura",            shortTitle: "Estructura", icon: Database,   accent: "from-purple-500/20 to-purple-500/5",    color: "text-purple-400",   borderColor: "border-purple-500/30"  },
-  { key: "arquitectura",       num: "03", title: "Arquitectura",          shortTitle: "Arquitect.", icon: Network,    accent: "from-blue-500/20 to-blue-500/5",        color: "text-blue-400",     borderColor: "border-blue-500/30"    },
-  { key: "herramientas",       num: "04", title: "Herramientas",          shortTitle: "Herram.",    icon: Wrench,     accent: "from-amber-500/20 to-amber-500/5",      color: "text-amber-400",    borderColor: "border-amber-500/30"   },
-  { key: "plan_accion",        num: "05", title: "Plan de acción",        shortTitle: "Plan",       icon: ListChecks, accent: "from-cyan-500/20 to-cyan-500/5",        color: "text-cyan-400",     borderColor: "border-cyan-500/30"    },
-  { key: "rapido_adorable",    num: "06", title: "Rápido y adorable",     shortTitle: "Rápido",     icon: Rocket,     accent: "from-pink-500/20 to-pink-500/5",        color: "text-pink-400",     borderColor: "border-pink-500/30"    },
-  { key: "contenido",          num: "07", title: "Contenido",             shortTitle: "Contenido",  icon: BookOpen,   accent: "from-orange-500/20 to-orange-500/5",    color: "text-orange-400",   borderColor: "border-orange-500/30"  },
-  { key: "economia",           num: "08", title: "Economía",              shortTitle: "Economía",   icon: PiggyBank,  accent: "from-teal-500/20 to-teal-500/5",        color: "text-teal-400",     borderColor: "border-teal-500/30"    },
+  { key: "base_conocimientos", num: "01", title: "Base de conocimientos", shortTitle: "Base",       icon: Sparkles   },
+  { key: "estructura",         num: "02", title: "Estructura",            shortTitle: "Estructura", icon: Database   },
+  { key: "arquitectura",       num: "03", title: "Arquitectura",          shortTitle: "Arq.",       icon: Network    },
+  { key: "herramientas",       num: "04", title: "Herramientas",          shortTitle: "Herram.",    icon: Wrench     },
+  { key: "plan_accion",        num: "05", title: "Plan de acción",        shortTitle: "Plan",       icon: ListChecks },
+  { key: "rapido_adorable",    num: "06", title: "Rápido y adorable",     shortTitle: "Rápido",     icon: Rocket     },
+  { key: "contenido",          num: "07", title: "Contenido",             shortTitle: "Contenido",  icon: BookOpen   },
+  { key: "economia",           num: "08", title: "Economía",              shortTitle: "Economía",   icon: PiggyBank  },
 ];
 
 function ResultView({
@@ -913,15 +917,19 @@ function ResultView({
 }) {
   if (error) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-20 text-center">
-        <div className="mx-auto mb-6 inline-flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
-          <X className="h-7 w-7 sm:h-8 sm:w-8" />
+      <div className="mx-auto max-w-2xl px-8 py-20 text-center">
+        <div className="mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+          <X className="h-8 w-8" />
         </div>
-        <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-3">No pudimos generar tu blueprint</h2>
-        <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto">{error}</p>
+        <h2 className="text-[26px] font-bold tracking-[-0.01em] text-foreground mb-3">No pudimos generar tu blueprint</h2>
+        <p className="text-[15px] text-muted-foreground mb-10 max-w-md mx-auto leading-relaxed">{error}</p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button onClick={onRetry} className="gap-1.5"><Zap className="h-3.5 w-3.5" />Reintentar</Button>
-          <Button variant="ghost" onClick={onRestart} className="gap-1.5"><ArrowLeft className="h-3.5 w-3.5" />Volver al inicio</Button>
+          <button onClick={onRetry} className="app-cta-primary">
+            <Zap className="h-3.5 w-3.5" />Reintentar
+          </button>
+          <button onClick={onRestart} className="app-cta-ghost">
+            <ArrowLeft className="h-3.5 w-3.5" />Volver al inicio
+          </button>
         </div>
       </div>
     );
@@ -929,7 +937,6 @@ function ResultView({
 
   if (!blueprint) return null;
 
-  // Navegación full-page de sección
   if (openSection !== null) {
     return (
       <SectionDetailPage
@@ -943,32 +950,38 @@ function ResultView({
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-      {/* Header */}
-      <div className="mb-6 sm:mb-8 flex items-center justify-between gap-2">
+    <div className="mx-auto max-w-[1340px] px-8 py-8">
+      {/* Header nav */}
+      <div className="mb-8 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={onRestart}
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition shrink-0"
+          className="flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Nueva idea</span>
-          <span className="sm:hidden">Nueva</span>
+          Nueva idea
         </button>
-        <span className="rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-medium shrink-0">
-          ✨ Blueprint generado
+        <span className="app-pill-violet inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold [color:var(--violet-text-strong)]">
+          <Sparkles className="h-3 w-3" />
+          Blueprint generado
         </span>
       </div>
 
-      {/* Título + descripción + tags */}
-      <div className="mb-8 sm:mb-10">
-        <div className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Tu solución de IA</div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">{blueprint.titulo}</h1>
-        <p className="text-sm sm:text-base text-muted-foreground max-w-3xl">{blueprint.descripcion}</p>
+      {/* Hero — título + descripción + tags */}
+      <div className="mb-10">
+        <p className="text-[11px] text-muted-foreground uppercase tracking-[0.15em] font-semibold mb-3">
+          Tu solución de IA
+        </p>
+        <h1 className="text-[44px] font-bold tracking-[-0.02em] leading-[1.05] text-foreground mb-4">
+          {blueprint.titulo}
+        </h1>
+        <p className="text-[16px] text-muted-foreground leading-relaxed max-w-[640px] mb-5">
+          {blueprint.descripcion}
+        </p>
         {blueprint.tags?.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {blueprint.tags.map((tag, i) => (
-              <span key={i} className="rounded-full border border-border bg-card px-3 py-1 text-[11px] text-muted-foreground">
+              <span key={i} className="app-pill-violet inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold [color:var(--violet-text-strong)]">
                 {tag}
               </span>
             ))}
@@ -976,14 +989,17 @@ function ResultView({
         )}
       </div>
 
+      {/* Hairline */}
+      <div className="my-8 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+
       {/* Recap idea */}
-      <div className="mb-6 sm:mb-8 rounded-lg border border-border bg-card/50 px-3 sm:px-4 py-3">
-        <span className="text-xs text-muted-foreground">Tu idea: </span>
-        <span className="text-xs text-foreground italic">"{idea}"</span>
+      <div className="app-card px-5 py-3.5 mb-8 flex items-center gap-2">
+        <span className="text-[11px] text-muted-foreground uppercase tracking-[0.1em] font-semibold shrink-0">Idea:</span>
+        <span className="text-[13px] text-foreground italic line-clamp-1">"{idea}"</span>
       </div>
 
       {/* Grid de 8 secciones */}
-      <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {BLUEPRINT_SECTIONS.map((s) => {
           const Icon = s.icon;
           const content = blueprint.secciones?.[s.key] ?? "";
@@ -992,32 +1008,38 @@ function ResultView({
             <button
               key={s.key}
               onClick={() => setOpenSection(s.key)}
-              className="app-card group text-left p-4 sm:p-5 relative overflow-hidden"
+              className="app-card p-5 text-left group flex flex-col gap-3"
             >
-              <div className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-40`} aria-hidden />
-              <div className="relative">
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-3xl font-bold text-muted-foreground/40 tabular-nums">{s.num}</span>
-                  <Icon className={`h-5 w-5 ${s.color}`} />
+              <div className="flex items-start justify-between">
+                <span className="font-mono text-[32px] font-bold leading-none text-muted-foreground/20 tabular-nums">
+                  {s.num}
+                </span>
+                <div className="h-8 w-8 rounded-lg bg-[var(--violet-pill-bg)] border border-[var(--violet-pill-border)] flex items-center justify-center [color:var(--violet-text)] group-hover:bg-[var(--violet-glow-hover)] transition-colors">
+                  <Icon className="h-4 w-4" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-1.5">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{preview}</p>
-                <div className="mt-3 flex items-center gap-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition">
-                  Ver detalle <ChevronRight className="h-3 w-3" />
-                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground text-[15px] mb-1.5">{s.title}</h3>
+                <p className="text-[13px] text-muted-foreground leading-relaxed line-clamp-2">{preview}</p>
+              </div>
+              <div className="flex items-center gap-1 text-[12px] [color:var(--violet-text)] opacity-0 group-hover:opacity-100 transition mt-auto font-medium">
+                Ver detalle <ChevronRight className="h-3 w-3" />
               </div>
             </button>
           );
         })}
       </div>
 
-      {/* CTA Explorar */}
-      <div className="mt-8 text-center">
-        <p className="text-sm text-muted-foreground mb-3">Hacé clic en cualquier sección para ver el plan completo</p>
-        <Button onClick={() => setOpenSection("rapido_adorable")} className="gap-2">
+      {/* CTA principal */}
+      <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <button onClick={() => setOpenSection("rapido_adorable")} className="app-cta-primary">
           <Rocket className="h-4 w-4" />
           Empezar por Rápido y adorable
-        </Button>
+        </button>
+        <button onClick={() => setOpenSection("economia")} className="app-cta-ghost">
+          <TrendingUp className="h-4 w-4" />
+          Ver ROI
+        </button>
       </div>
     </div>
   );
@@ -1027,11 +1049,7 @@ function ResultView({
 // SectionDetailPage — Navegación full-page entre las 8 secciones
 // ============================================================
 function SectionDetailPage({
-  blueprint,
-  currentSection,
-  onChangeSection,
-  onBack,
-  onRestart,
+  blueprint, currentSection, onChangeSection, onBack,
 }: {
   blueprint: Blueprint;
   currentSection: SectionKey;
@@ -1051,31 +1069,35 @@ function SectionDetailPage({
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Barra superior: navegación + título de sección */}
+      {/* Sticky top bar */}
       <div className="sticky top-0 z-30 border-b border-border bg-card/80 backdrop-blur-xl">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          {/* Fila superior: volver + título + próximo */}
-          <div className="flex items-center justify-between py-3 gap-2">
+        <div className="mx-auto max-w-[1340px] px-8">
+          <div className="flex items-center justify-between py-3.5 gap-4">
+            {/* Back */}
             <button
               onClick={onBack}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition shrink-0"
+              className="flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition shrink-0"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Vista general</span>
               <span className="sm:hidden">Volver</span>
             </button>
 
-            <div className="text-center min-w-0">
-              <div className={`flex items-center justify-center gap-2 ${meta.color}`}>
-                <Icon className="h-4 w-4 shrink-0" />
-                <span className="font-semibold text-foreground text-sm sm:text-base truncate">{meta.title}</span>
+            {/* Section identity */}
+            <div className="flex flex-col items-center gap-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <Icon className="h-4 w-4 shrink-0 [color:var(--violet-text)]" />
+                <span className="font-semibold text-foreground text-[15px] truncate">{meta.title}</span>
               </div>
-              <p className="text-[11px] text-muted-foreground">Paso {currentIdx + 1} de {BLUEPRINT_SECTIONS.length}</p>
+              <span className="app-pill-violet inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold [color:var(--violet-text-strong)] font-mono">
+                {String(currentIdx + 1).padStart(2, "0")} / {BLUEPRINT_SECTIONS.length}
+              </span>
             </div>
 
+            {/* Next */}
             <button
               onClick={handleNext}
-              className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition shrink-0"
+              className="flex items-center gap-1.5 text-[13px] font-semibold [color:var(--violet-text)] hover:opacity-80 transition shrink-0"
             >
               {isLast ? (
                 <><span className="hidden sm:inline">Finalizar</span><Check className="h-4 w-4" /></>
@@ -1085,15 +1107,12 @@ function SectionDetailPage({
             </button>
           </div>
 
-          {/* Progress bar con los 8 pasos */}
-          <SectionProgressBar
-            currentIdx={currentIdx}
-            onSelect={(i) => onChangeSection(BLUEPRINT_SECTIONS[i].key)}
-          />
+          {/* Progress tabs */}
+          <SectionProgressBar currentIdx={currentIdx} onSelect={(i) => onChangeSection(BLUEPRINT_SECTIONS[i].key)} />
         </div>
       </div>
 
-      {/* Contenido de la sección */}
+      {/* Section content */}
       <div className="flex-1 overflow-auto">
         {currentSection === "rapido_adorable" ? (
           <RapidoSection content={content} blueprintTitle={blueprint.titulo} />
@@ -1108,31 +1127,34 @@ function SectionDetailPage({
         )}
       </div>
 
-      {/* Barra inferior de navegación */}
-      <div className="sticky bottom-0 border-t border-border bg-card/80 backdrop-blur-xl px-4 py-3">
-        <div className="mx-auto max-w-7xl flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={handlePrev} disabled={isFirst} className="gap-1.5">
+      {/* Sticky bottom nav */}
+      <div className="sticky bottom-0 border-t border-border bg-card/80 backdrop-blur-xl px-8 py-3">
+        <div className="mx-auto max-w-[1340px] flex items-center justify-between">
+          <button
+            onClick={handlePrev}
+            disabled={isFirst}
+            className="app-cta-ghost disabled:opacity-30"
+          >
             <ArrowLeft className="h-3.5 w-3.5" />
             Anterior
-          </Button>
+          </button>
+
+          {/* Dot indicators */}
           <div className="flex items-center gap-1">
             {BLUEPRINT_SECTIONS.map((_, i) => (
               <button
                 key={i}
                 onClick={() => onChangeSection(BLUEPRINT_SECTIONS[i].key)}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === currentIdx ? "w-6 bg-primary" : i < currentIdx ? "w-1.5 bg-primary/50" : "w-1.5 bg-muted"
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === currentIdx ? "w-6 bg-[var(--violet-text)]" : i < currentIdx ? "w-1.5 bg-[var(--violet-text)]/40" : "w-1.5 bg-muted"
                 }`}
               />
             ))}
           </div>
-          <Button size="sm" onClick={handleNext} className="gap-1.5">
-            {isLast ? (
-              <><Check className="h-3.5 w-3.5" />Finalizar</>
-            ) : (
-              <>Próximo<ArrowRight className="h-3.5 w-3.5" /></>
-            )}
-          </Button>
+
+          <button onClick={handleNext} className="app-cta-primary">
+            {isLast ? <><Check className="h-3.5 w-3.5" />Finalizar</> : <>Próximo<ArrowRight className="h-3.5 w-3.5" /></>}
+          </button>
         </div>
       </div>
     </div>
@@ -1140,17 +1162,16 @@ function SectionDetailPage({
 }
 
 // ============================================================
-// SectionProgressBar — Los 8 iconos conectados con líneas
+// SectionProgressBar — Los 8 iconos con líneas conectoras
 // ============================================================
 function SectionProgressBar({
-  currentIdx,
-  onSelect,
+  currentIdx, onSelect,
 }: {
   currentIdx: number;
   onSelect: (i: number) => void;
 }) {
   return (
-    <div className="overflow-x-auto pb-2 -mx-2 px-2">
+    <div className="overflow-x-auto pb-2.5 -mx-2 px-2">
       <div className="flex items-center justify-center gap-0 min-w-max">
         {BLUEPRINT_SECTIONS.map((s, i) => {
           const Icon = s.icon;
@@ -1161,23 +1182,23 @@ function SectionProgressBar({
               <button
                 onClick={() => onSelect(i)}
                 title={s.title}
-                className="flex flex-col items-center gap-0.5 group"
+                className="flex flex-col items-center gap-1 group"
               >
                 <div
                   className={`
-                    h-8 w-8 rounded-full flex items-center justify-center border-2 transition-all
+                    h-7 w-7 rounded-full flex items-center justify-center border-2 transition-all
                     ${isCompleted
-                      ? "bg-primary/20 border-primary/60 text-primary"
+                      ? "bg-[var(--violet-pill-bg)] border-[var(--violet-border-hover)] [color:var(--violet-text)]"
                       : isCurrent
-                      ? "bg-primary border-primary text-primary-foreground shadow-[0_0_12px_-2px_var(--primary)]"
-                      : "bg-card border-border text-muted-foreground hover:border-muted-foreground/50"}
+                      ? "bg-[var(--violet-text)] border-[var(--violet-text)] text-white shadow-[0_0_14px_-2px_rgba(139,92,246,0.6)]"
+                      : "bg-card border-border text-muted-foreground hover:border-[var(--violet-border)] hover:[color:var(--violet-text)] transition"}
                   `}
                 >
-                  {isCompleted ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
+                  {isCompleted ? <Check className="h-3 w-3" /> : <Icon className="h-3 w-3" />}
                 </div>
                 <span
-                  className={`text-[9px] leading-tight max-w-[52px] text-center hidden sm:block transition-colors ${
-                    isCurrent ? "text-foreground font-medium" : "text-muted-foreground/60 group-hover:text-muted-foreground"
+                  className={`text-[9px] leading-tight max-w-[52px] text-center hidden sm:block transition-colors font-mono ${
+                    isCurrent ? "text-foreground font-medium" : "text-muted-foreground/50 group-hover:text-muted-foreground"
                   }`}
                 >
                   {s.shortTitle}
@@ -1186,7 +1207,7 @@ function SectionProgressBar({
               {i < BLUEPRINT_SECTIONS.length - 1 && (
                 <div
                   className={`w-5 sm:w-8 h-px mx-0.5 sm:mx-1 transition-colors ${
-                    i < currentIdx ? "bg-primary/50" : "bg-border"
+                    i < currentIdx ? "bg-[var(--violet-border-hover)]" : "bg-border"
                   }`}
                 />
               )}
@@ -1199,12 +1220,12 @@ function SectionProgressBar({
 }
 
 // ============================================================
-// DefaultMarkdownSection — Renderiza markdown con prose
+// DefaultMarkdownSection — Markdown con prose
 // ============================================================
 function DefaultMarkdownSection({ content }: { content: string }) {
   return (
-    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
-      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-strong:text-foreground">
+    <div className="mx-auto max-w-3xl px-8 py-10">
+      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-li:text-muted-foreground prose-code:text-[var(--violet-text)] prose-code:bg-[var(--violet-pill-bg)] prose-code:rounded prose-code:px-1 prose-pre:bg-card prose-pre:border prose-pre:border-border prose-strong:text-foreground prose-a:text-[var(--violet-text)]">
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
     </div>
@@ -1212,7 +1233,7 @@ function DefaultMarkdownSection({ content }: { content: string }) {
 }
 
 // ============================================================
-// RapidoSection — Panel doble: lista de prompts + detalle con copia
+// RapidoSection — Panel doble: lista de prompts + detalle
 // ============================================================
 function RapidoSection({ content, blueprintTitle }: { content: string; blueprintTitle: string }) {
   const prompts = parsePrompts(content);
@@ -1239,97 +1260,98 @@ function RapidoSection({ content, blueprintTitle }: { content: string; blueprint
     } catch { /* noop */ }
   };
 
-  // Fallback si no se pudieron parsear prompts
   if (prompts.length === 0) return <DefaultMarkdownSection content={content} />;
 
   const currentPrompt = prompts[selected];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6">
-      {/* Barra superior: instrucción + copiar todo */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-          Pegá cada indicación en Lovable en el orden en que aparece.
-        </p>
+    <div className="mx-auto max-w-[1340px] px-8 py-8">
+      {/* Header de sección */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-[22px] font-bold tracking-[-0.01em] text-foreground mb-1">
+            Construí el MVP en Lovable
+          </h2>
+          <p className="text-[13px] text-muted-foreground">
+            Pegá cada prompt en orden para construir tu solución paso a paso.
+          </p>
+        </div>
         <div className="flex items-center gap-3 shrink-0">
-          <span className="text-xs text-muted-foreground">
+          <span className="app-pill-violet inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold [color:var(--violet-text-strong)] font-mono tabular-nums">
             {copiedSet.size} / {prompts.length} copiados
           </span>
-          <Button
-            variant="outline"
-            size="sm"
+          <button
             onClick={copyAll}
-            className="gap-1.5 h-8"
+            className="app-cta-primary"
           >
-            {copiedAll ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-            {copiedAll ? "¡Copiado!" : "Copiar el PRD completo"}
-          </Button>
+            {copiedAll ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {copiedAll ? "¡Copiado!" : "Copiar PRD completo"}
+          </button>
         </div>
       </div>
 
       {/* Layout doble columna */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        {/* Left: lista de prompts */}
-        <div className="lg:col-span-2 space-y-1.5">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        {/* Left — lista de pasos */}
+        <div className="lg:col-span-2 space-y-2">
           {prompts.map((p, i) => (
             <button
               key={i}
               onClick={() => setSelected(i)}
-              className={`w-full text-left rounded-xl p-3 flex items-start gap-3 border transition-all ${
+              className={`w-full text-left rounded-xl p-3.5 flex items-start gap-3 border transition-all ${
                 selected === i
-                  ? "border-primary/60 bg-primary/5 shadow-sm"
-                  : "border-border bg-card hover:border-border/80 hover:bg-card/80"
+                  ? "border-[var(--violet-border-hover)] bg-[var(--violet-pill-bg)] shadow-sm"
+                  : "border-border bg-card hover:border-[var(--violet-border)] hover:bg-[var(--violet-pill-bg)]"
               }`}
             >
+              {/* Step number / check */}
               <span
-                className={`shrink-0 h-6 w-6 rounded-full text-xs font-semibold flex items-center justify-center transition-colors ${
+                className={`shrink-0 h-7 w-7 rounded-full text-[11px] font-bold flex items-center justify-center transition-colors font-mono tabular-nums ${
                   copiedSet.has(i)
                     ? "bg-emerald-500/20 text-emerald-400"
                     : selected === i
-                    ? "bg-primary/20 text-primary"
+                    ? "bg-[var(--violet-text)] text-white"
                     : "bg-muted text-muted-foreground"
                 }`}
               >
                 {copiedSet.has(i) ? <Check className="h-3 w-3" /> : i + 1}
               </span>
               <div className="min-w-0 flex-1">
-                <p className={`text-sm font-medium truncate ${selected === i ? "text-foreground" : "text-muted-foreground"}`}>
+                <p className={`text-[13px] font-semibold truncate ${selected === i ? "text-foreground" : "text-muted-foreground"}`}>
                   {p.title}
                 </p>
-                <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">
-                  {p.content.slice(0, 55)}…
+                <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5 leading-relaxed">
+                  {p.content.slice(0, 60)}…
                 </p>
               </div>
-              <ChevronRight className={`h-3.5 w-3.5 shrink-0 transition-colors ${selected === i ? "text-primary" : "text-muted-foreground/40"}`} />
+              <ChevronRight className={`h-3.5 w-3.5 shrink-0 transition-colors mt-0.5 ${selected === i ? "[color:var(--violet-text)]" : "text-muted-foreground/30"}`} />
             </button>
           ))}
         </div>
 
-        {/* Right: prompt seleccionado */}
-        <div className="app-card lg:col-span-3 flex flex-col">
-          <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4 border-b border-border">
+        {/* Right — prompt seleccionado */}
+        <div className="lg:col-span-3 app-card flex flex-col">
+          <div className="flex items-start justify-between gap-3 px-6 pt-5 pb-4 border-b border-[var(--violet-border)]">
             <div>
-              <p className="text-[11px] text-muted-foreground mb-0.5">
+              <span className="text-[11px] text-muted-foreground uppercase tracking-[0.1em] font-semibold font-mono">
                 Paso {selected + 1} de {prompts.length}
-              </p>
-              <h3 className="font-semibold text-foreground text-sm sm:text-base leading-tight">
+              </span>
+              <h3 className="font-bold text-foreground text-[17px] leading-snug mt-1">
                 {currentPrompt?.title}
               </h3>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
+            <button
               onClick={() => copyPrompt(selected)}
-              className={`gap-1.5 h-8 shrink-0 transition-colors ${
+              className={`app-cta-ghost shrink-0 transition-colors ${
                 copied === selected ? "border-emerald-500/40 text-emerald-400" : ""
               }`}
             >
               {copied === selected ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
               {copied === selected ? "¡Copiado!" : "Copiar"}
-            </Button>
+            </button>
           </div>
-          <ScrollArea className="flex-1 max-h-[460px]">
-            <pre className="px-5 py-4 text-sm text-muted-foreground whitespace-pre-wrap break-words leading-relaxed font-mono">
+          <ScrollArea className="flex-1 max-h-[520px]">
+            <pre className="px-6 py-5 text-[13px] text-muted-foreground whitespace-pre-wrap break-words leading-relaxed font-mono">
               {currentPrompt?.content ?? ""}
             </pre>
           </ScrollArea>
@@ -1337,10 +1359,11 @@ function RapidoSection({ content, blueprintTitle }: { content: string; blueprint
       </div>
 
       {/* Tip */}
-      <div className="mt-5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 flex items-start gap-2">
-        <Zap className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
-        <p className="text-xs text-amber-300/90">
-          <span className="font-semibold">Consejo:</span> Seguí las indicaciones en orden. Cada prompt hace referencia a tablas y componentes creados en el anterior. Pegá el <strong>primero en un proyecto nuevo de Lovable</strong> y los demás como actualizaciones.
+      <div className="mt-6 rounded-xl border border-[var(--violet-border)] bg-[var(--violet-pill-bg)] px-5 py-4 flex items-start gap-3">
+        <Zap className="h-4 w-4 [color:var(--violet-text)] shrink-0 mt-0.5" />
+        <p className="text-[13px] text-muted-foreground leading-relaxed">
+          <span className="font-semibold text-foreground">Consejo:</span> Seguí las indicaciones en orden. Cada prompt hace referencia a tablas y componentes creados en el anterior.{" "}
+          Pegá el <span className="font-semibold [color:var(--violet-text)]">primero en un proyecto nuevo de Lovable</span> y los demás como actualizaciones.
         </p>
       </div>
     </div>
@@ -1355,40 +1378,42 @@ function PlanAccionSection({ content }: { content: string }) {
 
   if (sprints.length < 2) return <DefaultMarkdownSection content={content} />;
 
-  const sprintStyles = [
-    { bg: "bg-cyan-500/10", border: "border-cyan-500/30", badge: "bg-cyan-500/20 text-cyan-400" },
-    { bg: "bg-purple-500/10", border: "border-purple-500/30", badge: "bg-purple-500/20 text-purple-400" },
-    { bg: "bg-emerald-500/10", border: "border-emerald-500/30", badge: "bg-emerald-500/20 text-emerald-400" },
-  ];
+  const sprintLabels = ["Fundación", "MVP funcional", "Lanzamiento"];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-      <div className="grid gap-4 md:grid-cols-3">
-        {sprints.map((sprint, i) => {
-          const style = sprintStyles[i] ?? sprintStyles[0];
-          return (
-            <div
-              key={i}
-              className={`rounded-2xl border ${style.border} ${style.bg} p-5`}
-            >
-              <div className="mb-4">
-                <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${style.badge}`}>
-                  {sprint.title}
-                </span>
-              </div>
-              <ul className="space-y-2.5">
-                {sprint.tasks.map((task, j) => (
-                  <li key={j} className="flex items-start gap-2.5 group">
-                    <span className="mt-0.5 h-4 w-4 shrink-0 rounded border border-border bg-background/50 group-hover:border-primary/40 transition" />
-                    <span className="text-sm text-muted-foreground leading-snug">{task}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
+    <div className="mx-auto max-w-[1340px] px-8 py-10">
+      <div className="mb-8">
+        <h2 className="text-[22px] font-bold tracking-[-0.01em] text-foreground mb-1">Plan de acción</h2>
+        <p className="text-[14px] text-muted-foreground">3 sprints para llevar tu solución de idea a producción.</p>
       </div>
-
+      <div className="grid gap-5 md:grid-cols-3">
+        {sprints.map((sprint, i) => (
+          <div key={i} className="app-card p-6 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <span className="app-pill-violet inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold [color:var(--violet-text-strong)]">
+                Sprint {i + 1}
+              </span>
+              <span className="text-[11px] text-muted-foreground font-medium">
+                {sprintLabels[i]}
+              </span>
+            </div>
+            <div className="my-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+            <ul className="space-y-3">
+              {sprint.tasks.map((task, j) => (
+                <li key={j} className="flex items-start gap-2.5 group">
+                  <span className="mt-0.5 h-4 w-4 shrink-0 rounded border border-[var(--violet-border)] bg-[var(--violet-pill-bg)] group-hover:border-[var(--violet-border-hover)] group-hover:bg-[var(--violet-glow-hover)] transition-colors" />
+                  <span className="text-[13px] text-muted-foreground leading-relaxed">{task}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-auto pt-2">
+              <span className="font-mono text-[32px] font-bold text-muted-foreground/10 tabular-nums">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1402,23 +1427,27 @@ function ContenidoSection({ content }: { content: string }) {
   if (topics.length === 0) return <DefaultMarkdownSection content={content} />;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
-      <div className="space-y-3">
+    <div className="mx-auto max-w-3xl px-8 py-10">
+      <div className="mb-8">
+        <h2 className="text-[22px] font-bold tracking-[-0.01em] text-foreground mb-1">Lo que necesitás aprender</h2>
+        <p className="text-[14px] text-muted-foreground">Temas clave para implementar esta solución con éxito.</p>
+      </div>
+      <div className="space-y-4">
         {topics.map((topic, i) => (
-          <div
-            key={i}
-            className="app-card p-4 sm:p-5 flex items-start gap-4"
-          >
-            <div className="shrink-0 h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
-              <GraduationCap className="h-5 w-5 text-orange-400" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-foreground mb-1 leading-snug">{topic.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{topic.description}</p>
-            </div>
-            <span className="shrink-0 text-2xl font-bold text-muted-foreground/20 tabular-nums">
+          <div key={i} className="app-card p-5 flex items-start gap-5">
+            {/* Number */}
+            <span className="font-mono text-[40px] font-bold leading-none [color:var(--violet-text)] opacity-30 tabular-nums shrink-0 mt-1">
               {String(i + 1).padStart(2, "0")}
             </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start gap-2.5 mb-2">
+                <div className="shrink-0 h-7 w-7 rounded-lg bg-[var(--violet-pill-bg)] border border-[var(--violet-pill-border)] flex items-center justify-center [color:var(--violet-text)] mt-0.5">
+                  <GraduationCap className="h-3.5 w-3.5" />
+                </div>
+                <h3 className="font-bold text-foreground text-[17px] leading-snug">{topic.title}</h3>
+              </div>
+              <p className="text-[14px] text-muted-foreground leading-relaxed pl-9">{topic.description}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -1427,48 +1456,69 @@ function ContenidoSection({ content }: { content: string }) {
 }
 
 // ============================================================
-// EconomiaSection — ROI visual con número prominente + markdown
+// EconomiaSection — ROI visual + markdown
 // ============================================================
 function EconomiaSection({ content }: { content: string }) {
-  // Intentar extraer número principal de ahorro
   const moneyMatch = content.match(/\$\s?[\d.,]+(?:\s?[kKmM])?/);
   const hoursMatch = content.match(/(\d+)\s*horas?\s*(?:\/?\s*mes|ahorradas?)/i);
   const paybackMatch = content.match(/(\d+(?:[.,]\d+)?)\s*mes(?:es)?\s*(?:de\s*)?payback/i);
   const roiMatch = content.match(/ROI[^:]*:\s*(\d+\s*%)/i) ?? content.match(/(\d+\s*%).*?retorno/i);
 
+  const hasMetrics = moneyMatch || hoursMatch || paybackMatch || roiMatch;
+
   return (
-    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8">
-      {/* Hero metrics */}
-      {(moneyMatch || hoursMatch) && (
-        <div className="grid gap-3 sm:grid-cols-3 mb-8">
-          {moneyMatch && (
-            <div className="rounded-2xl border border-teal-500/30 bg-teal-500/10 p-5 text-center">
-              <TrendingUp className="h-5 w-5 text-teal-400 mx-auto mb-2" />
-              <p className="text-3xl sm:text-4xl font-bold text-teal-400">{moneyMatch[0]}</p>
-              <p className="text-xs text-muted-foreground mt-1">Ahorro estimado</p>
-            </div>
-          )}
-          {hoursMatch && (
-            <div className="rounded-2xl border border-purple-500/30 bg-purple-500/10 p-5 text-center">
-              <Clock className="h-5 w-5 text-purple-400 mx-auto mb-2" />
-              <p className="text-3xl sm:text-4xl font-bold text-purple-400">{hoursMatch[1]}h</p>
-              <p className="text-xs text-muted-foreground mt-1">Horas ahorradas / mes</p>
-            </div>
-          )}
-          {(paybackMatch || roiMatch) && (
-            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5 text-center">
-              <PiggyBank className="h-5 w-5 text-emerald-400 mx-auto mb-2" />
-              <p className="text-3xl sm:text-4xl font-bold text-emerald-400">
-                {roiMatch ? roiMatch[1] : `${paybackMatch![1]}m`}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">{roiMatch ? "ROI estimado" : "Payback"}</p>
-            </div>
-          )}
-        </div>
+    <div className="mx-auto max-w-3xl px-8 py-10">
+      <div className="mb-8">
+        <h2 className="text-[22px] font-bold tracking-[-0.01em] text-foreground mb-1">Economía de la solución</h2>
+        <p className="text-[14px] text-muted-foreground">ROI proyectado y análisis de costos vs. beneficios.</p>
+      </div>
+
+      {hasMetrics && (
+        <>
+          <div className="grid gap-4 sm:grid-cols-3 mb-10">
+            {moneyMatch && (
+              <div className="app-card p-6 text-center flex flex-col items-center gap-2">
+                <div className="h-10 w-10 rounded-xl bg-[var(--violet-pill-bg)] border border-[var(--violet-pill-border)] flex items-center justify-center [color:var(--violet-text)]">
+                  <DollarSign className="h-5 w-5" />
+                </div>
+                <p className="text-[40px] font-bold tracking-[-0.02em] leading-none [color:var(--violet-text)] tabular-nums">
+                  {moneyMatch[0]}
+                </p>
+                <p className="text-[11px] text-muted-foreground uppercase tracking-[0.1em] font-semibold">Ahorro estimado</p>
+              </div>
+            )}
+            {hoursMatch && (
+              <div className="app-card p-6 text-center flex flex-col items-center gap-2">
+                <div className="h-10 w-10 rounded-xl bg-[var(--violet-pill-bg)] border border-[var(--violet-pill-border)] flex items-center justify-center [color:var(--violet-text)]">
+                  <Clock className="h-5 w-5" />
+                </div>
+                <p className="text-[40px] font-bold tracking-[-0.02em] leading-none [color:var(--violet-text)] tabular-nums">
+                  {hoursMatch[1]}<span className="text-[22px]">h</span>
+                </p>
+                <p className="text-[11px] text-muted-foreground uppercase tracking-[0.1em] font-semibold">Horas / mes</p>
+              </div>
+            )}
+            {(paybackMatch || roiMatch) && (
+              <div className="app-card p-6 text-center flex flex-col items-center gap-2">
+                <div className="h-10 w-10 rounded-xl bg-[var(--violet-pill-bg)] border border-[var(--violet-pill-border)] flex items-center justify-center [color:var(--violet-text)]">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+                <p className="text-[40px] font-bold tracking-[-0.02em] leading-none [color:var(--violet-text)] tabular-nums">
+                  {roiMatch ? roiMatch[1] : `${paybackMatch![1]}m`}
+                </p>
+                <p className="text-[11px] text-muted-foreground uppercase tracking-[0.1em] font-semibold">
+                  {roiMatch ? "ROI estimado" : "Payback"}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="my-8 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        </>
       )}
 
       {/* Markdown completo */}
-      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-strong:text-foreground">
+      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-li:text-muted-foreground prose-code:text-[var(--violet-text)] prose-code:bg-[var(--violet-pill-bg)] prose-code:rounded prose-code:px-1 prose-pre:bg-card prose-pre:border prose-pre:border-border prose-strong:text-foreground prose-table:text-sm">
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
     </div>
