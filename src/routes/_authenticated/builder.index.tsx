@@ -552,7 +552,7 @@ function HistoricoView({
             <button
               key={b.id}
               onClick={() => onOpen(b)}
-              className="group w-full text-left rounded-xl border border-border bg-card p-4 sm:p-5 hover:border-primary/40 hover:bg-card/80 transition flex items-start justify-between gap-3"
+              className="app-card group w-full text-left p-4 sm:p-5 flex items-start justify-between gap-3"
             >
               <div className="min-w-0">
                 <h3 className="font-semibold text-foreground truncate">
@@ -637,7 +637,7 @@ function LandingView({
         </p>
       </div>
 
-      <div className="relative rounded-2xl border border-border bg-card shadow-lg overflow-hidden focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition">
+      <div className="app-card relative overflow-hidden shadow-lg focus-within:border-[color:var(--violet-border-hover)] focus-within:ring-2 focus-within:ring-[color:var(--violet-pill-bg)] transition">
         <Textarea
           ref={textareaRef}
           value={idea}
@@ -654,7 +654,7 @@ function LandingView({
         <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 border-t border-border bg-muted/30">
           <span className="text-[11px] text-muted-foreground hidden sm:inline">⌘ + Enter</span>
           <span className="text-[11px] text-muted-foreground sm:hidden" aria-hidden />
-          <Button size="sm" disabled={!canContinue} onClick={onContinue} className="gap-1.5 ml-auto">
+          <Button disabled={!canContinue} onClick={onContinue} className="app-cta-primary ml-auto gap-1.5 disabled:opacity-60" style={{ padding: "8px 14px", fontSize: 13 }}>
             <ArrowUp className="h-3.5 w-3.5" />
             Continuar
           </Button>
@@ -795,7 +795,7 @@ function WizardView({
           <ArrowLeft className="h-3.5 w-3.5" />
           Volver
         </Button>
-        <Button onClick={handleNext} disabled={!canContinue} className="gap-1.5">
+        <Button onClick={handleNext} disabled={!canContinue} className="app-cta-primary gap-1.5 disabled:opacity-60">
           {isLast ? <><Zap className="h-3.5 w-3.5" />Listo</> : <>Próximo<ArrowRight className="h-3.5 w-3.5" /></>}
         </Button>
       </div>
@@ -849,7 +849,7 @@ function ConfirmView({ onGenerate, onAddPremium, onBack, premiumAdded }: {
         {!premiumAdded ? (
           <button
             onClick={onAddPremium}
-            className="group rounded-2xl border border-border bg-card p-6 text-left hover:border-foreground/40 transition"
+            className="app-card group p-6 text-left"
           >
             <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-foreground">
               <Plus className="h-5 w-5" />
@@ -992,7 +992,7 @@ function ResultView({
             <button
               key={s.key}
               onClick={() => setOpenSection(s.key)}
-              className="group text-left rounded-2xl border border-border bg-card p-4 sm:p-5 relative overflow-hidden hover:border-primary/40 transition"
+              className="app-card group text-left p-4 sm:p-5 relative overflow-hidden"
             >
               <div className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-40`} aria-hidden />
               <div className="relative">
@@ -1306,7 +1306,7 @@ function RapidoSection({ content, blueprintTitle }: { content: string; blueprint
         </div>
 
         {/* Right: prompt seleccionado */}
-        <div className="lg:col-span-3 rounded-2xl border border-border bg-card flex flex-col">
+        <div className="app-card lg:col-span-3 flex flex-col">
           <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4 border-b border-border">
             <div>
               <p className="text-[11px] text-muted-foreground mb-0.5">
@@ -1407,7 +1407,7 @@ function ContenidoSection({ content }: { content: string }) {
         {topics.map((topic, i) => (
           <div
             key={i}
-            className="rounded-2xl border border-border bg-card p-4 sm:p-5 flex items-start gap-4 hover:border-primary/30 transition"
+            className="app-card p-4 sm:p-5 flex items-start gap-4"
           >
             <div className="shrink-0 h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
               <GraduationCap className="h-5 w-5 text-orange-400" />
