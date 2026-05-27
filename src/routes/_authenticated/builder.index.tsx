@@ -315,7 +315,7 @@ function BuilderPage() {
       .select("id, idea, blueprint, created_at")
       .order("created_at", { ascending: false })
       .limit(50);
-    setSavedBlueprints((data as SavedBlueprint[]) ?? []);
+    setSavedBlueprints((data as unknown as SavedBlueprint[]) ?? []);
     setLoadingHistorico(false);
   };
 

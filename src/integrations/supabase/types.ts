@@ -50,6 +50,33 @@ export type Database = {
         }
         Relationships: []
       }
+      builder_blueprints: {
+        Row: {
+          answers: Json
+          blueprint: Json
+          created_at: string
+          id: string
+          idea: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          blueprint: Json
+          created_at?: string
+          id?: string
+          idea: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          blueprint?: Json
+          created_at?: string
+          id?: string
+          idea?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       builder_projects: {
         Row: {
           builder_session_id: string | null
