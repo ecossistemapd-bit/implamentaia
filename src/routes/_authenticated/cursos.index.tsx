@@ -203,13 +203,7 @@ function CursosPage() {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className="rounded-full px-4 py-1.5 text-sm transition-all duration-200"
-                style={{
-                  backgroundColor: active ? "rgba(201,168,76,0.15)" : "#1C2333",
-                  border: active ? "1px solid #C9A84C" : "1px solid rgba(255,255,255,0.08)",
-                  color: active ? "#C9A84C" : "#A0AABF",
-                  fontWeight: active ? 600 : 500,
-                }}
+                className={active ? "app-chip-active" : "app-chip"}
               >
                 {f}
               </button>

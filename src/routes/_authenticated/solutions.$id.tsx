@@ -423,8 +423,8 @@ function SolutionByIdDetail() {
             {completedCount} de {STEPS.length} etapas completadas
           </div>
         </div>
-        <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-border">
-          <div className="h-full bg-primary transition-all" style={{ width: `${progressPct}%` }} />
+        <div className="app-progress-track mt-3" style={{ height: 4 }}>
+          <div className="app-progress-fill" style={{ width: `${progressPct}%` }} />
         </div>
       </div>
 

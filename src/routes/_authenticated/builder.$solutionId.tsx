@@ -288,12 +288,17 @@ function BuilderWizard() {
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button
-              className="h-8 rounded-lg bg-foreground text-background hover:bg-foreground/90 text-[12px]"
+              className="app-cta-primary"
+              style={{ padding: "6px 12px", fontSize: 12 }}
               onClick={resumeSession}
             >
               Continuar donde lo dejé
             </Button>
-            <Button variant="outline" className="h-8 rounded-lg text-[12px]" onClick={startOver}>
+            <Button
+              className="app-cta-ghost"
+              style={{ padding: "6px 12px", fontSize: 12 }}
+              onClick={startOver}
+            >
               Empezar de nuevo
             </Button>
           </div>
