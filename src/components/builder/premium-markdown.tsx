@@ -25,6 +25,10 @@ type Block =
     }
   | { type: "bullet_list"; items: string[] }
   | { type: "checklist"; items: { checked: boolean; text: string }[] }
+  | {
+      type: "definition_list";
+      items: { label: string; description: string }[];
+    }
   | { type: "table"; headers: string[]; rows: string[][] }
   | { type: "code"; lang: string; content: string }
   | { type: "hr" };
@@ -155,6 +159,29 @@ function parseMarkdown(content: string): Block[] {
       }
       blocks.push({ type: "bullet_list", items });
       continue;
+    }
+
+    // Definition list — 2+ consecutive líneas tipo "**Label**: descripción"
+    // Look ahead sin consumir para decidir si vale la pena agruparlas como cards.
+    {
+      const isDefLine = (l: string) =>
+        /^\*\*[^*]+\*\*\s*[:：]\s*.+$/.test(l.trim());
+      if (isDefLine(line)) {
+        let j = i;
+        const items: { label: string; description: string }[] = [];
+        while (j < lines.length && isDefLine(lines[j])) {
+          const m = lines[j].trim().match(/^\*\*([^*]+)\*\*\s*[:：]\s*(.+)$/);
+          if (!m) break;
+          items.push({ label: m[1].trim(), description: m[2].trim() });
+          j++;
+        }
+        if (items.length >= 2) {
+          blocks.push({ type: "definition_list", items });
+          i = j;
+          continue;
+        }
+        // single-line — falls through a paragraph (renderInline maneja el **bold**)
+      }
     }
 
     // Paragraph — consume consecutive non-empty non-structural lines
@@ -359,6 +386,27 @@ function PremiumBlock({ block, idx }: { block: Block; idx: number }) {
                 }`}
               >
                 {renderInline(item.text)}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+
+    case "definition_list":
+      return (
+        <div key={idx} className="grid gap-3 my-5 md:grid-cols-2">
+          {block.items.map((item, i) => (
+            <div key={i} className="app-card p-5">
+              {/* Label en violeta arriba */}
+              <div
+                className="text-[13px] font-semibold mb-2 leading-snug"
+                style={{ color: "var(--violet-text-strong)" }}
+              >
+                {renderInline(item.label)}
+              </div>
+              {/* Descripción abajo */}
+              <div className="text-[13px] leading-relaxed text-muted-foreground">
+                {renderInline(item.description)}
               </div>
             </div>
           ))}
