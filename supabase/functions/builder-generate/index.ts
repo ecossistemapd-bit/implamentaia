@@ -18,7 +18,7 @@ const corsHeaders = {
 };
 
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
-// Modelo por defecto: claude-3-5-sonnet (probado, disponible en todos los planes).
+// Modelo activo: claude-3-5-sonnet-20241022
 const MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-3-5-sonnet-20241022";
 
 const SYSTEM_PROMPT = `Sos un consultor senior en implementación de IA para empresas de LatAm, parte de la plataforma Implementa AI.
