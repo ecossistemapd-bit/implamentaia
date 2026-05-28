@@ -170,7 +170,7 @@ const SECTIONS: NavSection[] = [
       { to: "/projects", label: "Mis Proyectos", icon: IconFolderProyectos, navClass: "nav-proyectos" },
       { to: "/builder", label: "Builder", icon: IconWandBuilder, navClass: "nav-builder", badge: "NUEVO" },
       { to: "/contratar-experto", label: "Contratar Experto", icon: HeartHandshake },
-      { to: "/mentoria", label: "Mentoría", icon: IconClockMentoria, navClass: "nav-mentorias", badge: "PRÓXIMAMENTE" },
+      { to: "/mentoria", label: "Mentoría", icon: IconClockMentoria, navClass: "nav-mentorias" },
       { to: "/implementador", label: "Panel Impl.", icon: LayoutDashboard, implOnly: true },
       { to: "/admin", label: "Admin", icon: Settings2, adminOnly: true },
     ],
