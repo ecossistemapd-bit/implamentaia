@@ -226,7 +226,11 @@ function Dashboard() {
         )}
 
         {/* TU JOURNEY */}
-        <TuJourney recommended={data?.recommended ?? null} />
+        <TuJourney
+          recommended={data?.recommended ?? null}
+          inProgressSolutions={data?.inProgressSolutions ?? []}
+          completed={completed}
+        />
 
         {/* LO QUE ESTÁ PASANDO */}
         <LoQueEstaPasando newest={data?.newest ?? null} />
@@ -351,53 +355,130 @@ function HeroRutaIA({
 // Anotarme · te avisamos antes → HOY YA HUBO 09:00/10:30/14:00 + Grabaciones →
 // 4 mentorías por día · entrá a todas.
 // =============================================================================
+// Slots fijos en hora Argentina (UTC-3). 4 por día. Mañana=hoy+1.
+const MENTORIA_SLOTS_HORA = [9, 10.5, 14, 15.5];
+
+function computeNextMentoria() {
+  // Calculamos en hora local del browser (asumimos ART o cercano).
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+
+  const pastToday: string[] = [];
+  let nextToday: number | null = null;
+  for (const h of MENTORIA_SLOTS_HORA) {
+    const slotMin = Math.round(h * 60);
+    if (slotMin <= nowMin) {
+      pastToday.push(formatHM(slotMin));
+    } else if (nextToday === null) {
+      nextToday = slotMin;
+    }
+  }
+
+  const target = new Date(now);
+  let isToday = true;
+  if (nextToday === null) {
+    // Próxima es mañana 09:00
+    target.setDate(target.getDate() + 1);
+    target.setHours(9, 0, 0, 0);
+    isToday = false;
+  } else {
+    target.setHours(Math.floor(nextToday / 60), nextToday % 60, 0, 0);
+  }
+
+  const diffMin = Math.max(0, Math.round((target.getTime() - now.getTime()) / 60000));
+  return {
+    isToday,
+    targetTime: formatHM(target.getHours() * 60 + target.getMinutes()),
+    countdown: formatCountdown(diffMin),
+    diffMinutes: diffMin,
+    pastToday,
+  };
+}
+
+function formatHM(totalMin: number): string {
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+function formatCountdown(min: number): string {
+  if (min < 60) return `${min} min`;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h < 24) return m === 0 ? `${h}h` : `${h}h ${m}min`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? "mañana" : `${d} días`;
+}
+
 function NextMentoria() {
-  // TODO(mentorías): leer próxima mentoría + slots pasados de tabla `mentorias`.
-  // 4 slots por día: 09:00 / 10:30 / 14:00 / 15:30 ART.
-  const nextSlot = { hora: "15:30", faltan: "1h 30min", titulo: "Mentoría grupal de IA" };
-  const pastSlotsHoy = ["09:00", "10:30", "14:00"];
+  // TODO(mentorías): cuando exista tabla `mentorias` con datos reales (título,
+  // mentor, plataforma), reemplazar los slots fijos por query real.
+  const next = computeNextMentoria();
+  const isImminent = next.isToday && next.diffMinutes <= 120;
 
   return (
     <div className="app-card col-span-12 p-5 lg:col-span-4">
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
-          PRÓXIMA MENTORÍA
+          {isImminent ? "PRÓXIMA MENTORÍA" : "AGENDA DE MENTORÍAS"}
         </span>
-        <span className="app-pill-violet inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium">
-          <Clock className="h-3 w-3" /> FALTAN {nextSlot.faltan}
-        </span>
-      </div>
-      <div className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold tracking-wide text-muted-foreground">
-        <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#8B5CF6" }} />
-        HOY · {nextSlot.hora} ART
-      </div>
-      <h3 className="mt-1 text-[22px] font-bold leading-tight">{nextSlot.titulo}</h3>
-      <p className="mt-1 text-[13px] text-muted-foreground">Q&amp;A abierto · entrá cuando quieras</p>
-      <Link
-        to="/mentoria"
-        className="app-cta-primary mt-4 w-full justify-center"
-      >
-        <Bell className="h-4 w-4" /> Anotarme · te avisamos antes
-      </Link>
-      <div className="my-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-      <div className="text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
-        HOY YA HUBO
-      </div>
-      <div className="mt-2 flex items-center gap-2 text-[12px] text-muted-foreground">
-        {pastSlotsHoy.map((s, i) => (
-          <span key={s} className="inline-flex items-center gap-2">
-            <span className="tabular-nums">{s}</span>
-            {i < pastSlotsHoy.length - 1 && <span className="text-muted-foreground/40">·</span>}
+        {isImminent && (
+          <span className="app-pill-violet inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium">
+            <Clock className="h-3 w-3" /> EN {next.countdown.toUpperCase()}
           </span>
-        ))}
-        <Link to="/mentoria" className="ml-auto inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground transition hover:text-foreground">
-          Grabaciones <ArrowRight className="h-3 w-3" />
-        </Link>
+        )}
       </div>
-      <div className="my-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-      <div className="text-[11px] text-muted-foreground">
-        4 mentorías por día · entrá a todas las que quieras
-      </div>
+
+      {/* Inmininente (≤ 2h hoy) — card protagonista con countdown */}
+      {isImminent && (
+        <>
+          <div className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold tracking-wide text-muted-foreground">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--violet-text)" }} />
+            HOY · {next.targetTime} ART
+          </div>
+          <h3 className="mt-1 text-[22px] font-bold leading-tight">Mentoría grupal de IA</h3>
+          <p className="mt-1 text-[13px] text-muted-foreground">Q&amp;A abierto · entrá cuando quieras</p>
+          <Link to="/mentoria" className="app-cta-primary mt-4 w-full justify-center">
+            <Bell className="h-4 w-4" /> Anotarme · te avisamos antes
+          </Link>
+        </>
+      )}
+
+      {/* Más tarde hoy o próximos días — card de agenda */}
+      {!isImminent && (
+        <>
+          <div className="mt-4 inline-flex items-center gap-1.5 text-[12px] font-semibold tracking-wide text-muted-foreground">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--violet-text)" }} />
+            {next.isToday ? `HOY · ${next.targetTime} ART` : `${next.countdown.toUpperCase()} · ${next.targetTime} ART`}
+          </div>
+          <h3 className="mt-1 text-[22px] font-bold leading-tight">Mentoría grupal de IA</h3>
+          <p className="mt-1 text-[13px] text-muted-foreground">4 por día · Q&amp;A en vivo con el equipo</p>
+          <Link to="/mentoria" className="app-cta-ghost mt-4 w-full justify-center">
+            Ver calendario completo <ArrowRight className="h-4 w-4" />
+          </Link>
+        </>
+      )}
+
+      {/* Sección "hoy ya hubo" — sólo si quedan grabaciones del día */}
+      {next.pastToday.length > 0 && (
+        <>
+          <div className="my-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+          <div className="text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
+            GRABACIONES DE HOY
+          </div>
+          <div className="mt-2 flex items-center gap-2 text-[12px] text-muted-foreground">
+            {next.pastToday.map((s, i) => (
+              <span key={s} className="inline-flex items-center gap-2">
+                <span className="tabular-nums">{s}</span>
+                {i < next.pastToday.length - 1 && <span className="text-muted-foreground/40">·</span>}
+              </span>
+            ))}
+            <Link to="/mentoria" className="ml-auto inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground transition hover:text-foreground">
+              Ver <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -642,9 +723,83 @@ function KpiCard({
 // =============================================================================
 function TuJourney({
   recommended,
+  inProgressSolutions,
+  completed,
 }: {
   recommended: { id: string; title: string } | null;
+  inProgressSolutions: Array<{
+    id: string; title: string; completedSteps: number; totalSteps: number;
+  }>;
+  completed: number;
 }) {
+  // Build cards contextuales según estado real del user.
+  type Card = {
+    step: string;
+    time: string;
+    title: string;
+    subtitle: string;
+    cta: string;
+    to: "/settings" | "/solutions/$id" | "/solutions" | "/mentoria";
+    params?: { id: string };
+  };
+  const cards: Card[] = [];
+
+  // Card 1 — varía según estado
+  if (inProgressSolutions.length > 0) {
+    const active = inProgressSolutions[0];
+    cards.push({
+      step: "01",
+      time: `${active.completedSteps}/${active.totalSteps}`,
+      title: `Continuá ${active.title.length > 26 ? active.title.slice(0, 26) + "…" : active.title}`,
+      subtitle: "Implementación en curso",
+      cta: "Seguir",
+      to: "/solutions/$id",
+      params: { id: active.id },
+    });
+  } else if (completed > 0) {
+    cards.push({
+      step: "01",
+      time: "Explorá",
+      title: "Sumá una nueva solución",
+      subtitle: "Recomendada según tu perfil",
+      cta: "Ver catálogo",
+      to: "/solutions",
+    });
+  } else {
+    cards.push({
+      step: "01",
+      time: "10 min",
+      title: "Conectá tus herramientas",
+      subtitle: "Slack · Gmail · Calendar",
+      cta: "Conectar",
+      to: "/settings",
+    });
+  }
+
+  // Card 2 — solución recomendada (sólo si existe Y es distinta a la activa)
+  if (recommended && (!inProgressSolutions.length || recommended.id !== inProgressSolutions[0]?.id)) {
+    cards.push({
+      step: "02",
+      time: "45 min",
+      title: `Implementá ${recommended.title.length > 26 ? recommended.title.slice(0, 26) + "…" : recommended.title}`,
+      subtitle: "Tu próxima recomendación",
+      cta: "Empezar",
+      to: "/solutions/$id",
+      params: { id: recommended.id },
+    });
+  }
+
+  // Card 3 — mentoría (siempre relevante, pero el tiempo es dinámico)
+  const next = computeNextMentoria();
+  cards.push({
+    step: String(cards.length + 1).padStart(2, "0"),
+    time: next.isToday ? `Hoy ${next.targetTime}` : `${next.countdown} · ${next.targetTime}`,
+    title: "Entrá a la mentoría",
+    subtitle: "Q&A grupal · 4 por día",
+    cta: "Anotarme",
+    to: "/mentoria",
+  });
+
   return (
     <section className="app-card mt-6 overflow-hidden">
       <div className="flex items-center justify-between px-6 pt-5">
@@ -652,7 +807,9 @@ function TuJourney({
           <div className="text-[11px] font-semibold tracking-[0.15em] text-muted-foreground/70">
             TU JOURNEY
           </div>
-          <div className="mt-0.5 text-[17px] font-semibold">Próximos pasos</div>
+          <div className="mt-0.5 text-[17px] font-semibold">
+            {inProgressSolutions.length > 0 ? "Continuá donde dejaste" : "Próximos pasos"}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1 rounded border border-border bg-card/60 px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground">
@@ -661,32 +818,14 @@ function TuJourney({
           <span className="text-[12px] text-muted-foreground/70">para acción rápida</span>
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-3 p-5 md:grid-cols-3">
-        <JourneyCard
-          step="01"
-          time="10 min"
-          title="Conectá tus herramientas"
-          subtitle="Slack · Gmail · Calendar"
-          cta="Conectar"
-          to="/settings"
-        />
-        <JourneyCard
-          step="02"
-          time="45 min"
-          title={recommended ? `Implementá ${recommended.title.slice(0, 28)}${recommended.title.length > 28 ? "…" : ""}` : "Implementá tu primera solución"}
-          subtitle="Tu solución recomendada"
-          cta="Empezar"
-          to={recommended ? "/solutions/$id" : "/solutions"}
-          params={recommended ? { id: recommended.id } : undefined}
-        />
-        <JourneyCard
-          step="03"
-          time="15:30 hoy"
-          title="Entrá a la mentoría"
-          subtitle="Q&A grupal abierto"
-          cta="Anotarme"
-          to="/mentoria"
-        />
+      <div
+        className={`grid grid-cols-1 gap-3 p-5 ${
+          cards.length === 1 ? "md:grid-cols-1" : cards.length === 2 ? "md:grid-cols-2" : "md:grid-cols-3"
+        }`}
+      >
+        {cards.map((c, i) => (
+          <JourneyCard key={i} {...c} />
+        ))}
       </div>
     </section>
   );
@@ -726,39 +865,67 @@ function LoQueEstaPasando({
 }: {
   newest: { id: string; title: string; created_at: string; short_description: string } | null;
 }) {
-  // TODO: ranking de comunidad + eventos en vivo cuando exista la tabla.
+  // Single highlight card — el item más contextual (la solución más nueva).
+  // Datos secundarios (comunidad + workshop) van como sub-line para no competir.
+  // TODO: cuando haya tabla `eventos` real, rotar el highlight (a veces workshop,
+  // a veces ranking, a veces nueva solución) según relevancia.
   return (
     <section className="mt-7">
       <div className="mb-3 flex items-center justify-between">
         <div className="text-[15px] font-semibold">Lo que está pasando</div>
-        <div className="text-[12px] text-muted-foreground/70">en Implementa IA · esta semana</div>
+        <div className="text-[11px] text-muted-foreground/70">esta semana en Implementa IA</div>
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <PassingCard
-          badge="NUEVA"
-          subBadge={newest ? relativeShort(newest.created_at) : "hace 3 días"}
-          title={newest?.title ?? "Plataforma de Recompra y Suscripción"}
-          subtitle={newest?.short_description?.slice(0, 60) ?? "Solución recién agregada"}
-          cta="Ver solución"
-          to={newest ? "/solutions/$id" : "/solutions"}
-          params={newest ? { id: newest.id } : undefined}
-        />
-        <PassingCard
-          badge="COMUNIDAD"
-          subBadge="esta semana"
-          title="143 implementadores activos"
-          subtitle="LatAm · empresas B2B"
-          cta="Ver ranking"
+
+      {/* HIGHLIGHT CARD — la novedad más relevante */}
+      <Link
+        to={newest ? "/solutions/$id" : "/solutions"}
+        params={newest ? ({ id: newest.id } as never) : (undefined as never)}
+        className="app-card block p-6"
+      >
+        <div className="flex items-start gap-5">
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <span className="app-pill-violet inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-[0.14em] uppercase">
+                Nueva solución
+              </span>
+              <span className="text-[11px] text-muted-foreground/70">
+                {newest ? relativeShort(newest.created_at) : "hace 3 días"}
+              </span>
+            </div>
+            <h3 className="mt-3 text-[20px] font-semibold leading-snug text-foreground">
+              {newest?.title ?? "Plataforma de Recompra y Suscripción"}
+            </h3>
+            <p className="mt-1.5 max-w-[640px] text-[13px] leading-relaxed text-muted-foreground">
+              {newest?.short_description?.slice(0, 120) ?? "Solución recién agregada al catálogo. Probada en empresas B2B con equipos chicos."}
+            </p>
+          </div>
+          <span
+            className="hidden shrink-0 self-center text-[18px] sm:block"
+            style={{ color: "var(--violet-text)" }}
+          >
+            →
+          </span>
+        </div>
+      </Link>
+
+      {/* SUB-LINE: datos secundarios sin competir visualmente */}
+      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[11.5px] text-muted-foreground/80">
+        <Link
           to="/solutions"
-        />
-        <PassingCard
-          badge="EN VIVO"
-          subBadge="Jue 5 jun · 19h ART"
-          title="Workshop: Builder no-code"
-          subtitle="Carlos Sánchez · 60 min"
-          cta="Inscribirme"
+          className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+        >
+          <span className="h-1 w-1 rounded-full" style={{ background: "var(--violet-text)" }} />
+          <span className="tabular-nums font-medium text-foreground/90">143</span>
+          <span>implementadores activos</span>
+        </Link>
+        <Link
           to="/mentoria"
-        />
+          className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+        >
+          <span className="h-1 w-1 rounded-full" style={{ background: "var(--violet-text)" }} />
+          <span className="font-medium text-foreground/90">Workshop:</span>
+          <span>Builder no-code · Jue 5 jun 19h ART</span>
+        </Link>
       </div>
     </section>
   );
