@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPanel,
@@ -103,7 +103,93 @@ type UserRow = {
   company_name: string | null;
   role: string;
   created_at: string;
+  tickets: number;
 };
+
+// ── TicketCell — edición inline de tickets por usuario ─────────
+function TicketCell({ userId, initialTickets, onSaved }: {
+  userId: string;
+  initialTickets: number;
+  onSaved: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(initialTickets);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    if (value < 0 || !Number.isFinite(value)) {
+      toast.error("Los tickets deben ser un número ≥ 0", { duration: 3000 });
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.rpc("admin_set_user_tickets" as never, {
+      p_user_id: userId,
+      p_tickets: value,
+    });
+    setSaving(false);
+    if (error) {
+      toast.error("Error: " + error.message, { duration: 4000 });
+      return;
+    }
+    toast.success(`✓ Tickets actualizados → ${value}`, { duration: 3000 });
+    setEditing(false);
+    onSaved();
+  };
+
+  if (!editing) {
+    return (
+      <div className="flex items-center gap-1.5">
+        <span className={`inline-flex items-center gap-0.5 rounded-full border px-2 py-0.5 text-xs font-semibold ${
+          initialTickets > 0
+            ? "border-violet-200 bg-violet-50 text-violet-700"
+            : "border-gray-200 bg-gray-50 text-gray-500"
+        }`}>
+          🎟 {initialTickets}
+        </span>
+        <button
+          onClick={() => { setEditing(true); setValue(initialTickets); }}
+          className="text-gray-300 hover:text-gray-600 transition"
+          title="Editar tickets"
+        >
+          <Pencil className="h-3 w-3" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1">
+      <input
+        type="number"
+        min={0}
+        step={1}
+        value={value}
+        onChange={(e) => setValue(Math.max(0, parseInt(e.target.value, 10) || 0))}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") save();
+          if (e.key === "Escape") setEditing(false);
+        }}
+        className="h-7 w-14 rounded border border-gray-300 bg-white px-2 text-xs text-gray-900 focus:border-violet-400 focus:outline-none"
+        autoFocus
+      />
+      <button
+        onClick={save}
+        disabled={saving}
+        className="text-xs font-semibold text-green-600 hover:text-green-700 disabled:opacity-50"
+        title="Guardar"
+      >
+        {saving ? "…" : "✓"}
+      </button>
+      <button
+        onClick={() => setEditing(false)}
+        className="text-xs text-gray-400 hover:text-gray-600"
+        title="Cancelar"
+      >
+        ✕
+      </button>
+    </div>
+  );
+}
 
 function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void }) {
   const qc = useQueryClient();
@@ -160,15 +246,16 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Empresa</th>
               <th className="px-4 py-3">Rol</th>
+              <th className="px-4 py-3">Tickets</th>
               <th className="px-4 py-3">Registro</th>
               <th className="px-4 py-3 text-right">Acción</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {isLoading ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-gray-400">Cargando…</td></tr>
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-xs text-gray-400">Cargando…</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-gray-400">Sin resultados.</td></tr>
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-xs text-gray-400">Sin resultados.</td></tr>
             ) : (
               filtered.map((u) => (
                 <tr key={u.id} className="hover:bg-gray-50">
@@ -192,6 +279,13 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>
+                  </td>
+                  <td className="px-4 py-3">
+                    <TicketCell
+                      userId={u.id}
+                      initialTickets={u.tickets ?? 0}
+                      onSaved={() => qc.invalidateQueries({ queryKey: ["admin-users"] })}
+                    />
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-600">
                     {new Date(u.created_at).toLocaleDateString("es", { day: "2-digit", month: "2-digit", year: "numeric" })}
