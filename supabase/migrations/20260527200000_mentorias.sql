@@ -131,54 +131,50 @@ GRANT EXECUTE ON FUNCTION public.consume_ticket_for_mentoria(UUID, DATE) TO auth
 INSERT INTO public.mentores (id, full_name, role, bio, specialties) VALUES
 (
   '11111111-0001-0001-0001-000000000001',
-  'Pablo Rodríguez',
-  'Especialista en Automatización',
-  'Más de 5 años implementando soluciones de IA en empresas de LatAm. Experto en n8n, Make y flujos de automatización complejos con impacto real en operaciones.',
-  ARRAY['Automatización', 'n8n', 'Make', 'Zapier']
+  'Gino Altamirano',
+  'Co-fundador de Implementa AI',
+  'Co-fundador de Implementa AI. Especialista en inteligencia artificial aplicada a negocios B2B en LatAm. Ayuda a empresas a implementar IA de forma práctica y con impacto real desde el primer sprint.',
+  ARRAY['IA Aplicada', 'Automatización', 'Estrategia IA', 'n8n']
 ),
 (
   '11111111-0001-0001-0001-000000000002',
-  'María García',
-  'Experta en Chatbots y NLP',
-  'Desarrolla chatbots inteligentes para ventas y atención al cliente usando WhatsApp Business API y modelos de lenguaje de última generación.',
-  ARRAY['Chatbots', 'WhatsApp API', 'NLP', 'OpenAI']
-),
-(
-  '11111111-0001-0001-0001-000000000003',
-  'Javier López',
-  'Arquitecto de Soluciones IA',
-  'Diseña arquitecturas IA end-to-end para empresas B2B, con foco en escalabilidad, integración de herramientas y medición de ROI desde el primer sprint.',
-  ARRAY['Arquitectura', 'Claude', 'Supabase', 'ROI']
+  'Antonio Torrealba',
+  'Experto en IA y Automatización',
+  'Especialista en implementación de soluciones de inteligencia artificial para empresas. Experto en automatización de flujos de trabajo, agentes conversacionales y optimización de procesos con IA.',
+  ARRAY['Chatbots', 'Automatización', 'OpenAI', 'Agentes IA']
 )
 ON CONFLICT (id) DO NOTHING;
 
 -- ── Seed: Mentorias (4 slots × 5 días = 20 sesiones) ──────────
+--    Horarios: 10:00 / 11:30 / 14:00 / 15:30
+--    Gino: morning_1 (10:00) y afternoon_1 (14:00)
+--    Antonio: morning_2 (11:30) y afternoon_2 (15:30)
 INSERT INTO public.mentorias
   (title, mentor_id, day_of_week, time_slot, starts_at, duration_minutes, meeting_url)
 VALUES
 -- LUNES
-('Mentoría Express — Automatización',       '11111111-0001-0001-0001-000000000001', 1, 'morning_1',   '09:00', 60, 'https://meet.google.com/implementa-lun-m1'),
-('Workshop de Flujos IA',                   '11111111-0001-0001-0001-000000000002', 1, 'morning_2',   '10:30', 60, 'https://meet.google.com/implementa-lun-m2'),
-('Mentoría IA Aplicada',                    '11111111-0001-0001-0001-000000000003', 1, 'afternoon_1', '15:00', 60, 'https://meet.google.com/implementa-lun-t1'),
-('Clínica de Implementación',               '11111111-0001-0001-0001-000000000001', 1, 'afternoon_2', '16:30', 60, 'https://meet.google.com/implementa-lun-t2'),
+('Mentoría IA Aplicada',          '11111111-0001-0001-0001-000000000001', 1, 'morning_1',   '10:00', 60, NULL),
+('Workshop de Automatización IA', '11111111-0001-0001-0001-000000000002', 1, 'morning_2',   '11:30', 60, NULL),
+('Estrategia IA para tu negocio', '11111111-0001-0001-0001-000000000001', 1, 'afternoon_1', '14:00', 60, NULL),
+('Clínica de Implementación IA',  '11111111-0001-0001-0001-000000000002', 1, 'afternoon_2', '15:30', 60, NULL),
 -- MARTES
-('Mentoría Express — Chatbots',             '11111111-0001-0001-0001-000000000002', 2, 'morning_1',   '09:00', 60, 'https://meet.google.com/implementa-mar-m1'),
-('Workshop NLP Práctico',                   '11111111-0001-0001-0001-000000000003', 2, 'morning_2',   '10:30', 60, 'https://meet.google.com/implementa-mar-m2'),
-('Mentoría IA Aplicada',                    '11111111-0001-0001-0001-000000000001', 2, 'afternoon_1', '15:00', 60, 'https://meet.google.com/implementa-mar-t1'),
-('Clínica de Implementación',               '11111111-0001-0001-0001-000000000002', 2, 'afternoon_2', '16:30', 60, 'https://meet.google.com/implementa-mar-t2'),
+('Mentoría IA Aplicada',          '11111111-0001-0001-0001-000000000001', 2, 'morning_1',   '10:00', 60, NULL),
+('Workshop de Automatización IA', '11111111-0001-0001-0001-000000000002', 2, 'morning_2',   '11:30', 60, NULL),
+('Estrategia IA para tu negocio', '11111111-0001-0001-0001-000000000001', 2, 'afternoon_1', '14:00', 60, NULL),
+('Clínica de Implementación IA',  '11111111-0001-0001-0001-000000000002', 2, 'afternoon_2', '15:30', 60, NULL),
 -- MIÉRCOLES
-('Mentoría Express — Arquitectura',         '11111111-0001-0001-0001-000000000003', 3, 'morning_1',   '09:00', 60, 'https://meet.google.com/implementa-mie-m1'),
-('Workshop Claude API',                     '11111111-0001-0001-0001-000000000001', 3, 'morning_2',   '10:30', 60, 'https://meet.google.com/implementa-mie-m2'),
-('Mentoría IA Aplicada',                    '11111111-0001-0001-0001-000000000002', 3, 'afternoon_1', '15:00', 60, 'https://meet.google.com/implementa-mie-t1'),
-('Clínica de Implementación',               '11111111-0001-0001-0001-000000000003', 3, 'afternoon_2', '16:30', 60, 'https://meet.google.com/implementa-mie-t2'),
+('Mentoría IA Aplicada',          '11111111-0001-0001-0001-000000000001', 3, 'morning_1',   '10:00', 60, NULL),
+('Workshop de Automatización IA', '11111111-0001-0001-0001-000000000002', 3, 'morning_2',   '11:30', 60, NULL),
+('Estrategia IA para tu negocio', '11111111-0001-0001-0001-000000000001', 3, 'afternoon_1', '14:00', 60, NULL),
+('Clínica de Implementación IA',  '11111111-0001-0001-0001-000000000002', 3, 'afternoon_2', '15:30', 60, NULL),
 -- JUEVES
-('Mentoría Express — ROI IA',               '11111111-0001-0001-0001-000000000001', 4, 'morning_1',   '09:00', 60, 'https://meet.google.com/implementa-jue-m1'),
-('Workshop Automatización Avanzada',        '11111111-0001-0001-0001-000000000002', 4, 'morning_2',   '10:30', 60, 'https://meet.google.com/implementa-jue-m2'),
-('Mentoría IA Aplicada',                    '11111111-0001-0001-0001-000000000003', 4, 'afternoon_1', '15:00', 60, 'https://meet.google.com/implementa-jue-t1'),
-('Clínica de Implementación',               '11111111-0001-0001-0001-000000000001', 4, 'afternoon_2', '16:30', 60, 'https://meet.google.com/implementa-jue-t2'),
+('Mentoría IA Aplicada',          '11111111-0001-0001-0001-000000000001', 4, 'morning_1',   '10:00', 60, NULL),
+('Workshop de Automatización IA', '11111111-0001-0001-0001-000000000002', 4, 'morning_2',   '11:30', 60, NULL),
+('Estrategia IA para tu negocio', '11111111-0001-0001-0001-000000000001', 4, 'afternoon_1', '14:00', 60, NULL),
+('Clínica de Implementación IA',  '11111111-0001-0001-0001-000000000002', 4, 'afternoon_2', '15:30', 60, NULL),
 -- VIERNES
-('Mentoría Express — Estrategia IA',        '11111111-0001-0001-0001-000000000002', 5, 'morning_1',   '09:00', 60, 'https://meet.google.com/implementa-vie-m1'),
-('Workshop de Casos de Uso',                '11111111-0001-0001-0001-000000000003', 5, 'morning_2',   '10:30', 60, 'https://meet.google.com/implementa-vie-m2'),
-('Mentoría IA Aplicada',                    '11111111-0001-0001-0001-000000000001', 5, 'afternoon_1', '15:00', 60, 'https://meet.google.com/implementa-vie-t1'),
-('Cierre Semanal — Q&A IA',                 '11111111-0001-0001-0001-000000000002', 5, 'afternoon_2', '16:30', 60, 'https://meet.google.com/implementa-vie-t2')
+('Mentoría IA Aplicada',          '11111111-0001-0001-0001-000000000001', 5, 'morning_1',   '10:00', 60, NULL),
+('Workshop de Automatización IA', '11111111-0001-0001-0001-000000000002', 5, 'morning_2',   '11:30', 60, NULL),
+('Estrategia IA para tu negocio', '11111111-0001-0001-0001-000000000001', 5, 'afternoon_1', '14:00', 60, NULL),
+('Clínica de Implementación IA',  '11111111-0001-0001-0001-000000000002', 5, 'afternoon_2', '15:30', 60, NULL)
 ON CONFLICT DO NOTHING;

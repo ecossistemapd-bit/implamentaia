@@ -100,15 +100,21 @@ function SolutionsList() {
   ];
 
   return (
-    <div className="mx-auto max-w-[1100px] px-6 py-10">
-      <header>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">Soluciones</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+    <div className="mx-auto max-w-[1340px] px-8 py-8">
+      <header className="mb-8">
+        <span className="app-pill-violet inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium">
+          <LayoutGrid className="h-3 w-3" />
+          <span className="tabular-nums">{data?.length ?? 93}</span> soluciones disponibles
+        </span>
+        <h1 className="mt-4 text-[44px] font-bold leading-[1.05] tracking-[-0.02em] text-foreground">
+          Soluciones
+        </h1>
+        <p className="mt-3 max-w-[640px] text-[16px] leading-relaxed text-muted-foreground">
           Implementaciones reales y listas para tu empresa.
         </p>
       </header>
 
-      <div className="sticky top-0 z-10 mt-4 space-y-3 bg-background/85 py-3 backdrop-blur">
+      <div className="sticky top-0 z-10 space-y-3 bg-background/60 py-3 backdrop-blur-xl">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -575,14 +581,7 @@ function FilterChip({
   small?: boolean;
 }) {
   return (
-    <button
-      onClick={onClick}
-      className={`h-8 rounded-full border px-3.5 text-xs transition-all duration-200 ${
-        active
-          ? "border-primary bg-primary font-semibold text-primary-foreground"
-          : "border-border bg-secondary font-medium text-muted-foreground hover:text-foreground"
-      }`}
-    >
+    <button onClick={onClick} className={active ? "app-chip-active" : "app-chip"}>
       {children}
     </button>
   );
