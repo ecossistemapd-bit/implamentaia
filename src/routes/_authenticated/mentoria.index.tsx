@@ -61,7 +61,7 @@ interface MentoriaBooking {
 // ── Calendario — constantes ────────────────────────────────────
 const DAY_LABELS  = ["LUN", "MAR", "MIÉ", "JUE", "VIE"];
 const GRID_START  = 9;    // 09:00
-const GRID_END    = 18;   // 18:00 (la última sesión termina 17:30)
+const GRID_END    = 17;   // 17:00 (última sesión termina 16:30)
 const PX_PER_HOUR = 72;   // altura en px por hora
 const TOTAL_H     = (GRID_END - GRID_START) * PX_PER_HOUR; // 648px
 const HOURS       = Array.from({ length: GRID_END - GRID_START + 1 }, (_, i) => GRID_START + i);
