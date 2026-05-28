@@ -214,84 +214,98 @@ function HeroRutaIA({
   nextInRoute: Array<{ id: string; title: string; short_description: string }>;
 }) {
   return (
-    <div className="app-card col-span-12 p-7 lg:col-span-8">
-      <div>
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="app-pill-violet rounded px-2 py-0.5 text-[10px] font-bold tracking-[0.10em]">
-            RUTA IA PERSONALIZADA
-          </span>
-          <span className="text-[12px] text-muted-foreground/70">Generada por Nina · hace unos minutos</span>
-        </div>
-        <h2 className="text-[26px] font-bold leading-tight text-foreground">
-          Para tu empresa, te recomendamos arrancar por{" "}
-          <span className="text-foreground">{recommended?.title ?? "CRM Inteligente con IA"}</span>
-        </h2>
-        <p className="mt-3 max-w-[640px] text-[14px] leading-relaxed text-muted-foreground">
-          El <span className="font-semibold text-foreground">78%</span> de empresas como la tuya (B2B, equipo
-          &lt;20) implementa esta solución en el primer mes. Tu match:{" "}
-          <span className="font-semibold text-foreground">94%</span>. ROI estimado en 30 días:{" "}
-          <span className="font-semibold text-foreground">USD 4.200/mes</span> ahorrando ~32h de trabajo
-          manual.
+    <div className="app-card col-span-12 flex flex-col lg:col-span-8" style={{ padding: "32px 36px" }}>
+      {/* ETIQUETA limpia, sin meta duplicado */}
+      <span className="app-pill-violet self-start rounded-full px-3 py-1 text-[10px] font-semibold tracking-[0.12em] uppercase">
+        Ruta IA · Personalizada por Luna
+      </span>
+
+      {/* TÍTULO con jerarquía: kicker chico + nombre de la solución protagonista */}
+      <div className="mt-5">
+        <p className="text-[13px] font-medium tracking-wide text-muted-foreground">
+          Tu próxima implementación
         </p>
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          {recommended ? (
-            <Link
-              to="/solutions/$id"
-              params={{ id: recommended.id }}
-              className="app-cta-primary"
-            >
-              <Play className="h-4 w-4 fill-current" /> Comenzar ahora
-            </Link>
-          ) : (
-            <Link
-              to="/solutions"
-              className="app-cta-primary"
-            >
-              <Play className="h-4 w-4 fill-current" /> Explorar soluciones
-            </Link>
-          )}
-          <Link
-            to="/builder"
-            className="app-cta-ghost"
-          >
-            <RefreshCw className="h-4 w-4" /> Regenerar ruta
+        <h2 className="mt-1.5 text-[34px] font-bold leading-[1.1] tracking-[-0.015em] text-foreground">
+          {recommended?.title ?? "CRM Inteligente con IA"}
+        </h2>
+      </div>
+
+      {/* STATS como chips visuales separados */}
+      <div className="mt-6 flex flex-wrap gap-2.5">
+        <div className="app-hero-stat">
+          <div className="app-hero-stat-num">
+            94<span className="text-[16px] opacity-70">%</span>
+          </div>
+          <div className="app-hero-stat-label">Match con tu perfil</div>
+        </div>
+        <div className="app-hero-stat">
+          <div className="app-hero-stat-num">
+            $4.200<span className="ml-1 text-[14px] opacity-70">/mes</span>
+          </div>
+          <div className="app-hero-stat-label">ROI estimado</div>
+        </div>
+        <div className="app-hero-stat">
+          <div className="app-hero-stat-num">
+            32<span className="text-[16px] opacity-70">h</span>
+          </div>
+          <div className="app-hero-stat-label">Ahorro por mes</div>
+        </div>
+      </div>
+
+      {/* CTAs limpios + meta info en línea aparte */}
+      <div className="mt-7 flex flex-wrap items-center gap-3">
+        {recommended ? (
+          <Link to="/solutions/$id" params={{ id: recommended.id }} className="app-cta-primary">
+            <Play className="h-4 w-4 fill-current" /> Comenzar ahora
           </Link>
-          <span className="text-[12px] text-muted-foreground/70">⏱ 45-60 min · Intermedio · 3 herramientas</span>
-        </div>
+        ) : (
+          <Link to="/solutions" className="app-cta-primary">
+            <Play className="h-4 w-4 fill-current" /> Explorar soluciones
+          </Link>
+        )}
+        <Link to="/builder" className="app-cta-ghost">
+          <RefreshCw className="h-4 w-4" /> Regenerar
+        </Link>
+      </div>
+      <div className="mt-3 text-[11px] tracking-wide text-muted-foreground/70">
+        45-60 min · Intermedio · 3 herramientas
+      </div>
 
-        {/* Hairline */}
-        <div className="my-5 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      {/* Hairline */}
+      <div className="my-7 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-        <div className="mb-3 text-[10px] font-semibold tracking-[0.15em] text-muted-foreground/70">
-          SIGUIENTES EN TU RUTA
+      {/* SIGUIENTES — header con CTA secundario "Ver todas →" */}
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-[10px] font-semibold tracking-[0.16em] uppercase text-muted-foreground/70">
+          Sigue tu ruta
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {nextInRoute.length > 0 ? (
-            nextInRoute.map((s, idx) => (
-              <Link
-                key={s.id}
-                to="/solutions/$id"
-                params={{ id: s.id }}
-                className="app-mini-step flex items-center gap-3 p-3"
-              >
-                <StepNum muted>{String(idx + 2).padStart(2, "0")}</StepNum>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-[13px] font-medium text-foreground">{s.title}</div>
-                  <div className="truncate text-[11px] text-muted-foreground/70">
-                    {s.short_description?.slice(0, 60) ?? ""}
-                  </div>
-                </div>
-                <span className="text-[11px] font-medium tabular-nums" style={{ color: "#A78BFA" }}>
-                  {idx === 0 ? "87%" : "82%"}
-                </span>
-              </Link>
-            ))
-          ) : (
-            <div className="col-span-2 rounded-xl border border-dashed border-border p-4 text-center text-[12px] text-muted-foreground/70">
-              Tu ruta se completa a medida que avanzás.
-            </div>
-          )}
-        </div>
+        <Link to="/solutions" className="text-[11px] tracking-wide text-muted-foreground/70 transition-colors hover:text-foreground">
+          Ver todas →
+        </Link>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {nextInRoute.length > 0 ? (
+          nextInRoute.map((s, idx) => (
+            <Link
+              key={s.id}
+              to="/solutions/$id"
+              params={{ id: s.id }}
+              className="app-mini-step flex items-center gap-3 p-3"
+            >
+              <StepNum muted>{String(idx + 2).padStart(2, "0")}</StepNum>
+              <div className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground">
+                {s.title}
+              </div>
+              <span className="text-[11px] font-semibold tabular-nums" style={{ color: "var(--violet-text)" }}>
+                {idx === 0 ? "87%" : "82%"}
+              </span>
+            </Link>
+          ))
+        ) : (
+          <div className="col-span-2 rounded-xl border border-dashed border-border p-4 text-center text-[12px] text-muted-foreground/70">
+            Tu ruta se completa a medida que avanzás.
+          </div>
+        )}
       </div>
     </div>
   );
