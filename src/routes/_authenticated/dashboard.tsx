@@ -74,6 +74,68 @@ function Dashboard() {
       const inProgressCount = Object.values(stepsBySol).filter((s) => s.size > 0 && s.size < 5).length;
       const activeProjects = (projects.data ?? []).filter((p) => p.status !== "completed").length;
 
+      // ── ACTIVE IMPLEMENTATIONS (lista, no sólo count) ───────────────────
+      // Soluciones con 1-4 steps completados, enriquecidas con última actividad.
+      const stepDates = stepRows
+        .filter((s) => s.completed && s.completed_at)
+        .map((s) => ({ solution_id: s.solution_id, ts: new Date(s.completed_at!).getTime() }));
+
+      const lastActivityBySol: Record<string, number> = {};
+      stepDates.forEach((s) => {
+        lastActivityBySol[s.solution_id] = Math.max(
+          lastActivityBySol[s.solution_id] ?? 0,
+          s.ts,
+        );
+      });
+
+      const inProgressSolutions = Object.entries(stepsBySol)
+        .filter(([, set]) => set.size > 0 && set.size < 5)
+        .map(([solId, set]) => {
+          const sol = solsList.find((s) => s.id === solId);
+          if (!sol) return null;
+          return {
+            id: sol.id,
+            title: sol.title,
+            slug: sol.slug,
+            completedSteps: set.size,
+            totalSteps: 5,
+            progressPct: (set.size / 5) * 100,
+            lastActivity: lastActivityBySol[solId] ?? Date.now(),
+          };
+        })
+        .filter((x): x is NonNullable<typeof x> => x !== null)
+        .sort((a, b) => b.lastActivity - a.lastActivity)
+        .slice(0, 3);
+
+      // ── IMPACT (esta semana + acumulado total) ──────────────────────────
+      // Heurística simple por ahora: cada step = 2.5h + $350 ahorrado.
+      // Cada solución 5/5 completada = +12h/$1800 mensuales ongoing.
+      // TODO: cuando solutions tenga campos `time_saved_hours_per_step` y
+      // `dollar_value_per_step` reales, usar esos.
+      const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const stepsThisWeek = stepDates.filter((s) => s.ts >= weekAgo).length;
+      const totalStepsCompleted = stepDates.length;
+
+      const HOURS_PER_STEP = 2.5;
+      const DOLLARS_PER_STEP = 350;
+      const HOURS_PER_COMPLETED_MONTHLY = 12;
+      const DOLLARS_PER_COMPLETED_MONTHLY = 1800;
+
+      const weekImpact = {
+        stepsThisWeek,
+        hoursThisWeek: stepsThisWeek * HOURS_PER_STEP,
+        dollarsThisWeek: stepsThisWeek * DOLLARS_PER_STEP,
+      };
+      const lifetimeImpact = {
+        stepsTotal: totalStepsCompleted,
+        hoursLifetime:
+          totalStepsCompleted * HOURS_PER_STEP +
+          completed * HOURS_PER_COMPLETED_MONTHLY,
+        dollarsLifetime:
+          totalStepsCompleted * DOLLARS_PER_STEP +
+          completed * DOLLARS_PER_COMPLETED_MONTHLY,
+      };
+
       // Solución recomendada para el hero "Ruta IA":
       // primero busca CRM por slug; si no hay progreso, sino primer featured no iniciada.
       const startedIds = new Set(Object.keys(stepsBySol).filter((id) => (stepsBySol[id]?.size ?? 0) > 0));
@@ -100,6 +162,9 @@ function Dashboard() {
         nextInRoute,
         newest,
         totalSolutions,
+        inProgressSolutions,
+        weekImpact,
+        lifetimeImpact,
       };
     },
   });
@@ -120,16 +185,7 @@ function Dashboard() {
     ? Math.max(1, Math.floor((Date.now() - memberSince.getTime()) / (1000 * 60 * 60 * 24)) + 1)
     : 1;
 
-  // Nivel basado en soluciones completadas (heurística simple)
   const completed = data?.completed ?? 0;
-  const level =
-    completed >= 10 ? { name: "Experto", next: "Maestro", curr: completed * 30, ceil: 1000, pct: 80 } :
-    completed >= 3  ? { name: "Especialista", next: "Experto", curr: 380 + (completed - 3) * 50, ceil: 800, pct: 50 } :
-                      { name: "Aprendiz", next: "Especialista", curr: 120 + completed * 60, ceil: 380, pct: Math.min(100, (120 + completed * 60) / 380 * 100) };
-
-  // Estimaciones aspirational (TODO: leer de solution.development_time_minutes / platform_investment)
-  const horasIA = Math.max(8, completed * 12 + (data?.inProgressCount ?? 0) * 4);
-  const roi = Math.max(1200, completed * 1500 + (data?.inProgressCount ?? 0) * 800);
 
   return (
     <>
@@ -155,41 +211,19 @@ function Dashboard() {
           <NextMentoria />
         </section>
 
-        {/* KPIs */}
-        <section className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-          <KpiCard
-            label="TU PROGRESO"
-            value={completed}
-            suffix={`/${data?.totalSolutions ?? 93}`}
-            sub="soluciones completadas"
-            progressPct={Math.min(100, (completed / (data?.totalSolutions ?? 93)) * 100)}
-            footer={`Meta: 3 soluciones en 30 días`}
+        {/* IMPLEMENTACIONES ACTIVAS — reemplaza los 4 KPIs genéricos */}
+        <ActiveImplementations
+          items={data?.inProgressSolutions ?? []}
+          completed={completed}
+        />
+
+        {/* IMPACTO REAL — sólo aparece si hay actividad (≥1 step completado alguna vez) */}
+        {(data?.lifetimeImpact?.stepsTotal ?? 0) > 0 && (
+          <ImpactHero
+            week={data!.weekImpact}
+            lifetime={data!.lifetimeImpact}
           />
-          <KpiCard
-            label="TU NIVEL"
-            value={level.curr}
-            suffix="XP"
-            sub={`Siguiente: ${level.next} (${level.ceil} XP)`}
-            progressPct={level.pct}
-            footer={`Top 32% de implementadores`}
-            badge={level.name.toUpperCase()}
-          />
-          <KpiCard
-            label="HORAS IA / MES"
-            value={horasIA}
-            suffix="h"
-            sub="estimadas con tu ruta"
-            sparkline
-          />
-          <KpiCard
-            label="ROI ESTIMADO"
-            value={roi.toLocaleString("es-AR")}
-            prefix="USD"
-            suffix="/mes"
-            sub="si implementás tu ruta"
-            sparkline
-          />
-        </section>
+        )}
 
         {/* TU JOURNEY */}
         <TuJourney recommended={data?.recommended ?? null} />
@@ -369,7 +403,181 @@ function NextMentoria() {
 }
 
 // =============================================================================
-// KPI Card
+// Active Implementations — reemplaza los 4 KPIs genéricos.
+// Si hay 0 en curso: empty state CTA. Si hay 1+: cards con progreso real.
+// =============================================================================
+function ActiveImplementations({
+  items,
+  completed,
+}: {
+  items: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    completedSteps: number;
+    totalSteps: number;
+    progressPct: number;
+    lastActivity: number;
+  }>;
+  completed: number;
+}) {
+  // ── Empty state: el user todavía no arrancó ninguna ─────────
+  if (items.length === 0) {
+    return (
+      <section className="mt-6">
+        <div className="app-card flex flex-col items-start justify-between gap-5 p-7 sm:flex-row sm:items-center">
+          <div className="flex-1">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/70">
+              Implementaciones activas
+            </div>
+            <h3 className="mt-2 text-[20px] font-semibold leading-tight text-foreground">
+              {completed > 0
+                ? `Llevás ${completed} implementada${completed > 1 ? "s" : ""} · ¿arrancamos otra?`
+                : "Todavía no arrancaste una implementación"}
+            </h3>
+            <p className="mt-2 max-w-[520px] text-[14px] leading-relaxed text-muted-foreground">
+              Cuando arranques una solución, vas a ver acá el progreso en tiempo real, la última actividad y los próximos pasos.
+            </p>
+          </div>
+          <Link to="/solutions" className="app-cta-primary shrink-0">
+            Ver soluciones <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  // ── Estado activo: hasta 3 implementaciones en curso ─────────
+  return (
+    <section className="mt-6">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/70">
+          Implementaciones activas
+        </div>
+        <span className="text-[11px] text-muted-foreground/70 tabular-nums">
+          {items.length} en curso
+          {completed > 0
+            ? ` · ${completed} completada${completed > 1 ? "s" : ""}`
+            : ""}
+        </span>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((item) => (
+          <Link
+            key={item.id}
+            to="/solutions/$id"
+            params={{ id: item.id }}
+            className="app-card block p-5"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <h4 className="line-clamp-2 text-[15px] font-semibold leading-snug text-foreground">
+                {item.title}
+              </h4>
+              <span
+                className="shrink-0 text-[11px] font-semibold tabular-nums"
+                style={{ color: "var(--violet-text)" }}
+              >
+                {item.completedSteps}/{item.totalSteps}
+              </span>
+            </div>
+            <div className="app-progress-track mt-4" style={{ height: 4 }}>
+              <div
+                className="app-progress-fill"
+                style={{ width: `${item.progressPct}%` }}
+              />
+            </div>
+            <div className="mt-3 flex items-center justify-between text-[12px]">
+              <span className="text-muted-foreground/70">
+                {relativeShort(new Date(item.lastActivity).toISOString())}
+              </span>
+              <span
+                className="font-medium"
+                style={{ color: "var(--violet-text)" }}
+              >
+                Continuar →
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// =============================================================================
+// Impact Hero — métrica REAL (no aspiracional).
+// Sólo aparece cuando el user tiene actividad (≥1 step completado lifetime).
+// =============================================================================
+function ImpactHero({
+  week,
+  lifetime,
+}: {
+  week: {
+    stepsThisWeek: number;
+    hoursThisWeek: number;
+    dollarsThisWeek: number;
+  };
+  lifetime: {
+    stepsTotal: number;
+    hoursLifetime: number;
+    dollarsLifetime: number;
+  };
+}) {
+  return (
+    <section className="mt-6">
+      <div className="app-card flex flex-col gap-6 p-7 md:flex-row md:items-center md:gap-8">
+        {/* IZQUIERDA — métrica grande de la semana */}
+        <div className="flex-1">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/70">
+            Tu impacto esta semana
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span
+              className="text-[48px] font-bold leading-none tracking-[-0.02em] tabular-nums"
+              style={{ color: "var(--violet-text-strong)" }}
+            >
+              {Math.round(week.hoursThisWeek)}
+              <span className="text-[24px] opacity-70">h</span>
+            </span>
+            <span className="text-[15px] text-muted-foreground">
+              ahorradas con IA
+            </span>
+          </div>
+          <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
+            Equivale a{" "}
+            <strong className="text-foreground tabular-nums">
+              USD {week.dollarsThisWeek.toLocaleString("es-AR")}
+            </strong>{" "}
+            en eficiencia ·{" "}
+            <span className="tabular-nums">{week.stepsThisWeek}</span>{" "}
+            {week.stepsThisWeek === 1 ? "paso completado" : "pasos completados"}
+          </p>
+        </div>
+
+        {/* DIVISOR vertical en desktop, horizontal en mobile */}
+        <div className="hidden h-16 w-px self-center bg-border md:block" />
+        <div className="block h-px w-full bg-border md:hidden" />
+
+        {/* DERECHA — acumulado total */}
+        <div className="flex-none md:min-w-[200px]">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">
+            Acumulado total
+          </div>
+          <div className="mt-2 text-[24px] font-bold leading-none tabular-nums text-foreground">
+            {lifetime.hoursLifetime}
+            <span className="text-[14px] font-normal text-muted-foreground/70">h</span>
+          </div>
+          <div className="mt-1.5 text-[13px] tabular-nums text-muted-foreground">
+            USD {lifetime.dollarsLifetime.toLocaleString("es-AR")}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// =============================================================================
+// KPI Card (legacy — ya no se usa en el dashboard, mantenido por si reaparece)
 // =============================================================================
 function KpiCard({
   label, value, prefix, suffix, sub, progressPct, footer, badge, sparkline,
