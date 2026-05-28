@@ -114,7 +114,10 @@ function SolutionsList() {
         </p>
       </header>
 
-      <div className="sticky top-0 z-10 space-y-3 bg-background/60 py-3 backdrop-blur-xl">
+      <div
+        className="sticky top-0 z-10 space-y-3 py-4 backdrop-blur-2xl"
+        style={{ background: "linear-gradient(to bottom, var(--background) 55%, transparent)" }}
+      >
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
