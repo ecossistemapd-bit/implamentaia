@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, Pencil, GraduationCap, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPanel,
@@ -61,7 +61,31 @@ function AdminPanel() {
       <h1 className="text-2xl font-bold tracking-tight">Panel de Administración</h1>
       <p className="mt-1 text-sm text-gray-500">Gestión de usuarios y proyectos de Implementa AI.</p>
 
-      <div className="mt-6 flex gap-1 rounded-lg border border-gray-200 bg-white p-1 text-xs w-fit">
+      {/* Atajos a secciones aparte (rutas dedicadas, no inline) */}
+      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Link
+          to="/admin/cursos"
+          className="app-card group flex items-center gap-4 p-4 text-left"
+        >
+          <span
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg"
+            style={{ background: "var(--violet-pill-bg)", color: "var(--violet-text)" }}
+          >
+            <GraduationCap className="h-5 w-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[14px] font-semibold text-foreground">
+              Cursos
+            </span>
+            <span className="block text-[12px] text-muted-foreground">
+              Crear, editar y cargar contenido de Capacitación
+            </span>
+          </span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+        </Link>
+      </div>
+
+      <div className="mt-8 flex gap-1 rounded-lg border border-gray-200 bg-white p-1 text-xs w-fit">
         {([
           ["users", "Usuarios"],
           ["projects", "Proyectos"],
