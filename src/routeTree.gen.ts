@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CursosCourseIdRouteImport } from './routes/cursos.$courseId'
 import { Route as ContratarConfirmacionRouteImport } from './routes/contratar.confirmacion'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
@@ -28,7 +27,11 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as SolutionsIdContratarRouteImport } from './routes/solutions.$id.contratar'
 import { Route as AuthenticatedSolutionsSlugRouteImport } from './routes/_authenticated/solutions.$slug'
 import { Route as AuthenticatedSolutionsIdRouteImport } from './routes/_authenticated/solutions.$id'
+import { Route as AuthenticatedCursosCourseIdRouteImport } from './routes/_authenticated/cursos.$courseId'
+import { Route as AuthenticatedAdminCursosIndexRouteImport } from './routes/_authenticated/admin.cursos.index'
 import { Route as AuthenticatedImplementadorProyectoProjectIdRouteImport } from './routes/_authenticated/implementador.proyecto.$projectId'
+import { Route as AuthenticatedAdminCursosCourseIdRouteImport } from './routes/_authenticated/admin.cursos.$courseId'
+import { Route as AuthenticatedCursosCourseIdLeccionLessonIdRouteImport } from './routes/_authenticated/cursos.$courseId.leccion.$lessonId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -42,11 +45,6 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CursosCourseIdRoute = CursosCourseIdRouteImport.update({
-  id: '/cursos/$courseId',
-  path: '/cursos/$courseId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContratarConfirmacionRoute = ContratarConfirmacionRouteImport.update({
@@ -132,6 +130,16 @@ const AuthenticatedSolutionsIdRoute =
     path: '/solutions/$id',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedCursosCourseIdRoute =
+  AuthenticatedCursosCourseIdRouteImport.update({
+    id: '/cursos/$courseId',
+    path: '/cursos/$courseId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminCursosIndexRoute =
+  AuthenticatedAdminCursosIndexRouteImport.update({
+    id: '/admin/cursos/',
+    path: '/admin/cursos/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedImplementadorProyectoProjectIdRoute =
@@ -139,6 +147,18 @@ const AuthenticatedImplementadorProyectoProjectIdRoute =
     id: '/implementador/proyecto/$projectId',
     path: '/implementador/proyecto/$projectId',
     getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminCursosCourseIdRoute =
+  AuthenticatedAdminCursosCourseIdRouteImport.update({
+    id: '/admin/cursos/$courseId',
+    path: '/admin/cursos/$courseId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCursosCourseIdLeccionLessonIdRoute =
+  AuthenticatedCursosCourseIdLeccionLessonIdRouteImport.update({
+    id: '/leccion/$lessonId',
+    path: '/leccion/$lessonId',
+    getParentRoute: () => AuthenticatedCursosCourseIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -150,7 +170,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
-  '/cursos/$courseId': typeof CursosCourseIdRoute
+  '/cursos/$courseId': typeof AuthenticatedCursosCourseIdRouteWithChildren
   '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
@@ -160,7 +180,10 @@ export interface FileRoutesByFullPath {
   '/implementador/': typeof AuthenticatedImplementadorIndexRoute
   '/mentoria/': typeof AuthenticatedMentoriaIndexRoute
   '/solutions/': typeof AuthenticatedSolutionsIndexRoute
+  '/admin/cursos/$courseId': typeof AuthenticatedAdminCursosCourseIdRoute
   '/implementador/proyecto/$projectId': typeof AuthenticatedImplementadorProyectoProjectIdRoute
+  '/admin/cursos/': typeof AuthenticatedAdminCursosIndexRoute
+  '/cursos/$courseId/leccion/$lessonId': typeof AuthenticatedCursosCourseIdLeccionLessonIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -171,7 +194,7 @@ export interface FileRoutesByTo {
   '/projects': typeof AuthenticatedProjectsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
-  '/cursos/$courseId': typeof CursosCourseIdRoute
+  '/cursos/$courseId': typeof AuthenticatedCursosCourseIdRouteWithChildren
   '/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
@@ -181,7 +204,10 @@ export interface FileRoutesByTo {
   '/implementador': typeof AuthenticatedImplementadorIndexRoute
   '/mentoria': typeof AuthenticatedMentoriaIndexRoute
   '/solutions': typeof AuthenticatedSolutionsIndexRoute
+  '/admin/cursos/$courseId': typeof AuthenticatedAdminCursosCourseIdRoute
   '/implementador/proyecto/$projectId': typeof AuthenticatedImplementadorProyectoProjectIdRoute
+  '/admin/cursos': typeof AuthenticatedAdminCursosIndexRoute
+  '/cursos/$courseId/leccion/$lessonId': typeof AuthenticatedCursosCourseIdLeccionLessonIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -194,7 +220,7 @@ export interface FileRoutesById {
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/contratar/confirmacion': typeof ContratarConfirmacionRoute
-  '/cursos/$courseId': typeof CursosCourseIdRoute
+  '/_authenticated/cursos/$courseId': typeof AuthenticatedCursosCourseIdRouteWithChildren
   '/_authenticated/solutions/$id': typeof AuthenticatedSolutionsIdRoute
   '/_authenticated/solutions/$slug': typeof AuthenticatedSolutionsSlugRoute
   '/solutions/$id/contratar': typeof SolutionsIdContratarRoute
@@ -204,7 +230,10 @@ export interface FileRoutesById {
   '/_authenticated/implementador/': typeof AuthenticatedImplementadorIndexRoute
   '/_authenticated/mentoria/': typeof AuthenticatedMentoriaIndexRoute
   '/_authenticated/solutions/': typeof AuthenticatedSolutionsIndexRoute
+  '/_authenticated/admin/cursos/$courseId': typeof AuthenticatedAdminCursosCourseIdRoute
   '/_authenticated/implementador/proyecto/$projectId': typeof AuthenticatedImplementadorProyectoProjectIdRoute
+  '/_authenticated/admin/cursos/': typeof AuthenticatedAdminCursosIndexRoute
+  '/_authenticated/cursos/$courseId/leccion/$lessonId': typeof AuthenticatedCursosCourseIdLeccionLessonIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -227,7 +256,10 @@ export interface FileRouteTypes {
     | '/implementador/'
     | '/mentoria/'
     | '/solutions/'
+    | '/admin/cursos/$courseId'
     | '/implementador/proyecto/$projectId'
+    | '/admin/cursos/'
+    | '/cursos/$courseId/leccion/$lessonId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -248,7 +280,10 @@ export interface FileRouteTypes {
     | '/implementador'
     | '/mentoria'
     | '/solutions'
+    | '/admin/cursos/$courseId'
     | '/implementador/proyecto/$projectId'
+    | '/admin/cursos'
+    | '/cursos/$courseId/leccion/$lessonId'
   id:
     | '__root__'
     | '/'
@@ -260,7 +295,7 @@ export interface FileRouteTypes {
     | '/_authenticated/projects'
     | '/_authenticated/settings'
     | '/contratar/confirmacion'
-    | '/cursos/$courseId'
+    | '/_authenticated/cursos/$courseId'
     | '/_authenticated/solutions/$id'
     | '/_authenticated/solutions/$slug'
     | '/solutions/$id/contratar'
@@ -270,7 +305,10 @@ export interface FileRouteTypes {
     | '/_authenticated/implementador/'
     | '/_authenticated/mentoria/'
     | '/_authenticated/solutions/'
+    | '/_authenticated/admin/cursos/$courseId'
     | '/_authenticated/implementador/proyecto/$projectId'
+    | '/_authenticated/admin/cursos/'
+    | '/_authenticated/cursos/$courseId/leccion/$lessonId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -278,7 +316,6 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   ContratarConfirmacionRoute: typeof ContratarConfirmacionRoute
-  CursosCourseIdRoute: typeof CursosCourseIdRoute
   SolutionsIdContratarRoute: typeof SolutionsIdContratarRoute
 }
 
@@ -303,13 +340,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cursos/$courseId': {
-      id: '/cursos/$courseId'
-      path: '/cursos/$courseId'
-      fullPath: '/cursos/$courseId'
-      preLoaderRoute: typeof CursosCourseIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contratar/confirmacion': {
@@ -417,6 +447,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSolutionsIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/cursos/$courseId': {
+      id: '/_authenticated/cursos/$courseId'
+      path: '/cursos/$courseId'
+      fullPath: '/cursos/$courseId'
+      preLoaderRoute: typeof AuthenticatedCursosCourseIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/cursos/': {
+      id: '/_authenticated/admin/cursos/'
+      path: '/admin/cursos'
+      fullPath: '/admin/cursos/'
+      preLoaderRoute: typeof AuthenticatedAdminCursosIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/implementador/proyecto/$projectId': {
       id: '/_authenticated/implementador/proyecto/$projectId'
       path: '/implementador/proyecto/$projectId'
@@ -424,8 +468,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedImplementadorProyectoProjectIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/cursos/$courseId': {
+      id: '/_authenticated/admin/cursos/$courseId'
+      path: '/admin/cursos/$courseId'
+      fullPath: '/admin/cursos/$courseId'
+      preLoaderRoute: typeof AuthenticatedAdminCursosCourseIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/cursos/$courseId/leccion/$lessonId': {
+      id: '/_authenticated/cursos/$courseId/leccion/$lessonId'
+      path: '/leccion/$lessonId'
+      fullPath: '/cursos/$courseId/leccion/$lessonId'
+      preLoaderRoute: typeof AuthenticatedCursosCourseIdLeccionLessonIdRouteImport
+      parentRoute: typeof AuthenticatedCursosCourseIdRoute
+    }
   }
 }
+
+interface AuthenticatedCursosCourseIdRouteChildren {
+  AuthenticatedCursosCourseIdLeccionLessonIdRoute: typeof AuthenticatedCursosCourseIdLeccionLessonIdRoute
+}
+
+const AuthenticatedCursosCourseIdRouteChildren: AuthenticatedCursosCourseIdRouteChildren =
+  {
+    AuthenticatedCursosCourseIdLeccionLessonIdRoute:
+      AuthenticatedCursosCourseIdLeccionLessonIdRoute,
+  }
+
+const AuthenticatedCursosCourseIdRouteWithChildren =
+  AuthenticatedCursosCourseIdRoute._addFileChildren(
+    AuthenticatedCursosCourseIdRouteChildren,
+  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedContratarExpertoRoute: typeof AuthenticatedContratarExpertoRoute
@@ -433,6 +506,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMiProgresoRoute: typeof AuthenticatedMiProgresoRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedCursosCourseIdRoute: typeof AuthenticatedCursosCourseIdRouteWithChildren
   AuthenticatedSolutionsIdRoute: typeof AuthenticatedSolutionsIdRoute
   AuthenticatedSolutionsSlugRoute: typeof AuthenticatedSolutionsSlugRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -441,7 +515,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedImplementadorIndexRoute: typeof AuthenticatedImplementadorIndexRoute
   AuthenticatedMentoriaIndexRoute: typeof AuthenticatedMentoriaIndexRoute
   AuthenticatedSolutionsIndexRoute: typeof AuthenticatedSolutionsIndexRoute
+  AuthenticatedAdminCursosCourseIdRoute: typeof AuthenticatedAdminCursosCourseIdRoute
   AuthenticatedImplementadorProyectoProjectIdRoute: typeof AuthenticatedImplementadorProyectoProjectIdRoute
+  AuthenticatedAdminCursosIndexRoute: typeof AuthenticatedAdminCursosIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -450,6 +526,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMiProgresoRoute: AuthenticatedMiProgresoRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedCursosCourseIdRoute:
+    AuthenticatedCursosCourseIdRouteWithChildren,
   AuthenticatedSolutionsIdRoute: AuthenticatedSolutionsIdRoute,
   AuthenticatedSolutionsSlugRoute: AuthenticatedSolutionsSlugRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
@@ -458,8 +536,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedImplementadorIndexRoute: AuthenticatedImplementadorIndexRoute,
   AuthenticatedMentoriaIndexRoute: AuthenticatedMentoriaIndexRoute,
   AuthenticatedSolutionsIndexRoute: AuthenticatedSolutionsIndexRoute,
+  AuthenticatedAdminCursosCourseIdRoute: AuthenticatedAdminCursosCourseIdRoute,
   AuthenticatedImplementadorProyectoProjectIdRoute:
     AuthenticatedImplementadorProyectoProjectIdRoute,
+  AuthenticatedAdminCursosIndexRoute: AuthenticatedAdminCursosIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -471,19 +551,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   ContratarConfirmacionRoute: ContratarConfirmacionRoute,
-  CursosCourseIdRoute: CursosCourseIdRoute,
   SolutionsIdContratarRoute: SolutionsIdContratarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
