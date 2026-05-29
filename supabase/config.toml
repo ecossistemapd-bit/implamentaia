@@ -1,1 +1,4 @@
 project_id = "joswqctaezhifuionful"
+
+[functions.luna-chat]
+verify_jwt = true
