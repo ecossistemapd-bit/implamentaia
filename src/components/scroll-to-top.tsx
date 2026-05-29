@@ -31,9 +31,19 @@ export function ScrollToTop() {
       onClick={handleClick}
       title={label}
       aria-label={label}
-      className="group fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all duration-300 hover:scale-110 hover:opacity-90 animate-in fade-in"
+      className="group fixed right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:scale-110 animate-in fade-in"
+      style={{
+        // Posición: arriba del FAB de Luna (que está en right-6 bottom-6 y mide ~64px alto).
+        // Alineado al mismo right edge que Luna (right-6 = 24px).
+        // 24 + 64 + 8 (gap) = 96 → bottom 96px.
+        bottom: "96px",
+        background: "var(--card)",
+        border: "1px solid var(--violet-border)",
+        color: "var(--foreground)",
+        boxShadow: "0 4px 12px -4px rgba(0,0,0,0.4)",
+      }}
     >
-      <Icon className="h-5 w-5" strokeWidth={2.25} />
+      <Icon className="h-4 w-4" strokeWidth={2.25} />
     </button>
   );
 }
