@@ -113,6 +113,7 @@ import { FEATURES } from "@/lib/features";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { LunaAssistant } from "@/components/luna-assistant";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -245,6 +246,7 @@ function AuthenticatedLayout() {
         </main>
       </div>
       <ScrollToTop />
+      <LunaAssistant />
     </div>
   );
 }
