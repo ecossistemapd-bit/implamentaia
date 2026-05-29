@@ -218,7 +218,21 @@ function AuthenticatedLayout() {
        * Theme-aware (alpha sube en light, baja en dark). Fixed → no scroll. */}
       <div className="app-violet-wash" aria-hidden />
 
-      <DesktopSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+      <DesktopSidebar collapsed={sidebarCollapsed} />
+
+      {/* Pestaña de toggle — fixed, sigue el borde de la sidebar sin heredar su fondo */}
+      <button
+        onClick={toggleSidebar}
+        title={sidebarCollapsed ? "Mostrar panel" : "Ocultar panel"}
+        style={{ left: sidebarCollapsed ? 0 : 220, transition: "left 300ms ease-in-out" }}
+        className="fixed top-1/2 z-50 hidden -translate-y-1/2 lg:flex h-14 w-[14px] items-center justify-center rounded-r-md border border-l-0 border-border bg-sidebar text-muted-foreground hover:text-foreground hover:bg-white/[0.08] transition-colors duration-200"
+      >
+        {sidebarCollapsed
+          ? <ChevronRight className="h-3 w-3" />
+          : <ChevronLeft className="h-3 w-3" />
+        }
+      </button>
+
       <div className="relative z-[1] flex min-w-0 flex-1 flex-col">
         <MobileTopBar />
         <main className="flex-1 animate-fade-in">
@@ -230,20 +244,15 @@ function AuthenticatedLayout() {
   );
 }
 
-function DesktopSidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+function DesktopSidebar({ collapsed }: { collapsed: boolean }) {
   return (
-    // Wrapper sticky que controla el ancho — la pestaña siempre protruye del borde derecho
+    // overflow-hidden clipea el contenido limpiamente al colapsar — sin sangrado de fondo
     <div
-      className={`relative hidden lg:block shrink-0 sticky top-0 h-screen z-20 transition-[width] duration-300 ease-in-out ${
+      className={`hidden lg:block shrink-0 sticky top-0 h-screen overflow-hidden transition-[width] duration-300 ease-in-out ${
         collapsed ? "w-0" : "w-[220px]"
       }`}
     >
-      {/* Sidebar content — se desvanece al colapsar */}
-      <aside
-        className={`absolute inset-0 flex flex-col border-r border-sidebar-border bg-sidebar overflow-hidden transition-opacity duration-300 ${
-          collapsed ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
-      >
+      <aside className="flex h-full w-[220px] flex-col border-r border-sidebar-border bg-sidebar">
         <div className="flex items-center justify-between px-5 py-5 shrink-0">
           <Logo />
           <ThemeToggle />
@@ -251,18 +260,6 @@ function DesktopSidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
         <NavList />
         <UserMenu />
       </aside>
-
-      {/* Pestaña de toggle — siempre visible en el borde derecho */}
-      <button
-        onClick={onToggle}
-        title={collapsed ? "Mostrar panel" : "Ocultar panel"}
-        className="absolute right-0 top-1/2 z-50 -translate-y-1/2 translate-x-full flex h-14 w-[14px] items-center justify-center rounded-r-md border border-l-0 border-border bg-sidebar text-muted-foreground transition-colors duration-200 hover:text-foreground hover:bg-white/[0.08]"
-      >
-        {collapsed
-          ? <ChevronRight className="h-3 w-3" />
-          : <ChevronLeft className="h-3 w-3" />
-        }
-      </button>
     </div>
   );
 }
