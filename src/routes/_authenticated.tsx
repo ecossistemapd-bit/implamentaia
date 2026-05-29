@@ -14,9 +14,8 @@ import {
   LogOut,
   Menu,
   ChevronRight,
+  ChevronLeft,
   HeartHandshake,
-  PanelLeftClose,
-  PanelLeftOpen,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------
@@ -233,45 +232,38 @@ function AuthenticatedLayout() {
 
 function DesktopSidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   return (
-    <>
-      {/* Sidebar — se oculta completamente cuando collapsed */}
+    // Wrapper sticky que controla el ancho — la pestaña siempre protruye del borde derecho
+    <div
+      className={`relative hidden lg:block shrink-0 sticky top-0 h-screen transition-[width] duration-300 ease-in-out ${
+        collapsed ? "w-0" : "w-[220px]"
+      }`}
+    >
+      {/* Sidebar content — se desvanece al colapsar */}
       <aside
-        className={`sticky top-0 hidden h-screen shrink-0 border-r border-sidebar-border bg-sidebar lg:flex lg:flex-col overflow-hidden transition-[width,border-width] duration-300 ease-in-out ${
-          collapsed ? "w-0 border-r-0" : "w-[220px]"
+        className={`absolute inset-0 flex flex-col border-r border-sidebar-border bg-sidebar overflow-hidden transition-opacity duration-300 ${
+          collapsed ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
       >
-        {/* Header: logo + theme toggle */}
         <div className="flex items-center justify-between px-5 py-5 shrink-0">
           <Logo />
           <ThemeToggle />
         </div>
-
         <NavList />
         <UserMenu />
-
-        {/* Botón colapsar */}
-        <div className="border-t border-sidebar-border p-2 flex justify-end pr-3 shrink-0">
-          <button
-            onClick={onToggle}
-            title="Ocultar sidebar"
-            className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white/[0.08] hover:text-foreground"
-          >
-            <PanelLeftClose className="h-4 w-4" />
-          </button>
-        </div>
       </aside>
 
-      {/* Botón flotante para volver a abrir — solo visible cuando está oculta */}
-      {collapsed && (
-        <button
-          onClick={onToggle}
-          title="Mostrar sidebar"
-          className="fixed left-3 top-4 z-50 hidden lg:flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-sidebar text-muted-foreground shadow-md transition-all duration-200 hover:bg-white/[0.08] hover:text-foreground hover:shadow-lg"
-        >
-          <PanelLeftOpen className="h-4 w-4" />
-        </button>
-      )}
-    </>
+      {/* Pestaña de toggle — siempre visible en el borde derecho */}
+      <button
+        onClick={onToggle}
+        title={collapsed ? "Mostrar panel" : "Ocultar panel"}
+        className="absolute right-0 top-1/2 z-50 -translate-y-1/2 translate-x-full flex h-14 w-[14px] items-center justify-center rounded-r-md border border-l-0 border-border bg-sidebar text-muted-foreground transition-colors duration-200 hover:text-foreground hover:bg-white/[0.08]"
+      >
+        {collapsed
+          ? <ChevronRight className="h-3 w-3" />
+          : <ChevronLeft className="h-3 w-3" />
+        }
+      </button>
+    </div>
   );
 }
 
