@@ -234,7 +234,7 @@ function DesktopSidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
   return (
     // Wrapper sticky que controla el ancho — la pestaña siempre protruye del borde derecho
     <div
-      className={`relative hidden lg:block shrink-0 sticky top-0 h-screen transition-[width] duration-300 ease-in-out ${
+      className={`relative hidden lg:block shrink-0 sticky top-0 h-screen z-20 transition-[width] duration-300 ease-in-out ${
         collapsed ? "w-0" : "w-[220px]"
       }`}
     >
