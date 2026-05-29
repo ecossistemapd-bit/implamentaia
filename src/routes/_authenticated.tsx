@@ -231,7 +231,7 @@ function AuthenticatedLayout() {
         onClick={toggleSidebar}
         title={sidebarCollapsed ? "Mostrar panel" : "Ocultar panel"}
         style={{ left: sidebarCollapsed ? 54 : 220, transition: "left 300ms ease-in-out" }}
-        className="fixed top-1/2 z-50 hidden -translate-y-1/2 lg:flex h-14 w-[14px] items-center justify-center rounded-r-md border border-l-0 border-border bg-sidebar text-muted-foreground hover:text-foreground hover:bg-white/[0.08] transition-colors duration-200"
+        className="fixed top-1/2 z-50 hidden -translate-y-1/2 lg:flex h-14 w-[14px] items-center justify-center rounded-r-md border border-l-0 border-border bg-sidebar text-sidebar-foreground/55 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors duration-200"
       >
         {sidebarCollapsed
           ? <ChevronRight className="h-3 w-3" />
@@ -354,8 +354,8 @@ function NavList({ collapsed = false }: { collapsed?: boolean }) {
               title={item.label}
               className={`${item.navClass ?? ""} flex items-center justify-center mx-1.5 h-9 rounded-lg transition-colors duration-200 ${
                 active
-                  ? "bg-primary/[0.08] text-primary"
-                  : "text-muted-foreground hover:bg-white/[0.08] hover:text-foreground"
+                  ? "bg-sidebar-primary/[0.10] text-sidebar-primary"
+                  : "text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               }`}
             >
               <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} />
@@ -389,7 +389,7 @@ function NavList({ collapsed = false }: { collapsed?: boolean }) {
                   className={`${item.navClass ?? ""} group flex items-center gap-2.5 rounded-lg border-l-2 px-3 py-2 text-[13px] transition-colors duration-200 ${
                     active
                       ? "border-primary bg-primary/[0.08] font-medium text-foreground"
-                      : "border-transparent font-normal text-muted-foreground hover:bg-white/[0.08] hover:text-foreground"
+                      : "border-transparent font-normal text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
                   } ${locked ? "opacity-60" : ""}`}
                 >
                   <Icon
@@ -434,7 +434,7 @@ function UserMenu() {
     <div className="border-t border-sidebar-border px-3 py-3">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-white/[0.08]">
+          <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left transition hover:bg-sidebar-accent">
             <Avatar className="h-8 w-8">
               <AvatarImage src={(user?.user_metadata as { avatar_url?: string } | undefined)?.avatar_url} />
               <AvatarFallback className="bg-muted text-primary">{initial}</AvatarFallback>
