@@ -167,15 +167,17 @@ function SolutionsList() {
                 inDev ? "opacity-70" : ""
               }`}
             >
-              <div className="relative aspect-video w-full overflow-hidden">
+              {/* Fondo siempre oscuro: las imágenes orb son negras y deben
+                  mostrarse sobre oscuro en cualquier tema (dark header + light body). */}
+              <div className="relative aspect-video w-full overflow-hidden bg-[#0a0910]">
                 <div className="absolute right-3 top-3 z-10">
                   {isDone && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground backdrop-blur">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
                       ✓ Completada
                     </span>
                   )}
                   {inDev && (
-                    <span className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/70">
                       Próximamente
                     </span>
                   )}
@@ -192,7 +194,7 @@ function SolutionsList() {
                     className="card-orb-alive relative flex h-full w-full items-center justify-center"
                     style={{
                       background:
-                        "radial-gradient(120% 120% at 50% 30%, var(--secondary) 0%, var(--card) 72%)",
+                        "radial-gradient(120% 120% at 50% 30%, #2a1054 0%, #0a0910 72%)",
                     }}
                   >
                     <div
