@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Input } from "@/components/ui/input";
 import { CATEGORIES, DIFFICULTY_LABEL, type CategoryKey, type Difficulty } from "@/lib/categories";
+import { Paywall } from "@/components/Paywall";
 
 // Cards premium estilo Apple: portada (cover_image_url) o placeholder
 // monocromo con el monograma "IA". Cero color por categoría / íconos AI.
@@ -16,8 +17,16 @@ export const Route = createFileRoute("/_authenticated/solutions/")({
   validateSearch: (s: Record<string, unknown>): SolutionsSearch => ({
     mode: s.mode === "builder" ? "builder" : undefined,
   }),
-  component: SolutionsList,
+  component: SolutionsGate,
 });
+
+function SolutionsGate() {
+  return (
+    <Paywall feature="catalogo">
+      <SolutionsList />
+    </Paywall>
+  );
+}
 
 function SolutionsList() {
   Route.useSearch();

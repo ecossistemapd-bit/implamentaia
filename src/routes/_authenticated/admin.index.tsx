@@ -15,6 +15,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Trash2, Pencil, GraduationCap, ChevronRight } from "lucide-react";
+import { PLAN_LABEL, PLAN_ORDER, PLANS, type PlanKey } from "@/lib/plans";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminPanel,
@@ -128,6 +129,7 @@ type UserRow = {
   role: string;
   created_at: string;
   tickets: number;
+  plan_key?: PlanKey;
 };
 
 // ── TicketCell — edición inline de tickets por usuario ─────────
@@ -224,7 +226,16 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_list_users" as never);
       if (error) throw error;
-      return (data ?? []) as unknown as UserRow[];
+      const list = (data ?? []) as unknown as UserRow[];
+      if (list.length === 0) return list;
+      const { data: plans } = await supabase
+        .from("profiles")
+        .select("id, plan_key")
+        .in("id", list.map((u) => u.id));
+      const planMap = new Map(
+        ((plans ?? []) as Array<{ id: string; plan_key: PlanKey }>).map((p) => [p.id, p.plan_key]),
+      );
+      return list.map((u) => ({ ...u, plan_key: planMap.get(u.id) ?? ("starter" as PlanKey) }));
     },
   });
 
@@ -251,6 +262,25 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
     qc.invalidateQueries({ queryKey: ["admin-users"] });
   };
 
+  const updatePlan = async (id: string, newPlan: PlanKey) => {
+    // Al cambiar a Enterprise, setear tickets de mentoría a la cuota del plan.
+    // Para otros planes, resetear a 0.
+    const mentorshipTickets = PLANS[newPlan].quotas.mentorshipTicketsPerMonth;
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        plan_key: newPlan,
+        mentorship_tickets_remaining: mentorshipTickets,
+      })
+      .eq("id", id);
+    if (error) {
+      toast.error("Error: " + error.message, { duration: 4000 });
+      return;
+    }
+    toast.success(`✓ Plan actualizado a ${PLAN_LABEL[newPlan]}`, { duration: 4000 });
+    qc.invalidateQueries({ queryKey: ["admin-users"] });
+  };
+
   return (
     <div className="mt-6">
       <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -270,6 +300,7 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Empresa</th>
               <th className="px-4 py-3">Rol</th>
+              <th className="px-4 py-3">Plan</th>
               <th className="px-4 py-3">Tickets</th>
               <th className="px-4 py-3">Registro</th>
               <th className="px-4 py-3 text-right">Acción</th>
@@ -277,9 +308,9 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
           </thead>
           <tbody className="divide-y divide-gray-100">
             {isLoading ? (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-xs text-gray-400">Cargando…</td></tr>
+              <tr><td colSpan={8} className="px-4 py-10 text-center text-xs text-gray-400">Cargando…</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-xs text-gray-400">Sin resultados.</td></tr>
+              <tr><td colSpan={8} className="px-4 py-10 text-center text-xs text-gray-400">Sin resultados.</td></tr>
             ) : (
               filtered.map((u) => (
                 <tr key={u.id} className="hover:bg-gray-50">
@@ -301,6 +332,21 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
                         <SelectItem value="user">Usuario</SelectItem>
                         <SelectItem value="implementador">Implementador</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Select
+                      value={u.plan_key ?? "starter"}
+                      onValueChange={(v) => updatePlan(u.id, v as PlanKey)}
+                    >
+                      <SelectTrigger className="h-7 w-fit gap-1 border border-gray-200 px-2 text-xs">
+                        <SelectValue>{PLAN_LABEL[u.plan_key ?? "starter"]}</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PLAN_ORDER.map((k) => (
+                          <SelectItem key={k} value={k}>{PLAN_LABEL[k]}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </td>

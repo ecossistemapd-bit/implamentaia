@@ -24,11 +24,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Paywall } from "@/components/Paywall";
 
 // ── Route ──────────────────────────────────────────────────────
 export const Route = createFileRoute("/_authenticated/mentoria/")({
-  component: MentoriaPage,
+  component: MentoriaGate,
 });
+
+function MentoriaGate() {
+  return (
+    <Paywall feature="mentorias">
+      <MentoriaPage />
+    </Paywall>
+  );
+}
 
 // ── Types ──────────────────────────────────────────────────────
 interface Mentor {
