@@ -1,0 +1,246 @@
+/* ============================================================
+ * LunaAssistant — chat flotante con Luna.
+ * Theme-aware vía tokens del design system (no rompe app-*).
+ * ============================================================ */
+
+/* ── FAB (floating action button) ──────────────────────────── */
+.luna-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px 10px 10px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1px solid var(--violet-border);
+  box-shadow:
+    0 8px 24px -8px rgba(139, 92, 246, 0.32),
+    0 0 0 1px rgba(139, 92, 246, 0.08) inset;
+  cursor: pointer;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 280ms ease,
+              border-color 280ms ease;
+}
+.luna-fab:hover {
+  transform: translateY(-2px);
+  border-color: var(--violet-border-hover);
+  box-shadow:
+    0 16px 32px -8px rgba(139, 92, 246, 0.48),
+    0 0 0 1px rgba(139, 92, 246, 0.16) inset;
+}
+.luna-fab-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+  letter-spacing: 0.01em;
+}
+.luna-fab-pulse {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--violet-text);
+  box-shadow: 0 0 12px var(--violet-text);
+  animation: luna-fab-pulse 2.2s ease-in-out infinite;
+}
+@keyframes luna-fab-pulse {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(1.5); }
+}
+
+/* ── PANEL ─────────────────────────────────────────────────── */
+.luna-panel {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  height: 580px;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+  overflow: hidden;
+  animation: luna-panel-in 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes luna-panel-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.luna-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  background:
+    radial-gradient(90% 80% at 50% 0%, var(--violet-pill-bg), transparent 70%),
+    transparent;
+}
+
+/* ── Messages area ──────────────────────────────────────────── */
+.luna-panel-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+}
+.luna-panel-messages::-webkit-scrollbar { width: 6px; }
+.luna-panel-messages::-webkit-scrollbar-thumb {
+  background: var(--violet-pill-border);
+  border-radius: 3px;
+}
+
+.luna-msg { display: flex; }
+.luna-msg--user { justify-content: flex-end; }
+.luna-msg--assistant { justify-content: flex-start; }
+
+.luna-msg-bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.luna-msg--user .luna-msg-bubble {
+  background: var(--cta-primary-bg);
+  color: var(--cta-primary-text);
+  border-bottom-right-radius: 4px;
+}
+.luna-msg--assistant .luna-msg-bubble {
+  background: var(--violet-pill-bg);
+  color: var(--foreground);
+  border: 1px solid var(--violet-pill-border);
+  border-bottom-left-radius: 4px;
+}
+
+.luna-typing {
+  display: inline-block;
+  letter-spacing: 2px;
+  color: var(--violet-text);
+  animation: luna-typing-dots 1.4s ease-in-out infinite;
+}
+@keyframes luna-typing-dots {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
+.luna-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--violet-text);
+  animation: luna-cursor-blink 1s steps(2) infinite;
+}
+@keyframes luna-cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* ── Empty state ────────────────────────────────────────────── */
+.luna-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 16px;
+}
+
+.luna-quick-prompt {
+  width: 100%;
+  padding: 9px 13px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  text-align: left;
+  background: var(--cta-ghost-bg);
+  border: 1px solid var(--violet-pill-border);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background 220ms ease, border-color 220ms ease, color 220ms ease;
+}
+.luna-quick-prompt:hover {
+  background: var(--violet-pill-bg);
+  border-color: var(--violet-border-hover);
+  color: var(--foreground);
+}
+
+/* ── Input area ─────────────────────────────────────────────── */
+.luna-panel-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+
+.luna-input {
+  flex: 1;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: var(--cta-ghost-bg);
+  border: 1px solid var(--violet-pill-border);
+  color: var(--foreground);
+  font-size: 13.5px;
+  transition: border-color 220ms ease, background 220ms ease;
+}
+.luna-input::placeholder { color: var(--muted-foreground); }
+.luna-input:focus {
+  outline: none;
+  border-color: var(--violet-border-hover);
+  background: var(--violet-pill-bg);
+}
+.luna-input:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.luna-send {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  width: 38px;
+  border-radius: 10px;
+  background: var(--cta-primary-bg);
+  color: var(--cta-primary-text);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 220ms ease, transform 220ms ease;
+}
+.luna-send:hover:not(:disabled) {
+  background: var(--cta-primary-bg-hover);
+  transform: translateY(-1px);
+}
+.luna-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Responsive: full-screen panel en mobile ─────────────────── */
+@media (max-width: 640px) {
+  .luna-panel {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100vw;
+    max-width: 100vw;
+    height: 92vh;
+    border-radius: 16px 16px 0 0;
+  }
+  .luna-fab {
+    bottom: 16px;
+    right: 16px;
+  }
+}
