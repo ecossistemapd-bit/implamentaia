@@ -258,7 +258,7 @@ function DesktopSidebar({ collapsed }: { collapsed: boolean }) {
         collapsed ? "w-[54px]" : "w-[220px]"
       }`}
     >
-      <aside className="flex h-full w-[220px] flex-col border-r border-sidebar-border bg-sidebar">
+      <aside className="flex h-full w-full flex-col border-r border-sidebar-border bg-sidebar">
         {/* Header: logo completo en normal, solo ThemeToggle centrado en rail */}
         {collapsed ? (
           <div className="flex h-[74px] items-center justify-center shrink-0">
