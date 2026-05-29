@@ -31,8 +31,11 @@ export function Paywall({ feature, children }: Props) {
         {children}
       </div>
 
-      <div className="absolute inset-0 z-10 flex items-center justify-center px-6 py-12">
-        <div className="app-card relative max-w-md p-8 text-center">
+      {/* Overlay fixed: el CTA queda arriba de la viewport, siempre visible
+       * incluso al scrollear la página blureada de fondo.
+       * lg:left-[220px] respeta el sidebar autenticado. */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 bottom-0 z-10 flex items-start justify-center px-6 pt-16 md:pt-20 lg:left-[220px]">
+        <div className="app-card pointer-events-auto relative max-w-md p-8 text-center shadow-2xl shadow-black/40">
           <div
             className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full"
             style={{
