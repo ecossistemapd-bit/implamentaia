@@ -205,34 +205,49 @@ export type Database = {
       courses: {
         Row: {
           category: string | null
+          coming_soon: boolean
           created_at: string
           description: string | null
+          format: string | null
           id: string
+          instructor_name: string | null
           is_published: boolean
           level: string | null
           order_index: number
+          section_key: string | null
+          student_count: number
           thumbnail_url: string | null
           title: string
         }
         Insert: {
           category?: string | null
+          coming_soon?: boolean
           created_at?: string
           description?: string | null
+          format?: string | null
           id?: string
+          instructor_name?: string | null
           is_published?: boolean
           level?: string | null
           order_index?: number
+          section_key?: string | null
+          student_count?: number
           thumbnail_url?: string | null
           title: string
         }
         Update: {
           category?: string | null
+          coming_soon?: boolean
           created_at?: string
           description?: string | null
+          format?: string | null
           id?: string
+          instructor_name?: string | null
           is_published?: boolean
           level?: string | null
           order_index?: number
+          section_key?: string | null
+          student_count?: number
           thumbnail_url?: string | null
           title?: string
         }
@@ -273,6 +288,168 @@ export type Database = {
           total_rows?: number
         }
         Relationships: []
+      }
+      lessons: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          module_id: string
+          order_index: number
+          thumbnail_url: string | null
+          title: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          module_id: string
+          order_index?: number
+          thumbnail_url?: string | null
+          title: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          module_id?: string
+          order_index?: number
+          thumbnail_url?: string | null
+          title?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentores: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          full_name: string
+          id: string
+          is_active: boolean
+          role: string
+          specialties: string[]
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          is_active?: boolean
+          role: string
+          specialties?: string[]
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          role?: string
+          specialties?: string[]
+        }
+        Relationships: []
+      }
+      mentoria_bookings: {
+        Row: {
+          attended: boolean
+          booked_at: string
+          id: string
+          mentoria_id: string
+          ticket_consumed: boolean
+          user_id: string
+          week_date: string
+        }
+        Insert: {
+          attended?: boolean
+          booked_at?: string
+          id?: string
+          mentoria_id: string
+          ticket_consumed?: boolean
+          user_id: string
+          week_date: string
+        }
+        Update: {
+          attended?: boolean
+          booked_at?: string
+          id?: string
+          mentoria_id?: string
+          ticket_consumed?: boolean
+          user_id?: string
+          week_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentoria_bookings_mentoria_id_fkey"
+            columns: ["mentoria_id"]
+            isOneToOne: false
+            referencedRelation: "mentorias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentorias: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          duration_minutes: number
+          id: string
+          is_active: boolean
+          meeting_url: string | null
+          mentor_id: string | null
+          starts_at: string
+          time_slot: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          meeting_url?: string | null
+          mentor_id?: string | null
+          starts_at: string
+          time_slot: string
+          title?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          meeting_url?: string | null
+          mentor_id?: string | null
+          starts_at?: string
+          time_slot?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentorias_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       modules: {
         Row: {
@@ -323,9 +500,13 @@ export type Database = {
           full_name: string | null
           id: string
           industry: string | null
+          mentorship_tickets_period_start: string
+          mentorship_tickets_remaining: number
           onboarding_completed: boolean | null
+          plan_key: string
           role: string | null
           team_size: string | null
+          tickets: number
           updated_at: string
         }
         Insert: {
@@ -335,9 +516,13 @@ export type Database = {
           full_name?: string | null
           id: string
           industry?: string | null
+          mentorship_tickets_period_start?: string
+          mentorship_tickets_remaining?: number
           onboarding_completed?: boolean | null
+          plan_key?: string
           role?: string | null
           team_size?: string | null
+          tickets?: number
           updated_at?: string
         }
         Update: {
@@ -347,9 +532,13 @@ export type Database = {
           full_name?: string | null
           id?: string
           industry?: string | null
+          mentorship_tickets_period_start?: string
+          mentorship_tickets_remaining?: number
           onboarding_completed?: boolean | null
+          plan_key?: string
           role?: string | null
           team_size?: string | null
+          tickets?: number
           updated_at?: string
         }
         Relationships: []
@@ -623,24 +812,34 @@ export type Database = {
           completed: boolean
           completed_at: string | null
           id: string
-          module_id: string
+          lesson_id: string | null
+          module_id: string | null
           user_id: string
         }
         Insert: {
           completed?: boolean
           completed_at?: string | null
           id?: string
-          module_id: string
+          lesson_id?: string | null
+          module_id?: string | null
           user_id: string
         }
         Update: {
           completed?: boolean
           completed_at?: string | null
           id?: string
-          module_id?: string
+          lesson_id?: string | null
+          module_id?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_progress_module_id_fkey"
             columns: ["module_id"]
@@ -664,10 +863,23 @@ export type Database = {
           full_name: string
           id: string
           role: string
+          tickets: number
         }[]
       }
-      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      admin_set_user_tickets: {
+        Args: { p_tickets: number; p_user_id: string }
+        Returns: undefined
+      }
+      consume_mentorship_ticket: { Args: never; Returns: boolean }
+      consume_ticket_for_mentoria: {
+        Args: { p_mentoria_id: string; p_week_date: string }
+        Returns: Json
+      }
+      is_admin:
+        | { Args: never; Returns: boolean }
+        | { Args: { _user_id: string }; Returns: boolean }
       is_implementer_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      reset_mentorship_tickets: { Args: never; Returns: undefined }
       run_daily_backup: { Args: never; Returns: Json }
       send_weekly_backup_email: { Args: never; Returns: undefined }
     }
