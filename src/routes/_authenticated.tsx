@@ -16,7 +16,10 @@ import {
   ChevronRight,
   ChevronLeft,
   HeartHandshake,
+  Lock,
 } from "lucide-react";
+import type { PlanFeatureKey } from "@/lib/plans";
+import { usePlan } from "@/hooks/use-plan";
 
 /* ------------------------------------------------------------------
  * Sidebar custom icons (subpartes nombradas → animaciones temáticas).
@@ -146,6 +149,8 @@ type NavItem = {
   badge?: string;
   implOnly?: boolean;
   adminOnly?: boolean;
+  /** Si está seteado y el plan no la incluye, aparece con candadito. */
+  feature?: PlanFeatureKey;
 };
 
 type NavSection = { label: string; items: NavItem[] };
@@ -155,7 +160,7 @@ const SECTIONS: NavSection[] = [
     label: "Inicio",
     items: [
       { to: "/dashboard", label: "Dashboard", icon: IconDashboardGrid, navClass: "nav-dashboard" },
-      { to: "/solutions", label: "Soluciones", icon: IconStarSoluciones, navClass: "nav-soluciones" },
+      { to: "/solutions", label: "Soluciones", icon: IconStarSoluciones, navClass: "nav-soluciones", feature: "catalogo" },
     ],
   },
   {
@@ -171,7 +176,7 @@ const SECTIONS: NavSection[] = [
       { to: "/projects", label: "Mis Proyectos", icon: IconFolderProyectos, navClass: "nav-proyectos" },
       { to: "/builder", label: "Builder", icon: IconWandBuilder, navClass: "nav-builder", badge: "NUEVO" },
       { to: "/contratar-experto", label: "Contratar Experto", icon: HeartHandshake },
-      { to: "/mentoria", label: "Mentoría", icon: IconClockMentoria, navClass: "nav-mentorias" },
+      { to: "/mentoria", label: "Mentoría", icon: IconClockMentoria, navClass: "nav-mentorias", feature: "mentorias" },
       { to: "/implementador", label: "Panel Impl.", icon: LayoutDashboard, implOnly: true },
       { to: "/admin", label: "Admin", icon: Settings2, adminOnly: true },
     ],
@@ -294,6 +299,7 @@ function MobileTopBar() {
 function NavList() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { isImplementer, isAdmin } = useRole();
+  const { hasFeature } = usePlan();
   const [cursosVisited, setCursosVisited] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem("cursos_visited") === "true";
@@ -334,15 +340,17 @@ function NavList() {
                 pathname === item.to ||
                 (item.to !== "/dashboard" && pathname.startsWith(item.to));
               const Icon = item.icon;
+              const locked = !!item.feature && !hasFeature(item.feature);
               return (
                 <Link
                   key={item.label}
                   to={item.to}
+                  title={locked ? "Función bloqueada por tu plan" : undefined}
                   className={`${item.navClass ?? ""} group flex items-center gap-2.5 rounded-lg border-l-2 px-3 py-2 text-[13px] transition-colors duration-200 ${
                     active
                       ? "border-primary bg-primary/[0.08] font-medium text-foreground"
                       : "border-transparent font-normal text-muted-foreground hover:bg-white/[0.08] hover:text-foreground"
-                  }`}
+                  } ${locked ? "opacity-60" : ""}`}
                 >
                   <Icon
                     className={`h-[18px] w-[18px] shrink-0 ${
@@ -353,7 +361,10 @@ function NavList() {
                     strokeWidth={1.75}
                   />
                   <span>{item.label}</span>
-                  {item.badge && (
+                  {locked && (
+                    <Lock className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
+                  )}
+                  {!locked && item.badge && (
                     <span className="ml-auto rounded-md border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
                       {item.badge}
                     </span>
