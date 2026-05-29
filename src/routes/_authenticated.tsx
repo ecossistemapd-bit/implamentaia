@@ -224,7 +224,7 @@ function AuthenticatedLayout() {
       <button
         onClick={toggleSidebar}
         title={sidebarCollapsed ? "Mostrar panel" : "Ocultar panel"}
-        style={{ left: sidebarCollapsed ? 0 : 220, transition: "left 300ms ease-in-out" }}
+        style={{ left: sidebarCollapsed ? 54 : 220, transition: "left 300ms ease-in-out" }}
         className="fixed top-1/2 z-50 hidden -translate-y-1/2 lg:flex h-14 w-[14px] items-center justify-center rounded-r-md border border-l-0 border-border bg-sidebar text-muted-foreground hover:text-foreground hover:bg-white/[0.08] transition-colors duration-200"
       >
         {sidebarCollapsed
@@ -246,19 +246,30 @@ function AuthenticatedLayout() {
 
 function DesktopSidebar({ collapsed }: { collapsed: boolean }) {
   return (
-    // overflow-hidden clipea el contenido limpiamente al colapsar — sin sangrado de fondo
     <div
       className={`hidden lg:block shrink-0 sticky top-0 h-screen overflow-hidden transition-[width] duration-300 ease-in-out ${
-        collapsed ? "w-0" : "w-[220px]"
+        collapsed ? "w-[54px]" : "w-[220px]"
       }`}
     >
       <aside className="flex h-full w-[220px] flex-col border-r border-sidebar-border bg-sidebar">
-        <div className="flex items-center justify-between px-5 py-5 shrink-0">
-          <Logo />
-          <ThemeToggle />
-        </div>
-        <NavList />
-        <UserMenu />
+        {/* Header: logo completo en normal, solo ThemeToggle centrado en rail */}
+        {collapsed ? (
+          <div className="flex h-[74px] items-center justify-center shrink-0">
+            <ThemeToggle />
+          </div>
+        ) : (
+          <div className="flex items-center justify-between px-5 py-5 shrink-0">
+            <Logo />
+            <ThemeToggle />
+          </div>
+        )}
+        <NavList collapsed={collapsed} />
+        {/* UserMenu solo en modo expandido */}
+        {collapsed ? (
+          <div className="border-t border-sidebar-border h-[56px] shrink-0" />
+        ) : (
+          <UserMenu />
+        )}
       </aside>
     </div>
   );
@@ -288,7 +299,7 @@ function MobileTopBar() {
   );
 }
 
-function NavList() {
+function NavList({ collapsed = false }: { collapsed?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { isImplementer, isAdmin } = useRole();
   const [cursosVisited, setCursosVisited] = useState(() => {
@@ -318,6 +329,36 @@ function NavList() {
     [isImplementer, isAdmin, cursosVisited],
   );
 
+  /* ── Icon rail (sidebar colapsada) ── */
+  if (collapsed) {
+    const allItems = sections.flatMap((sec) => sec.items);
+    return (
+      <nav className="flex-1 overflow-y-auto py-2 flex flex-col gap-0.5">
+        {allItems.map((item) => {
+          const active =
+            pathname === item.to ||
+            (item.to !== "/dashboard" && pathname.startsWith(item.to));
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.label}
+              to={item.to}
+              title={item.label}
+              className={`${item.navClass ?? ""} flex items-center justify-center mx-1.5 h-9 rounded-lg transition-colors duration-200 ${
+                active
+                  ? "bg-primary/[0.08] text-primary"
+                  : "text-muted-foreground hover:bg-white/[0.08] hover:text-foreground"
+              }`}
+            >
+              <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} />
+            </Link>
+          );
+        })}
+      </nav>
+    );
+  }
+
+  /* ── Vista completa (sidebar expandida) ── */
   return (
     <nav className="flex-1 overflow-y-auto px-3 pb-4">
       {sections.map((sec) => (
