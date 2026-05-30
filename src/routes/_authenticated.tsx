@@ -230,7 +230,7 @@ function AuthenticatedLayout() {
       <button
         onClick={toggleSidebar}
         title={sidebarCollapsed ? "Mostrar panel" : "Ocultar panel"}
-        style={{ left: sidebarCollapsed ? 54 : 220, transition: "left 300ms ease-in-out" }}
+        style={{ left: sidebarCollapsed ? 60 : 220, transition: "left 300ms ease-in-out" }}
         className="fixed top-1/2 z-50 hidden -translate-y-1/2 lg:flex h-14 w-[14px] items-center justify-center rounded-r-md border border-l-0 border-border bg-sidebar text-sidebar-foreground/55 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors duration-200"
       >
         {sidebarCollapsed
@@ -255,14 +255,23 @@ function DesktopSidebar({ collapsed }: { collapsed: boolean }) {
   return (
     <div
       className={`hidden lg:block shrink-0 sticky top-0 h-screen overflow-hidden transition-[width] duration-300 ease-in-out ${
-        collapsed ? "w-[54px]" : "w-[220px]"
+        collapsed ? "w-[60px]" : "w-[220px]"
       }`}
     >
       <aside className="flex h-full w-full flex-col border-r border-sidebar-border bg-sidebar">
-        {/* Header: logo completo en normal, solo ThemeToggle centrado en rail */}
+        {/* Header */}
         {collapsed ? (
-          <div className="flex h-[74px] items-center justify-center shrink-0">
-            <ThemeToggle />
+          /* Rail: logo mini (icon-only) arriba */
+          <div className="flex h-[74px] flex-col items-center justify-center gap-2 shrink-0 border-b border-sidebar-border/40">
+            <Link to="/" aria-label="Implementa IA" className="flex h-9 w-9 items-center justify-center rounded-lg transition-opacity hover:opacity-80">
+              <svg viewBox="0 0 64 64" className="h-7 w-auto text-foreground" fill="currentColor" aria-hidden>
+                <path d="M3 60 L15 60 L29 10 L23 6 Z" />
+                <path d="M61 60 L49 60 L35 10 L41 6 Z" />
+                <path d="M22 60 L29 60 L33 28 L29 24 Z" />
+                <path d="M42 60 L35 60 L31 28 L35 24 Z" />
+                <path d="M32 0 L39 14 L32 28 L25 14 Z" />
+              </svg>
+            </Link>
           </div>
         ) : (
           <div className="flex items-center justify-between px-5 py-5 shrink-0">
@@ -271,13 +280,60 @@ function DesktopSidebar({ collapsed }: { collapsed: boolean }) {
           </div>
         )}
         <NavList collapsed={collapsed} />
-        {/* UserMenu solo en modo expandido */}
+        {/* Footer */}
         {collapsed ? (
-          <div className="border-t border-sidebar-border h-[56px] shrink-0" />
+          /* Rail: ThemeToggle + avatar mini */
+          <RailFooter />
         ) : (
           <UserMenu />
         )}
       </aside>
+    </div>
+  );
+}
+
+/* Footer del rail (sidebar colapsada) — ThemeToggle + avatar mini con inicial. */
+function RailFooter() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const email = user?.email ?? "";
+  const initial = email.charAt(0).toUpperCase() || "U";
+
+  return (
+    <div className="flex flex-col items-center gap-2 border-t border-sidebar-border/40 py-3 shrink-0">
+      <div className="flex h-9 w-9 items-center justify-center">
+        <ThemeToggle />
+      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="flex h-9 w-9 items-center justify-center rounded-full transition-all hover:scale-105"
+            style={{
+              background: "var(--violet-pill-bg)",
+              border: "1px solid var(--violet-pill-border)",
+              color: "var(--violet-text-strong)",
+            }}
+            title={email || "Mi cuenta"}
+            aria-label="Menú de cuenta"
+          >
+            <span className="text-[12px] font-semibold">{initial}</span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="right" className="w-56">
+          <DropdownMenuItem onSelect={() => navigate({ to: "/settings" })}>
+            <SettingsIcon className="mr-2 h-4 w-4" /> Configuración
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onSelect={async () => {
+              await supabase.auth.signOut();
+              navigate({ to: "/" });
+            }}
+          >
+            <LogOut className="mr-2 h-4 w-4" /> Cerrar sesión
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
@@ -337,31 +393,67 @@ function NavList({ collapsed = false }: { collapsed?: boolean }) {
     [isImplementer, isAdmin, cursosVisited],
   );
 
-  /* ── Icon rail (sidebar colapsada) ── */
+  /* ── Icon rail (sidebar colapsada) — con separadores entre secciones ── */
   if (collapsed) {
-    const allItems = sections.flatMap((sec) => sec.items);
     return (
-      <nav className="flex-1 overflow-y-auto py-2 flex flex-col gap-0.5">
-        {allItems.map((item) => {
-          const active =
-            pathname === item.to ||
-            (item.to !== "/dashboard" && pathname.startsWith(item.to));
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.label}
-              to={item.to}
-              title={item.label}
-              className={`${item.navClass ?? ""} flex items-center justify-center mx-1.5 h-9 rounded-lg transition-colors duration-200 ${
-                active
-                  ? "bg-sidebar-primary/[0.10] text-sidebar-primary"
-                  : "text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              }`}
-            >
-              <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} />
-            </Link>
-          );
-        })}
+      <nav className="flex-1 overflow-y-auto py-3 flex flex-col gap-1">
+        {sections.map((sec, secIdx) => (
+          <div key={sec.label} className="flex flex-col gap-0.5">
+            {/* Separador sutil entre secciones (no antes de la primera) */}
+            {secIdx > 0 && (
+              <div className="mx-3 my-1.5 h-px bg-sidebar-border/40" aria-hidden />
+            )}
+            {sec.items.map((item) => {
+              const active =
+                pathname === item.to ||
+                (item.to !== "/dashboard" && pathname.startsWith(item.to));
+              const locked = !!item.feature && !hasFeature(item.feature);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  title={locked ? `${item.label} (bloqueado por tu plan)` : item.label}
+                  className={`${item.navClass ?? ""} group relative flex items-center justify-center mx-2 h-10 rounded-lg transition-all duration-200 ${
+                    active
+                      ? "text-foreground"
+                      : "text-sidebar-foreground/60 hover:text-sidebar-foreground"
+                  } ${locked ? "opacity-50" : ""}`}
+                  style={
+                    active
+                      ? {
+                          background: "var(--violet-pill-bg)",
+                          border: "1px solid var(--violet-pill-border)",
+                        }
+                      : undefined
+                  }
+                >
+                  {/* Indicador violeta vertical para el item activo */}
+                  {active && (
+                    <span
+                      className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[2px] rounded-r"
+                      style={{ background: "var(--violet-text)" }}
+                      aria-hidden
+                    />
+                  )}
+                  <Icon
+                    className="h-[20px] w-[20px] shrink-0 transition-colors"
+                    strokeWidth={active ? 2 : 1.75}
+                    style={active ? { color: "var(--violet-text)" } : undefined}
+                  />
+                  {/* Badge "NUEVO" / "PRÓXIMAMENTE" como pip violeta en esquina */}
+                  {item.badge && !active && (
+                    <span
+                      className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full"
+                      style={{ background: "var(--violet-text)", boxShadow: "0 0 6px var(--violet-text)" }}
+                      aria-hidden
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
     );
   }
