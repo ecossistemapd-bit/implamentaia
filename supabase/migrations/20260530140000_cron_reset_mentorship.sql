@@ -30,7 +30,14 @@ select cron.schedule(
 );
 
 -- Cómo verificar después de aplicar:
+--
+--   -- Ver el job programado (jobname es columna de cron.job):
 --   select * from cron.job where jobname = 'reset_mentorship_tickets_monthly';
---   select * from cron.job_run_details
---     where jobname = 'reset_mentorship_tickets_monthly'
---     order by start_time desc limit 10;
+--
+--   -- Ver historial de ejecuciones (cron.job_run_details NO tiene jobname,
+--   -- hay que joinear por jobid):
+--   select jrd.start_time, jrd.status, jrd.return_message
+--   from cron.job_run_details jrd
+--   join cron.job j on j.jobid = jrd.jobid
+--   where j.jobname = 'reset_mentorship_tickets_monthly'
+--   order by jrd.start_time desc limit 10;
