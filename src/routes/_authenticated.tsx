@@ -219,9 +219,15 @@ function AuthenticatedLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div
+      className={`flex min-h-screen bg-background text-foreground ${
+        sidebarCollapsed ? "sidebar-collapsed" : ""
+      }`}
+    >
       {/* Wash violeta atmosférico global — visible en TODAS las rutas autenticadas.
-       * Theme-aware (alpha sube en light, baja en dark). Fixed → no scroll. */}
+       * Theme-aware (alpha sube en light, baja en dark). Fixed → no scroll.
+       * La clase sidebar-collapsed (arriba) hace que el wash llene los 220px
+       * que el sidebar deja libres al colapsarse. */}
       <div className="app-violet-wash" aria-hidden />
 
       <DesktopSidebar collapsed={sidebarCollapsed} />
