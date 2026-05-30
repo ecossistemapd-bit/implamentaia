@@ -239,7 +239,7 @@ function CourseRowItem({
   onDelete: () => void;
 }) {
   const navigate = useNavigate();
-  const coverUrl = useCourseCover(course.thumbnail_url);
+  const coverUrl = useCourseCover(course.thumbnail_url).url;
   const sectionLabel = SECTIONS.find((s) => s.key === course.section_key)?.label ?? "—";
 
   return (

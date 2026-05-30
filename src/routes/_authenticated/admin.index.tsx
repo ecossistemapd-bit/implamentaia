@@ -43,6 +43,15 @@ const ROLE_LABEL: Record<string, string> = {
   admin: "Admin",
 };
 
+// Badge styling para el dropdown Plan (mismo patrón que ROLE_BADGE).
+// Starter = neutral / Pro = violeta de marca / Enterprise = premium dorado.
+const PLAN_BADGE: Record<string, string> = {
+  starter: "bg-gray-100 text-gray-600 border border-gray-200",
+  pro: "bg-violet-50 text-violet-700 border border-violet-200",
+  enterprise:
+    "bg-gradient-to-r from-amber-50 to-amber-100 text-amber-800 border border-amber-200",
+};
+
 function AdminPanel() {
   const { role, loading: roleLoading, isAdmin } = useRole();
   const navigate = useNavigate();
@@ -340,7 +349,11 @@ function UsersTab({ onViewProjects }: { onViewProjects: (uid: string) => void })
                       value={u.plan_key ?? "starter"}
                       onValueChange={(v) => updatePlan(u.id, v as PlanKey)}
                     >
-                      <SelectTrigger className="h-7 w-fit gap-1 border border-gray-200 px-2 text-xs">
+                      <SelectTrigger
+                        className={`h-7 w-fit gap-1 border-0 px-2 text-xs font-semibold ${
+                          PLAN_BADGE[u.plan_key ?? "starter"] ?? PLAN_BADGE.starter
+                        }`}
+                      >
                         <SelectValue>{PLAN_LABEL[u.plan_key ?? "starter"]}</SelectValue>
                       </SelectTrigger>
                       <SelectContent>
