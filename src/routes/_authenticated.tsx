@@ -261,16 +261,27 @@ function DesktopSidebar({ collapsed }: { collapsed: boolean }) {
       <aside className="flex h-full w-full flex-col border-r border-sidebar-border bg-sidebar">
         {/* Header */}
         {collapsed ? (
-          /* Rail: logo mini (icon-only) arriba */
-          <div className="flex h-[74px] flex-col items-center justify-center gap-2 shrink-0 border-b border-sidebar-border/40">
-            <Link to="/" aria-label="Implementa IA" className="flex h-9 w-9 items-center justify-center rounded-lg transition-opacity hover:opacity-80">
-              <svg viewBox="0 0 64 64" className="h-7 w-auto text-foreground" fill="currentColor" aria-hidden>
-                <path d="M3 60 L15 60 L29 10 L23 6 Z" />
-                <path d="M61 60 L49 60 L35 10 L41 6 Z" />
-                <path d="M22 60 L29 60 L33 28 L29 24 Z" />
-                <path d="M42 60 L35 60 L31 28 L35 24 Z" />
-                <path d="M32 0 L39 14 L32 28 L25 14 Z" />
-              </svg>
+          /* Rail: logo MINI (icon-only) — usa el MISMO PNG oficial que el Logo component */
+          <div className="flex h-[74px] items-center justify-center shrink-0 border-b border-sidebar-border/40">
+            <Link
+              to="/"
+              aria-label="Implementa IA"
+              className="flex h-9 w-9 items-center justify-center rounded-lg transition-opacity hover:opacity-80"
+            >
+              <span
+                aria-hidden
+                className="block h-7 w-7 bg-current text-foreground"
+                style={{
+                  WebkitMaskImage: 'url("/logo-implementa.png")',
+                  maskImage: 'url("/logo-implementa.png")',
+                  WebkitMaskSize: "contain",
+                  maskSize: "contain",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskPosition: "center",
+                  maskPosition: "center",
+                }}
+              />
             </Link>
           </div>
         ) : (
