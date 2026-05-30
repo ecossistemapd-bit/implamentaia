@@ -569,6 +569,15 @@
   transition: width 500ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Shimmer para skeletons de portadas (mientras se obtiene el signed URL) */
+@keyframes cover-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [style*="cover-shimmer"] { animation: none !important; }
+}
+
 /* Hero stats — chips premium con número grande arriba + label uppercase abajo.
  * Usados en la Hero card del dashboard para mostrar 3-4 métricas clave (match, ROI, ahorro).
  * Theme-aware vía tokens violet-*. */

@@ -23,6 +23,23 @@ type Props = {
   onClick?: () => void;
 };
 
+/** Skeleton sutil con shimmer mientras se obtiene el signed URL. */
+function CoverSkeleton() {
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-card">
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.08) 50%, transparent 100%)",
+          backgroundSize: "200% 100%",
+          animation: "cover-shimmer 1.4s ease-in-out infinite",
+        }}
+      />
+    </div>
+  );
+}
+
 function FallbackCover({ title }: { title: string }) {
   const initial = (title.charAt(0) || "·").toUpperCase();
   return (
@@ -53,7 +70,7 @@ export function CourseCard({ course, progress, onClick }: Props) {
   const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
   const inProgress = progress.done > 0 && !course.coming_soon;
   const hasModules = progress.total > 0;
-  const coverUrl = useCourseCover(course.thumbnail_url);
+  const { url: coverUrl, isLoading: coverLoading } = useCourseCover(course.thumbnail_url);
 
   return (
     <button
@@ -70,6 +87,8 @@ export function CourseCard({ course, progress, onClick }: Props) {
             style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
             loading="lazy"
           />
+        ) : coverLoading ? (
+          <CoverSkeleton />
         ) : (
           <FallbackCover title={course.title} />
         )}

@@ -19,7 +19,7 @@ type Props = {
 export function ThumbnailUpload({ value, uploadPath, onChange, className = "" }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
-  const previewUrl = useCourseCover(value);
+  const previewUrl = useCourseCover(value).url;
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith("image/")) {

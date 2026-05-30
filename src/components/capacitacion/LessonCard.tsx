@@ -57,7 +57,7 @@ export function LessonCard({
   onClick,
 }: Props) {
   const thumb = lesson.thumbnail_url ?? courseFallbackThumbnail;
-  const coverUrl = useCourseCover(thumb);
+  const { url: coverUrl, isLoading: coverLoading } = useCourseCover(thumb);
   const numberLabel = String(displayNumber).padStart(2, "0");
 
   return (
@@ -74,6 +74,18 @@ export function LessonCard({
             style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
             loading="lazy"
           />
+        ) : coverLoading ? (
+          <div className="relative h-full w-full overflow-hidden bg-card">
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.08) 50%, transparent 100%)",
+                backgroundSize: "200% 100%",
+                animation: "cover-shimmer 1.4s ease-in-out infinite",
+              }}
+            />
+          </div>
         ) : (
           <FallbackCover title={lesson.title} />
         )}
