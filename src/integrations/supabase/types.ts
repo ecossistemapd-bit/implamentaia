@@ -495,6 +495,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           company_name: string | null
           created_at: string
           full_name: string | null
@@ -505,12 +506,15 @@ export type Database = {
           onboarding_completed: boolean | null
           plan_key: string
           role: string | null
+          role_title: string | null
           team_size: string | null
           tickets: number
           updated_at: string
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           company_name?: string | null
           created_at?: string
           full_name?: string | null
@@ -521,12 +525,15 @@ export type Database = {
           onboarding_completed?: boolean | null
           plan_key?: string
           role?: string | null
+          role_title?: string | null
           team_size?: string | null
           tickets?: number
           updated_at?: string
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           company_name?: string | null
           created_at?: string
           full_name?: string | null
@@ -537,9 +544,11 @@ export type Database = {
           onboarding_completed?: boolean | null
           plan_key?: string
           role?: string | null
+          role_title?: string | null
           team_size?: string | null
           tickets?: number
           updated_at?: string
+          website?: string | null
         }
         Relationships: []
       }
